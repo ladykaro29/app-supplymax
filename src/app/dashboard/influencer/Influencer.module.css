@@ -1,0 +1,183 @@
+.container {
+  min-height: 100vh;
+  padding-top: 100px;
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 5%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 3rem;
+}
+
+.welcome h1 {
+  font-size: 3rem;
+}
+
+.welcome h1 span {
+  color: var(--color-accent);
+}
+
+.welcome p {
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
+}
+
+.badge {
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 800;
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.statCard {
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.statCard h3 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.tokenCount {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--color-accent);
+  margin-bottom: 0.5rem;
+}
+
+.conversion {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.withdrawBtn {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  font-weight: 800;
+}
+
+.withdrawBtn:disabled {
+  background: rgba(255,255,255,0.1);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.percentage {
+  font-size: 4rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  margin-top: 1.5rem;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background: var(--color-accent);
+  box-shadow: 0 0 10px var(--color-accent);
+}
+
+.code {
+  font-size: 2.5rem;
+  font-weight: 900;
+  border: 2px dashed var(--color-accent);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  color: var(--color-accent);
+}
+
+.copyBtn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* Performance Section */
+.performance {
+  margin-top: 4rem;
+}
+
+.performance h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.metaInfo {
+  display: flex;
+  justify-content: space-around;
+  padding: 3rem;
+  border-radius: 20px;
+}
+
+.metaStat {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.metaStat span {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.metaStat strong {
+  font-size: 2.5rem;
+  font-weight: 900;
+}
+
+.warning {
+  margin-top: 1.5rem;
+  color: var(--color-error);
+  font-weight: 600;
+  text-align: center;
+}
+
+.unauthorized {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.errorContent {
+  text-align: center;
+}
+
+.errorContent h1 {
+  font-size: 3rem;
+  color: var(--color-error);
+}

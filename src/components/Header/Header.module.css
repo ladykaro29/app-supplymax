@@ -1,0 +1,174 @@
+.header {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  max-width: 1200px;
+  z-index: 1000;
+  padding: 0.75rem 2rem;
+  display: flex;
+  align-items: center;
+  border-radius: 50px !important;
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.logo {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.brandName {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.brandName span {
+  color: var(--color-accent);
+}
+
+.nav {
+  display: flex;
+  gap: 2rem;
+  font-weight: 500;
+}
+
+.nav a:hover {
+  color: var(--color-accent);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.currencyToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.currencyToggle span {
+  color: var(--color-text-muted);
+  transition: var(--transition-fast);
+}
+
+.currencyToggle span.active {
+  color: var(--color-accent);
+}
+
+.toggleTrack {
+  width: 40px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  position: relative;
+  border: 1px solid var(--glass-border);
+}
+
+.toggleThumb {
+  width: 14px;
+  height: 14px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0 10px var(--color-accent-glow);
+}
+
+.toggleRight {
+  transform: translateX(20px);
+}
+
+.cartIcon {
+  position: relative;
+  font-size: 1.25rem;
+}
+
+.cartCount {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  font-size: 0.65rem;
+  font-weight: 900;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.loginBtn {
+  background: var(--color-primary);
+  color: var(--color-bg);
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.loginBtn:hover {
+  background: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px var(--color-accent-glow);
+}
+
+.userMenu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profileLink {
+  color: var(--color-accent);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.logoutBtn {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-muted);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+}
+
+.logoutBtn:hover {
+  background: var(--color-error);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .nav {
+    display: none;
+  }
+}

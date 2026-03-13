@@ -1,0 +1,232 @@
+.container {
+  min-height: 100vh;
+}
+
+.hero {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5%;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 70% 30%, rgba(0, 229, 255, 0.05) 0%, transparent 50%);
+}
+
+.heroContent {
+  flex: 1;
+  z-index: 2;
+  max-width: 600px;
+}
+
+.badge {
+  display: inline-block;
+  background: var(--color-accent-glow);
+  color: var(--color-accent);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--color-accent);
+}
+
+.heroContent h1 {
+  font-size: 5rem;
+  line-height: 0.9;
+  margin-bottom: 1.5rem;
+  font-weight: 900;
+}
+
+.heroContent h1 span {
+  color: var(--color-accent);
+  text-shadow: 0 0 30px var(--color-accent-glow);
+}
+
+.heroContent p {
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+.heroActions {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.primaryBtn {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  padding: 1rem 2.5rem;
+  border-radius: 30px;
+  font-weight: 800;
+  font-size: 1rem;
+  text-transform: uppercase;
+  box-shadow: 0 10px 20px var(--color-accent-glow);
+}
+
+.primaryBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px var(--color-accent-glow);
+}
+
+.secondaryBtn {
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  padding: 1rem 2.5rem;
+  border-radius: 30px;
+  font-weight: 800;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.secondaryBtn:hover {
+  background: var(--color-primary);
+  color: var(--color-bg);
+}
+
+.heroImage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.glowCircle {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--color-accent-glow) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse 4s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+/* Featured Section */
+.featured {
+  padding: var(--spacing-xl) 5%;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.sectionHeader h2 {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.sectionHeader h2 span {
+  color: var(--color-accent);
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.productCard {
+  padding: 1.5rem;
+  position: relative;
+  transition: var(--transition-fast);
+}
+
+.productCard:hover {
+  transform: translateY(-10px);
+  border-color: var(--color-accent);
+}
+
+.productBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--color-bg-alt);
+  padding: 0.25rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.productImagePlaceholder {
+  height: 250px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.productInfo .category {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.productInfo h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.price {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--color-accent);
+  margin-bottom: 1.5rem;
+}
+
+.addToCart {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.addToCart:hover {
+  background: var(--color-primary);
+  color: var(--color-bg);
+}
+
+.productImage {
+  object-fit: contain;
+  transition: transform 0.5s ease;
+}
+
+.productCard:hover .productImage {
+  transform: scale(1.1) rotate(5deg);
+}
+
+@media (max-width: 1024px) {
+  .heroContent h1 {
+    font-size: 3.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding-top: 120px;
+  }
+  .heroActions {
+    justify-content: center;
+  }
+  .heroImage {
+    display: none;
+  }
+}
