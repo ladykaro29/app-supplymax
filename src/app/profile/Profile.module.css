@@ -1,0 +1,186 @@
+.container {
+  min-height: 100vh;
+  padding: 120px 5% 5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 3rem;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+}
+
+.header h1 span {
+  color: var(--color-accent);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 3rem;
+}
+
+/* Sidebar Profile */
+.profileCard {
+  padding: 2.5rem;
+  text-align: center;
+  height: fit-content;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  background: var(--color-accent-glow);
+  color: var(--color-accent);
+  border-radius: 50%;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 900;
+  border: 2px solid var(--color-accent);
+}
+
+.profileCard h2 {
+  margin-bottom: 0.5rem;
+}
+
+.email {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  border-top: 1px solid var(--glass-border);
+  padding-top: 2rem;
+}
+
+.statItem span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.statItem strong {
+  font-size: 1.25rem;
+  color: var(--color-accent);
+}
+
+/* Orders List */
+.ordersSection h2 {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.orderCard {
+  padding: 2rem;
+  border-radius: 20px;
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.orderId {
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+.status {
+  padding: 0.25rem 1rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--color-accent-glow);
+  color: var(--color-accent);
+}
+
+.orderItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.itemLine {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+}
+
+.orderFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.reorderBtn {
+  padding: 0.6rem 1.25rem;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+/* Re-buy Alert Area */
+.reminderSection {
+  grid-column: 1 / -1;
+  margin-bottom: 3rem;
+}
+
+.reminderCard {
+  padding: 2.5rem;
+  background: linear-gradient(90deg, var(--color-accent-glow) 0%, transparent 100%);
+  border-left: 5px solid var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.reminderText h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.buyNowBtn {
+  padding: 1rem 2rem;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border-radius: 12px;
+  font-weight: 900;
+  box-shadow: 0 10px 20px var(--color-accent-glow);
+}
+
+.emptyOrders {
+  text-align: center;
+  padding: 5rem;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -11,30 +11,32 @@ const FEATURED_PRODUCTS = [
   {
     id: 1,
     name: "Pure Whey Impact",
-    image: "/protein.png", // We'll link these to the generated assets later
+    image: "/protein.png",
     price: 49.99,
     category: "Proteína",
-    goal: "Ganancia"
+    goal: "Ganancia" as any,
+    description: "Proteína de suero de alta calidad."
   },
   {
     id: 2,
     name: "Creatine Micronized",
     image: "/creatine.png",
-    price: 29.99,
+    price: 34.99,
     category: "Aminoácidos",
-    goal: "Fuerza"
+    goal: "Ganancia" as any,
+    description: "Creatina pura."
   }
 ];
 
 export default function Home() {
-  const { formatPrice } = useAppContext();
+  const { formatPrice, addToCart } = useAppContext();
 
   return (
     <div className={styles.container}>
       <Header />
       
       <main>
-        {/* Hero Section */}
+        {/* ... hero ... */}
         <section className={styles.hero}>
           <div className={styles.heroContent}>
             <span className={styles.badge}>Nuevo Arribo: Supplymax Elite</span>
@@ -79,7 +81,12 @@ export default function Home() {
                   <span className={styles.category}>{product.category}</span>
                   <h3>{product.name}</h3>
                   <div className={styles.price}>{formatPrice(product.price)}</div>
-                  <button className={styles.addToCart}>Añadir al Carrito</button>
+                  <button 
+                    className={styles.addToCart}
+                    onClick={() => addToCart(product as any)}
+                  >
+                    Añadir al Carrito
+                  </button>
                 </div>
               </div>
             ))}

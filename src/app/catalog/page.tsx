@@ -8,7 +8,7 @@ import Image from 'next/image';
 import styles from './Catalog.module.css';
 
 export default function CatalogPage() {
-  const { formatPrice } = useAppContext();
+  const { formatPrice, addToCart } = useAppContext();
   const [activeCategory, setActiveCategory] = useState<string>('Todos');
   const [activeGoal, setActiveGoal] = useState<string>('Todos');
 
@@ -83,7 +83,12 @@ export default function CatalogPage() {
                   <span className={styles.category}>{product.category}</span>
                   <h3>{product.name}</h3>
                   <div className={styles.price}>{formatPrice(product.price)}</div>
-                  <button className={styles.addToCart}>Añadir al Carrito</button>
+                  <button 
+                    className={styles.addToCart}
+                    onClick={() => addToCart(product)}
+                  >
+                    Añadir al Carrito
+                  </button>
                 </div>
               </div>
             ))}

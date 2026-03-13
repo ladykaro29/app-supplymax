@@ -7,7 +7,7 @@ import { useAppContext } from '@/context/AppContext';
 import styles from './Header.module.css';
 
 export default function Header() {
-  const { currency, toggleCurrency, user, logout } = useAppContext();
+  const { currency, toggleCurrency, user, logout, cart } = useAppContext();
 
   return (
     <header className={`${styles.header} glass`}>
@@ -38,9 +38,9 @@ export default function Header() {
             <span className={currency === 'VES' ? styles.active : ''}>BS</span>
           </div>
           
-          <Link href="/cart" className={styles.cartIcon}>
+          <Link href="/checkout" className={styles.cartIcon}>
             🛒
-            <span className={styles.cartCount}>0</span>
+            <span className={styles.cartCount}>{cart.length}</span>
           </Link>
           
           {user ? (

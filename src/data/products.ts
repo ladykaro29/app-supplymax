@@ -6,6 +6,7 @@ export interface Product {
   price: number;
   image: string;
   description: string;
+  durationInDays?: number; // Estimated consumption days for re-buy alert
 }
 
 export const PRODUCTS: Product[] = [
@@ -16,7 +17,8 @@ export const PRODUCTS: Product[] = [
     goal: "Ganancia",
     price: 49.99,
     image: "/protein.png",
-    description: "Proteína de suero de alta calidad para máxima recuperación muscular."
+    description: "Proteína de suero de alta calidad para máxima recuperación muscular.",
+    durationInDays: 30
   },
   {
     id: 2,
@@ -25,7 +27,8 @@ export const PRODUCTS: Product[] = [
     goal: "Ganancia",
     price: 34.99,
     image: "/creatine.png",
-    description: "Creatina pura para aumentar fuerza y volumen muscular."
+    description: "Creatina pura para aumentar fuerza y volumen muscular.",
+    durationInDays: 60
   },
   {
     id: 3,
@@ -34,7 +37,8 @@ export const PRODUCTS: Product[] = [
     goal: "Definición",
     price: 29.99,
     image: "/amino.png",
-    description: "Mezcla optimizada de aminoácidos para recuperación durante la dieta."
+    description: "Mezcla optimizada de aminoácidos para recuperación durante la dieta.",
+    durationInDays: 45
   },
   {
     id: 4,
