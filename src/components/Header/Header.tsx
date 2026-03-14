@@ -45,7 +45,7 @@ export default function Header() {
           
           {user ? (
             <div className={styles.userMenu}>
-              <Link href={user.role === 'Influencer' ? '/dashboard/influencer' : '/profile'} className={styles.profileLink}>
+              <Link href={user.role === 'Admin' ? '/dashboard/admin' : user.role === 'Influencer' ? '/dashboard/influencer' : '/profile'} className={styles.profileLink}>
                 {user.name}
               </Link>
               <button onClick={logout} className={styles.logoutBtn}>✖</button>

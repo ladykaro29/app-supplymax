@@ -14,6 +14,8 @@ export default function LoginPage() {
     login(role);
     if (role === 'Influencer') {
       router.push('/dashboard/influencer');
+    } else if (role === 'Admin') {
+      router.push('/dashboard/admin');
     } else {
       router.push('/');
     }
