@@ -43,6 +43,8 @@ interface AppContextType {
   clearCart: () => void;
   completeOrder: () => void;
   cartTotal: number;
+  isCartOpen: boolean;
+  setCartOpen: (open: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -113,6 +115,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     clearCart();
   };
 
+  const [isCartOpen, setCartOpen] = useState(false);
+
   const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   const formatPrice = (usdPrice: number) => {
@@ -141,7 +145,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         removeFromCart,
         clearCart,
         completeOrder,
-        cartTotal
+        cartTotal,
+        isCartOpen,
+        setCartOpen
       }}
     >
       {children}

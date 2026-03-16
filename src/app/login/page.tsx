@@ -5,6 +5,7 @@ import Header from '@/components/Header/Header';
 import { useAppContext } from '@/context/AppContext';
 import { useRouter } from 'next/navigation';
 import styles from './Login.module.css';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const { login } = useAppContext();
@@ -26,32 +27,45 @@ export default function LoginPage() {
       <Header />
       
       <div className={styles.loginCardOuter}>
-        <div className={`${styles.loginCard} glass`}>
-          <h1>Bienvenido a <span>Supplymax</span></h1>
-          <p>Tu rendimiento empieza aquí.</p>
+        <div className={styles.loginCard}>
+          <div className={styles.logoGlow}>
+             <Image src="/logo.jpg" alt="Logo" width={60} height={60} />
+          </div>
+          <h1>Iniciar Sesión</h1>
+          <p>Accede a tu cuenta de Supply Max</p>
           
-          <div className={styles.socialButtons}>
-            <button className={styles.googleBtn} onClick={() => handleMockLogin('User')}>
-              <img src="https://www.google.com/favicon.ico" alt="Google" />
-              Continuar con Google
-            </button>
-            <button className={styles.facebookBtn} onClick={() => handleMockLogin('User')}>
-              <img src="https://www.facebook.com/favicon.ico" alt="FB" />
-              Continuar con Facebook
+          <div className={styles.form}>
+            <div className={styles.inputGroup}>
+              <label>Usuario o Email</label>
+              <input type="text" placeholder="Tu nombre de usuario o email" className={styles.input} />
+            </div>
+            
+            <div className={styles.inputGroup}>
+              <label>Contraseña</label>
+              <input type="password" placeholder="Tu contraseña" className={styles.input} />
+            </div>
+            
+            <span className={styles.forgot}>¿Olvidaste tu contraseña?</span>
+            
+            <button className={styles.submitBtn} onClick={() => handleMockLogin('User')}>
+              INICIAR SESIÓN
             </button>
           </div>
 
-          <div className={styles.divider}>
-            <span>O accede como</span>
+          <div className={styles.roleSection}>
+            <h4>¿Eres profesional o promotor?</h4>
+            <div className={styles.roleButtons}>
+              <button className={styles.roleBtn} onClick={() => handleMockLogin('Influencer')}>
+                🏆 Soy Coach
+              </button>
+              <button className={styles.roleBtn} onClick={() => handleMockLogin('Influencer')}>
+                💰 Quiero ser Afiliado
+              </button>
+            </div>
           </div>
 
-          <div className={styles.roleButtons}>
-            <button className={`${styles.roleBtn} glass`} onClick={() => handleMockLogin('Influencer')}>
-              Soy Influencer
-            </button>
-            <button className={`${styles.roleBtn} glass`} onClick={() => handleMockLogin('Admin')}>
-              Admin (Demo)
-            </button>
+          <div className={styles.register}>
+            ¿No tienes cuenta? <span>Crear Cuenta</span>
           </div>
         </div>
       </div>

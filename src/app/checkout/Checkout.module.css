@@ -1,23 +1,96 @@
 .container {
   min-height: 100vh;
-  padding: 120px 5% 5rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding-top: 100px;
 }
 
 .layout {
   display: grid;
   grid-template-columns: 1fr 400px;
-  gap: 3rem;
+  gap: 4rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 5%;
 }
 
 .section {
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
 }
 
 .section h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--color-accent);
+  padding-left: 1rem;
+}
+
+.shippingToggles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.shippingBtn {
+  padding: 20px;
+  border: 1px solid var(--glass-border);
+  background: var(--color-bg-alt);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  color: white;
+}
+
+.shippingBtn span {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.shippingBtn.active {
+  border-color: var(--color-accent);
+  background: var(--color-accent-glow);
+}
+
+.agencyData {
+  padding: 2rem;
+  border-radius: var(--radius-sm);
+  margin-top: 2rem;
+}
+
+.agencySelect {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.agencySelect button {
+  padding: 8px 20px;
+  border: 1px solid var(--glass-border);
+  font-size: 0.8rem;
+  color: white;
+}
+
+.agencySelect button.activeAgency {
+  background: white;
+  color: black;
+  border-color: white;
+}
+
+.input {
+  width: 100%;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--glass-border);
+  padding: 15px;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.note {
+  font-size: 0.8rem;
   color: var(--color-accent);
 }
 
@@ -88,8 +161,16 @@
   background: var(--color-bg-alt);
 }
 
+.paymentBlock {
+  padding: 2rem;
+  border-radius: var(--radius-sm);
+}
+
 .bankData {
-  margin-bottom: 2rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-sm);
 }
 
 .bankData p {
@@ -116,61 +197,74 @@
 }
 
 .uploadBtn {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background: var(--color-primary);
-  color: var(--color-bg);
-  border-radius: 8px;
+  width: 100%;
+  padding: 15px;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
   font-weight: 700;
-  cursor: pointer;
-  margin-top: 1rem;
 }
 
 /* Summary Card */
-.summaryCard {
-  padding: 2rem;
+.summary {
+  background: var(--color-bg-alt);
+  padding: 3rem;
+  border: 1px solid var(--glass-border);
   height: fit-content;
   position: sticky;
   top: 120px;
+}
+
+.summary h3 {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 1rem;
 }
 
 .summaryItem {
   display: flex;
   justify-content: space-between;
   margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
 }
 
-.total {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--glass-border);
-  font-size: 1.5rem;
-  font-weight: 900;
+.finalTotal {
+  margin-top: 3rem;
+  border-top: 2px solid white;
+  padding-top: 2rem;
+}
+
+.amount {
+  font-size: 1.8rem;
+  font-family: 'Oswald', sans-serif;
   color: var(--color-accent);
+  margin-top: 10px;
 }
 
-.checkoutBtn {
+.finishBtn {
   width: 100%;
-  padding: 1.25rem;
+  padding: 20px;
   background: var(--color-accent);
-  color: var(--color-bg);
-  border-radius: 12px;
+  color: black;
+  margin-top: 3rem;
   font-weight: 900;
-  font-size: 1.1rem;
-  margin-top: 2rem;
-  box-shadow: 0 10px 20px var(--color-accent-glow);
+  font-size: 1rem;
 }
 
-.checkoutBtn:disabled {
-  opacity: 0.5;
+.finishBtn:disabled {
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .layout {
     grid-template-columns: 1fr;
   }
-  .summaryCard {
+  .shippingToggles {
+    grid-template-columns: 1fr;
+  }
+  .summary {
     position: static;
   }
 }

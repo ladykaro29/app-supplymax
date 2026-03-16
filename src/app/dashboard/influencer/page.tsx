@@ -38,7 +38,7 @@ export default function InfluencerDashboard() {
 
         <section className={styles.statsGrid}>
           {/* Token Card */}
-          <div className={`${styles.statCard} glass glow`}>
+          <div className={`${styles.statCard} glass neon-glow`}>
             <h3>Saldo de Tokens</h3>
             <div className={styles.tokenCount}>
               🪙 {user.tokens?.toLocaleString()}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
+import CartDrawer from '@/components/CartDrawer/CartDrawer';
 
 export const metadata: Metadata = {
   title: "Supplymax | Premium Sports Nutrition & Apparel",
@@ -40,6 +41,7 @@ export default function RootLayout({
       <body>
         <AppProvider>
           {children}
+          <CartDrawer />
         </AppProvider>
       </body>
     </html>

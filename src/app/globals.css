@@ -1,21 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
   /* Brand Colors */
-  --color-bg: #001B3B;
-  --color-bg-alt: #002B5B;
+  --color-bg: #0A0A0A;
+  --color-bg-alt: #1A1A1A;
   --color-primary: #FFFFFF;
-  --color-accent: #00E5FF;
-  --color-accent-glow: rgba(0, 229, 255, 0.4);
+  --color-accent: #00D1FF;
+  --color-accent-glow: rgba(0, 209, 255, 0.4);
   --color-text: #FFFFFF;
-  --color-text-muted: #A0AEC0;
-  --color-success: #10B981;
-  --color-error: #F56565;
+  --color-text-muted: #888888;
+  --color-success: #00FF94;
+  --color-error: #FF3B3B;
   
-  /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-blur: blur(12px);
+  /* UI Elements */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(16px);
 
   /* Spacing */
   --spacing-xs: 0.5rem;
@@ -25,8 +25,13 @@
   --spacing-xl: 8rem;
 
   /* Transitions */
-  --transition-fast: 0.2s ease;
-  --transition-slow: 0.5s ease;
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Border Radius */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
 }
 
 * {
@@ -41,12 +46,14 @@ body {
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 a {
@@ -59,13 +66,15 @@ button {
   cursor: pointer;
   border: none;
   background: none;
-  font-family: inherit;
+  font-family: 'Oswald', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   transition: var(--transition-fast);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -74,7 +83,7 @@ button {
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-bg-alt);
-  border-radius: 4px;
+  border-radius: 0px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -86,9 +95,16 @@ button {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
-  border-radius: 16px;
+  border-radius: var(--radius-md);
 }
 
-.glow {
-  box-shadow: 0 0 20px var(--color-accent-glow);
+.neon-glow {
+  box-shadow: 0 0 15px var(--color-accent-glow);
+  border-color: var(--color-accent);
+}
+
+.container-wide {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 5%;
 }

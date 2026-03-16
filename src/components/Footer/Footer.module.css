@@ -1,0 +1,94 @@
+.footer {
+  background: #050505;
+  border-top: 1px solid var(--glass-border);
+  padding-top: 80px;
+  margin-top: 100px;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 5%;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 4rem;
+}
+
+.brandInfo .logo {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  letter-spacing: 2px;
+}
+
+.brandInfo .logo span {
+  color: var(--color-accent);
+}
+
+.brandInfo p {
+  color: var(--color-text-muted);
+  max-width: 300px;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+.socials a {
+  color: white;
+  opacity: 0.6;
+  transition: var(--transition-fast);
+}
+
+.socials a:hover {
+  color: var(--color-accent);
+  opacity: 1;
+}
+
+.linksColumn h4 {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.linksColumn ul {
+  list-style: none;
+}
+
+.linksColumn li {
+  margin-bottom: 1rem;
+}
+
+.linksColumn a {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.linksColumn a:hover {
+  color: var(--color-accent);
+}
+
+.linksColumn p {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.bottomBar {
+  margin-top: 80px;
+  padding: 30px 0;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.3);
+}
+
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,148 +1,147 @@
 .container {
   min-height: 100vh;
-  padding: 120px 5% 5rem;
-  max-width: 1200px;
+}
+
+.dashboardLayout {
+  display: flex;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
-.header {
-  margin-bottom: 3rem;
+.content {
+  flex: 1;
+  padding: 60px 5%;
 }
 
-.header h1 {
-  font-size: 2.5rem;
+.pageHeader {
+  margin-bottom: 4rem;
 }
 
-.header h1 span {
+.pageHeader h1 {
+  font-size: 3rem;
+  font-family: 'Oswald', sans-serif;
+}
+
+.pageHeader h1 span {
   color: var(--color-accent);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 3rem;
-}
-
-/* Sidebar Profile */
-.profileCard {
-  padding: 2.5rem;
-  text-align: center;
-  height: fit-content;
-}
-
-.avatar {
-  width: 100px;
-  height: 100px;
-  background: var(--color-accent-glow);
-  color: var(--color-accent);
-  border-radius: 50%;
-  margin: 0 auto 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5rem;
-  font-weight: 900;
-  border: 2px solid var(--color-accent);
-}
-
-.profileCard h2 {
-  margin-bottom: 0.5rem;
-}
-
-.email {
+.pageHeader p {
   color: var(--color-text-muted);
-  font-size: 0.9rem;
-  margin-bottom: 2rem;
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  border-top: 1px solid var(--glass-border);
-  padding-top: 2rem;
-}
-
-.statItem span {
-  display: block;
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-}
-
-.statItem strong {
-  font-size: 1.25rem;
-  color: var(--color-accent);
-}
-
-/* Orders List */
-.ordersSection h2 {
-  margin-bottom: 2rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.ordersList {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.orderCard {
-  padding: 2rem;
-  border-radius: 20px;
-}
-
-.orderHeader {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-}
-
-.orderId {
-  font-weight: 800;
-  color: var(--color-accent);
-}
-
-.status {
-  padding: 0.25rem 1rem;
-  border-radius: 50px;
+  letter-spacing: 2px;
   font-size: 0.8rem;
   font-weight: 700;
-  background: var(--color-accent-glow);
+}
+
+.overviewGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.infoCard {
+  padding: 3rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-alt);
+}
+
+.infoCard h3 {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2rem;
+}
+
+.bigValue {
+  font-size: 4rem;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 900;
+  margin-bottom: 1rem;
+}
+
+.levelBadge {
+  font-size: 2.5rem;
+  font-family: 'Oswald', sans-serif;
   color: var(--color-accent);
+  margin-bottom: 1rem;
 }
 
-.orderItems {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+.actionBtn {
+  margin-top: 2rem;
+  padding: 12px 30px;
+  background: white;
+  color: black;
+  font-weight: 700;
+  font-size: 0.8rem;
 }
 
-.itemLine {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.95rem;
+.progressBar {
+  height: 6px;
+  background: rgba(255,255,255,0.05);
+  margin-top: 2rem;
 }
 
-.orderFooter {
+.progress {
+  height: 100%;
+  background: var(--color-accent);
+  box-shadow: 0 0 10px var(--color-accent-glow);
+}
+
+.recentActivity {
+  border-top: 1px solid var(--glass-border);
+  padding-top: 4rem;
+}
+
+.sectionHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255,255,255,0.05);
+  margin-bottom: 2rem;
 }
 
-.reorderBtn {
-  padding: 0.6rem 1.25rem;
-  background: var(--color-accent);
-  color: var(--color-bg);
-  border-radius: 8px;
-  font-weight: 800;
-  font-size: 0.85rem;
+.sectionHeader h2 {
+  font-size: 1.5rem;
 }
 
+.sectionHeader button {
+  font-size: 0.8rem;
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.orderStrip {
+  background: #0D0D0D;
+  border: 1px solid var(--glass-border);
+  padding: 20px 40px;
+}
+
+.latestOrder {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.latestOrder span {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.empty {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 1024px) {
+  .dashboardLayout {
+    flex-direction: column;
+  }
+  .overviewGrid {
+    grid-template-columns: 1fr;
+  }
+}
 /* Re-buy Alert Area */
 .reminderSection {
   grid-column: 1 / -1;
@@ -183,4 +182,89 @@
   .grid {
     grid-template-columns: 1fr;
   }
+}
+
+.addressGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.defaultBadge {
+  font-size: 0.65rem;
+  background: var(--color-accent);
+  color: black;
+  padding: 2px 8px;
+  font-weight: 800;
+}
+
+.miniBtn {
+  font-size: 0.7rem;
+  color: var(--color-accent);
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.addAddressCard {
+  border: 1px dashed var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--color-text-muted);
+  transition: var(--transition-fast);
+  background: transparent;
+}
+
+.addAddressCard:hover {
+  border-color: var(--color-accent);
+  color: white;
+}
+
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.orderHeaderCompact {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding-bottom: 1rem;
+}
+
+.statusBadge {
+  font-size: 0.7rem;
+  padding: 4px 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.itemListCompact {
+  margin-bottom: 2rem;
+}
+
+.itemRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.orderTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 1rem;
+}
+
+.orderTotal strong {
+  font-size: 1.2rem;
+  color: var(--color-accent);
 }
