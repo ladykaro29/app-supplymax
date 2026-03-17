@@ -2,11 +2,11 @@ export interface Product {
   id: number;
   name: string;
   category: string;
-  goal: 'Ganancia' | 'Definición' | 'Energía' | 'General';
+  goal: string;
   price: number;
   image: string;
   description: string;
-  durationInDays?: number; // Estimated consumption days for re-buy alert
+  durationInDays?: number | null;
 }
 
 export const PRODUCTS: Product[] = [

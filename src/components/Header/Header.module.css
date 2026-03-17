@@ -95,7 +95,7 @@
   padding: 12px 15px 12px 45px;
   color: white;
   font-family: 'Inter', sans-serif;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   transition: var(--transition-fast);
 }
 
@@ -148,7 +148,7 @@
   background: var(--color-accent);
   color: black;
   padding: 8px 16px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   font-weight: 700;
   font-size: 0.85rem;
 }
@@ -238,7 +238,7 @@
   background: var(--color-primary);
   color: var(--color-bg);
   padding: 0.5rem 1.5rem;
-  border-radius: 25px;
+  border-radius: 30px;
   font-weight: 700;
   font-size: 0.9rem;
 }

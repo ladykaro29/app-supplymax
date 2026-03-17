@@ -1,6 +1,5 @@
 .container {
   min-height: 100vh;
-  padding-top: 100px;
 }
 
 .main {
@@ -114,13 +113,62 @@
   color: var(--color-accent);
 }
 
+.influencerTools {
+  margin-bottom: 3rem;
+}
+
+.promoCode {
+  font-size: 3rem;
+  font-family: 'Oswald', sans-serif;
+  color: var(--color-accent);
+  letter-spacing: 2px;
+  margin-bottom: 1rem;
+}
+
 .copyBtn {
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 12px;
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  font-weight: 700;
+  margin-top: 1.5rem;
+  padding: 10px 20px;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.copyBtn:hover {
+  background: var(--color-accent);
+  color: black;
+}
+
+.metaSection {
+  border-top: 1px solid var(--glass-border);
+  padding-top: 3rem;
+}
+
+.metaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.metaBox {
+  background: #0D0D0D;
+  padding: 2rem;
+  border: 1px solid var(--glass-border);
+  text-align: center;
+}
+
+.metaBox span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.metaBox strong {
+  font-size: 2rem;
+  font-family: 'Oswald', sans-serif;
+  color: white;
 }
 
 /* Performance Section */

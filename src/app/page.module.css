@@ -89,7 +89,7 @@
   padding: 20px 45px;
   font-size: 1.1rem;
   font-weight: 700;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
 }
 
 .btnPrimary {
@@ -130,14 +130,22 @@
   gap: 3rem;
 }
 
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
 .productCard {
   padding: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--color-bg-alt);
   border: 1px solid var(--glass-border);
-  transition: var(--transition-fast);
+  transition: transform 0.3s ease, border-color 0.3s ease;
   overflow: hidden;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .productCard:hover {
@@ -175,10 +183,16 @@
   font-weight: 900;
   text-transform: uppercase;
   z-index: 5;
+  border-radius: var(--radius-sm);
 }
 
 .productInfo {
-  padding: 2rem;
+  padding: 2rem 2rem 0;
+  flex: 1;
+}
+
+.infoAction {
+  padding: 0 2rem 2rem;
 }
 
 .productInfo .category {
@@ -211,6 +225,7 @@
   font-size: 0.9rem;
   background: transparent;
   transition: var(--transition-fast);
+  border-radius: var(--radius-sm);
 }
 
 .addBtn:hover {

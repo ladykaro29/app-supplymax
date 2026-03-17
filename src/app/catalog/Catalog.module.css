@@ -43,6 +43,7 @@
   color: var(--color-text-muted);
   font-size: 0.9rem;
   white-space: nowrap;
+  border-radius: var(--radius-md);
 }
 
 .filterBtn.active {
@@ -57,16 +58,26 @@
   gap: 2rem;
 }
 
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
 .productCard {
   background: var(--color-bg-alt);
   border: 1px solid var(--glass-border);
-  transition: var(--transition-fast);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
 }
 
 .productCard:hover {
-  border-color: var(--color-accent);
   transform: translateY(-5px);
+  border-color: var(--color-accent);
 }
 
 .imageArea {
@@ -114,6 +125,7 @@
   border: 1px solid rgba(255,255,255,0.1);
   color: white;
   font-size: 0.8rem;
+  border-radius: var(--radius-sm);
 }
 
 .addBtn:hover {

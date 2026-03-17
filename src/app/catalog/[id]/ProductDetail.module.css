@@ -1,0 +1,242 @@
+.container {
+  min-height: 100vh;
+}
+
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 120px 5% 80px;
+}
+
+.breadcrumb {
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  color: var(--color-text-muted);
+  margin-bottom: 3rem;
+  font-weight: 700;
+}
+
+.activeBr {
+  color: white;
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.imageSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mainImageWrapper {
+  background: #0D0D0D;
+  border: 1px solid var(--glass-border);
+  padding: 60px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--radius-lg);
+}
+
+.goalBadge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: var(--color-accent);
+  color: black;
+  font-size: 0.7rem;
+  font-weight: 900;
+  padding: 4px 12px;
+  letter-spacing: 1px;
+  border-radius: var(--radius-sm);
+}
+
+.mainImage {
+  object-fit: contain;
+  filter: drop-shadow(0 0 30px rgba(0, 209, 255, 0.2));
+  transition: transform 0.5s ease;
+}
+
+.mainImage:hover {
+  transform: scale(1.05);
+}
+
+.thumbnails {
+  display: flex;
+  gap: 15px;
+}
+
+.thumb {
+  width: 80px;
+  height: 80px;
+  background: #0D0D0D;
+  border: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.thumb:hover {
+  border-color: var(--color-accent);
+}
+
+.thumb.active {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 10px var(--color-accent-glow);
+}
+
+.placeholderThumb {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.infoSection {
+  padding-top: 20px;
+}
+
+.category {
+  color: var(--color-accent);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.title {
+  font-size: 3.5rem;
+  font-family: 'Oswald', sans-serif;
+  line-height: 1;
+  margin-bottom: 2rem;
+}
+
+.priceContainer {
+  margin-bottom: 2.5rem;
+}
+
+.mainPrice {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: white;
+}
+
+.vesConversion {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin-top: 0.5rem;
+}
+
+.description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  margin-bottom: 3rem;
+  max-width: 500px;
+}
+
+.purchaseArea {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 4rem;
+}
+
+.quantitySelector {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--glass-border);
+  background: #0D0D0D;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.quantitySelector button {
+  width: 50px;
+  height: 60px;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.quantitySelector button:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.quantitySelector span {
+  width: 50px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.addBtn {
+  flex: 1;
+  background: var(--color-accent);
+  color: black;
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  transition: var(--transition-fast);
+  border-radius: var(--radius-md);
+}
+
+.addBtn:hover {
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 209, 255, 0.3);
+}
+
+.shippingInfo {
+  border-top: 1px solid var(--glass-border);
+  padding-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 3rem;
+}
+
+.shipItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.shipItem svg {
+  color: var(--color-accent);
+}
+
+.trustBadges {
+  display: flex;
+  gap: 20px;
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 8px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 1024px) {
+  .productGrid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .title {
+    font-size: 2.5rem;
+  }
+  .purchaseArea {
+    flex-direction: column;
+  }
+}
