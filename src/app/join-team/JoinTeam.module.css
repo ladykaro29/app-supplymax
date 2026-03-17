@@ -1,0 +1,193 @@
+.main {
+  min-height: 100vh;
+  padding: 120px 5% 80px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.pageHeader h1 {
+  font-size: 4rem;
+  margin: 0;
+}
+
+.pageHeader h1 span {
+  color: var(--color-accent);
+}
+
+.choiceGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+
+.choiceCard {
+  padding: 4rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid var(--glass-border);
+}
+
+.choiceCard:hover {
+  transform: translateY(-10px);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 30px var(--color-accent-glow);
+}
+
+.icon {
+  font-size: 4rem;
+  margin-bottom: 2rem;
+}
+
+.choiceCard h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.choiceCard p {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.selectBtn {
+  background: var(--color-accent);
+  color: black;
+  padding: 12px 30px;
+  font-weight: 700;
+  border-radius: 4px;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  animation: slideIn 0.5s ease-out;
+}
+
+.backLink {
+  color: var(--color-accent);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.benefits {
+  padding: 3rem;
+  border-left: 4px solid var(--color-accent);
+}
+
+.benefits h2 {
+  margin-bottom: 2rem;
+}
+
+.benefitList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.benefitItem ul {
+  list-style: none;
+  margin-top: 1rem;
+}
+
+.benefitItem li {
+  margin-bottom: 8px;
+  color: var(--color-text-muted);
+}
+
+.form {
+  padding: 4rem;
+}
+
+.form h3 {
+  font-size: 2rem;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inputGroup label {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.inputGroup input {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  padding: 15px;
+  color: white;
+  border-radius: 4px;
+}
+
+.fileInput {
+  padding: 10px !important;
+}
+
+.note {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.fullWidth {
+  grid-column: span 2;
+}
+
+.submitBtn {
+  margin-top: 3rem;
+  width: 100%;
+  background: var(--color-accent);
+  color: black;
+  padding: 20px;
+  font-size: 1.2rem;
+  font-weight: 900;
+  border-radius: 4px;
+}
+
+.successCard {
+  max-width: 600px;
+  margin: 100px auto;
+  padding: 5rem;
+  text-align: center;
+}
+
+.backBtn {
+  margin-top: 2rem;
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .choiceGrid, .formGrid {
+    grid-template-columns: 1fr;
+  }
+  .form {
+    padding: 2rem;
+  }
+}

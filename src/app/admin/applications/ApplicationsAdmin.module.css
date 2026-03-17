@@ -1,0 +1,130 @@
+.main {
+  min-height: 100vh;
+  padding: 120px 5% 80px;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 4rem;
+}
+
+.header h1 span {
+  color: var(--color-accent);
+}
+
+.tableWrapper {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+}
+
+.table td {
+  padding: 20px;
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 0.9rem;
+}
+
+.typeBadge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.coach { background: #3b82f6; color: white; }
+.afiliado { background: #10b981; color: white; }
+
+.statusBadge {
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.pendiente { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+.aceptada { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.rechazada { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+.contactCell p, .socialCell p {
+  margin-bottom: 5px;
+}
+
+.degreeLink {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--color-accent);
+  text-decoration: none;
+  font-size: 0.8rem;
+  border: 1px solid rgba(0, 243, 255, 0.3);
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+.degreeLink:hover {
+  background: rgba(0, 243, 255, 0.1);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.approveBtn, .rejectBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-weight: 900;
+  transition: 0.2s;
+}
+
+.approveBtn {
+  background: #10b981;
+  color: black;
+}
+
+.rejectBtn {
+  background: #ef4444;
+  color: white;
+}
+
+.approveBtn:hover, .rejectBtn:hover {
+  transform: scale(1.1);
+}
+
+.noData {
+  text-align: center;
+  padding: 50px !important;
+  color: var(--color-text-muted);
+}
+
+.loading {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.5rem;
+}

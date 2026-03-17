@@ -6,6 +6,7 @@ import { useAppContext } from '@/context/AppContext';
 import { useRouter } from 'next/navigation';
 import styles from './Login.module.css';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const { login } = useAppContext();
@@ -53,14 +54,14 @@ export default function LoginPage() {
           </div>
 
           <div className={styles.roleSection}>
-            <h4>¿Eres profesional o promotor?</h4>
+            <h4>¿Quieres ser parte del equipo?</h4>
             <div className={styles.roleButtons}>
-              <button className={styles.roleBtn} onClick={() => handleMockLogin('Influencer')}>
-                🏆 Soy Coach
-              </button>
-              <button className={styles.roleBtn} onClick={() => handleMockLogin('Influencer')}>
-                💰 Quiero ser Afiliado
-              </button>
+              <Link href="/join-team" className={styles.roleBtn}>
+                🏆 Ser Coach Supply
+              </Link>
+              <Link href="/join-team" className={styles.roleBtn}>
+                💰 Ser Afiliado Supply
+              </Link>
             </div>
           </div>
 

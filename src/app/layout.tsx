@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
 import CartDrawer from '@/components/CartDrawer/CartDrawer';
+import SideMenu from '@/components/SideMenu/SideMenu';
+import ChatWidget from '@/components/ChatWidget/ChatWidget';
 
 export const metadata: Metadata = {
   title: "Supplymax | Premium Sports Nutrition & Apparel",
   description: "Next-generation sports supplements and fitness apparel. Bimonetary store with expert coaching and influencer rewards.",
+  metadataBase: new URL("https://supplymax.app"),
   keywords: "suplementos, venezuela, proteina, creatina, fitness, gym, ropa deportiva, supplymax, rendimiento",
   openGraph: {
     title: "Supplymax | Premium Sports Nutrition & Apparel",
@@ -42,6 +45,8 @@ export default function RootLayout({
         <AppProvider>
           {children}
           <CartDrawer />
+          <SideMenu />
+          <ChatWidget />
         </AppProvider>
       </body>
     </html>

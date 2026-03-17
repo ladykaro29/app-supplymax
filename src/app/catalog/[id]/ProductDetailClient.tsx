@@ -15,11 +15,19 @@ interface ProductDetailClientProps {
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const { addToCart, formatPrice } = useAppContext();
   const [quantity, setQuantity] = useState(1);
+  const [selectedFlavor, setSelectedFlavor] = useState(product.flavors?.[0] || '');
+  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '');
 
   const handleAddToCart = () => {
-    // Add multiple if quantity > 1
+    // Construct variant name if applicable
+    const variantName = [selectedFlavor, selectedSize].filter(Boolean).join(' - ');
+    const productWithVariant = {
+      ...product,
+      name: variantName ? `${product.name} (${variantName})` : product.name
+    };
+
     for (let i = 0; i < quantity; i++) {
-      addToCart(product);
+      addToCart(productWithVariant);
     }
   };
 
@@ -47,13 +55,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
              <div className={`${styles.thumb} active`}>
                <Image src={product.image} alt="thumb" width={80} height={80} />
              </div>
-             {/* Placeholders for additional images */}
-             <div className={styles.thumb}>
-               <div className={styles.placeholderThumb}></div>
-             </div>
-             <div className={styles.thumb}>
-               <div className={styles.placeholderThumb}></div>
-             </div>
+             {/* Dynamic thumbnails would go here if available */}
           </div>
         </div>
 
@@ -64,12 +66,57 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           
           <div className={styles.priceContainer}>
             <div className={styles.mainPrice}>{formatPrice(product.price)}</div>
+            {product.durationInDays && <div className={styles.vesConversion}>Rinde para aprox. {product.durationInDays} días</div>}
+          </div>
+
+          <div className={styles.highlights}>
+            {product.highlights?.map((h, i) => (
+              <div key={i} className={styles.hItem}>
+                <span className={styles.hIcon}>✓</span>
+                {h}
+              </div>
+            ))}
           </div>
 
           <p className={styles.description}>
-            {product.description} Este producto está diseñado para atletas de alto rendimiento que no aceptan menos de lo mejor. 
-            Fórmula pura, resultados reales y el respaldo de la calidad Supply Max.
+            {product.description}
           </p>
+
+          <div className={styles.variationSection}>
+            {product.flavors && product.flavors.length > 0 && (
+              <div>
+                <span className={styles.variationTitle}>SABOR SELECCIONADO: {selectedFlavor}</span>
+                <div className={styles.variationGrid}>
+                  {product.flavors.map(f => (
+                    <button 
+                      key={f} 
+                      className={`${styles.varBtn} ${selectedFlavor === f ? styles.active : ''}`}
+                      onClick={() => setSelectedFlavor(f)}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {product.sizes && product.sizes.length > 0 && (
+              <div>
+                <span className={styles.variationTitle}>PRESENTACIÓN: {selectedSize}</span>
+                <div className={styles.variationGrid}>
+                  {product.sizes.map(s => (
+                    <button 
+                      key={s} 
+                      className={`${styles.varBtn} ${selectedSize === s ? styles.active : ''}`}
+                      onClick={() => setSelectedSize(s)}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className={styles.purchaseArea}>
             <div className={styles.quantitySelector}>

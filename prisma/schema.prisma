@@ -1,10 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -17,14 +13,14 @@ model User {
   name           String
   email          String    @unique
   password       String
-  role           String    @default("User") // User, Influencer, Admin
+  role           String    @default("User")
   level          String?   @default("Bronce")
   tokens         Int       @default(0)
   influencerCode String?   @unique
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
-  orders         Order[]
   addresses      Address[]
+  orders         Order[]
 }
 
 model Product {
@@ -44,33 +40,49 @@ model Product {
 model Order {
   id           String      @id @default(cuid())
   userId       String
-  user         User        @relation(fields: [userId], references: [id])
   total        Float
-  status       String      @default("PENDIENTE") // PENDIENTE, PAGADO, ENVIADO, COMPLETADO
+  status       String      @default("PENDIENTE")
   referralCode String?
-  agency       String?     // MRW, ZOOM, TEALCA
+  agency       String?
   paymentRef   String?
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+  user         User        @relation(fields: [userId], references: [id])
   items        OrderItem[]
 }
 
 model OrderItem {
   id        String  @id @default(cuid())
   orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
   productId Int
-  product   Product @relation(fields: [productId], references: [id])
   quantity  Int
   price     Float
+  product   Product @relation(fields: [productId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id])
 }
 
 model Address {
   id        String  @id @default(cuid())
   userId    String
-  user      User    @relation(fields: [userId], references: [id])
-  name      String  // Ej: Sede MRW Centro
-  agency    String  // MRW, ZOOM, etc
-  details   String  // Dirección detallada
+  name      String
+  agency    String
+  details   String
   isDefault Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id])
+}
+
+model Application {
+  id              String   @id @default(cuid())
+  type            String
+  firstName       String
+  lastName        String
+  email           String
+  phone           String
+  instagram       String
+  tiktok          String?
+  degrees         String?
+  affiliatesCount Int?
+  status          String   @default("PENDIENTE")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

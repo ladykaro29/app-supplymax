@@ -45,6 +45,10 @@ interface AppContextType {
   cartTotal: number;
   isCartOpen: boolean;
   setCartOpen: (open: boolean) => void;
+  isMenuOpen: boolean;
+  setMenuOpen: (open: boolean) => void;
+  isChatOpen: boolean;
+  setChatOpen: (open: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -116,6 +120,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const [isCartOpen, setCartOpen] = useState(false);
+  const [isMenuOpen, setMenuOpen] = useState(false);
+  const [isChatOpen, setChatOpen] = useState(false);
 
   const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
@@ -146,8 +152,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         clearCart,
         completeOrder,
         cartTotal,
-        isCartOpen,
-        setCartOpen
+              isCartOpen,
+        setCartOpen,
+        isMenuOpen,
+        setMenuOpen,
+        isChatOpen,
+        setChatOpen
       }}
     >
       {children}

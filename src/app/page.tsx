@@ -4,6 +4,8 @@ import Footer from '@/components/Footer/Footer';
 import prisma from '@/lib/prisma';
 import HomeClient from './HomeClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   // Fetch featured products from DB
   const featuredProducts = await prisma.product.findMany({
