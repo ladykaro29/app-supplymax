@@ -7,7 +7,7 @@ import Link from 'next/link';
 import styles from './CartDrawer.module.css';
 
 export default function CartDrawer() {
-  const { cart, removeFromCart, cartTotal, formatPrice, isCartOpen, setCartOpen } = useAppContext();
+  const { cart, updateQuantity, removeFromCart, cartTotal, formatPrice, isCartOpen, setCartOpen } = useAppContext();
 
   if (!isCartOpen) return null;
 
@@ -36,9 +36,14 @@ export default function CartDrawer() {
                 <div className={styles.details}>
                   <h4>{item.name}</h4>
                   <div className={styles.priceRow}>
-                    <span>{item.quantity} x {formatPrice(item.price)}</span>
-                    <button onClick={() => removeFromCart(item.id)} className={styles.removeBtn}>ELIMINAR</button>
+                    <div className={styles.qtyControls}>
+                       <button onClick={() => updateQuantity(item.id, -1)} className={styles.qtyBtn}>-</button>
+                       <span className={styles.qtyNumber}>{item.quantity}</span>
+                       <button onClick={() => updateQuantity(item.id, 1)} className={styles.qtyBtn}>+</button>
+                    </div>
+                    <span className={styles.itemPrice}>{formatPrice(item.price * item.quantity)}</span>
                   </div>
+                  <button onClick={() => removeFromCart(item.id)} className={styles.removeBtn}>ELIMINAR</button>
                 </div>
               </div>
             ))

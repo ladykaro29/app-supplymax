@@ -8,13 +8,20 @@ import styles from './Checkout.module.css';
 import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
-  const { cart, cartTotal, formatPrice, currency, exchangeRate, completeOrder } = useAppContext();
+  const { cart, cartTotal, formatPrice, currency, exchangeRate, completeOrder, setCartOpen } = useAppContext();
   const router = useRouter();
   
   const [shippingLevel, setShippingLevel] = useState<1 | 2 | 3>(1);
   const [agency, setAgency] = useState<string>('MRW');
-  const [paymentMethod, setPaymentMethod] = useState<'Manual' | 'Card'>('Manual');
   const [fileUploaded, setFileUploaded] = useState(false);
+  
+  // New States
+  const [discountCode, setDiscountCode] = useState('');
+  const [localAddress, setLocalAddress] = useState('');
+  const [localTime, setLocalTime] = useState('');
+  const [muniLocation, setMuniLocation] = useState('');
+  const [nationalState, setNationalState] = useState('');
+  const [nationalAgency, setNationalAgency] = useState('');
 
   const totalInVES = cartTotal * exchangeRate;
 
@@ -24,7 +31,16 @@ export default function CheckoutPage() {
     router.push('/');
   };
 
-  if (cart.length === 0) return null; // Simplified for this update
+  const statesOfVenezuelaByAgency = [
+    "Amazonas", "Anzoátegui", "Apure", "Aragua", "Barinas", "Bolívar", "Carabobo", "Cojedes", 
+    "Delta Amacuro", "Distrito Capital", "Falcón", "Guárico", "Lara", "Mérida", "Miranda", 
+    "Monagas", "Nueva Esparta", "Portuguesa", "Sucre", "Táchira", "Trujillo", "Vargas", "Yaracuy", "Zulia"
+  ];
+
+  if (cart.length === 0) {
+    if (typeof window !== 'undefined') router.push('/catalog');
+    return null;
+  }
 
   return (
     <div className={styles.container}>
@@ -59,9 +75,40 @@ export default function CheckoutPage() {
                </button>
             </div>
 
-            {shippingLevel > 1 && (
+            {/* Level 1: Entrega Personal */}
+            {shippingLevel === 1 && (
               <div className={`${styles.agencyData} glass`}>
-                <h4>DATOS DE LA AGENCIA</h4>
+                <div className={styles.localNotice}>
+                  <strong>⚡ AVISO IMPORTANTE:</strong>
+                  Las entregas personales se realizan únicamente en el horario de 3:00 PM a 7:00 PM.
+                </div>
+                <div className={styles.formGroup}>
+                   <label>Dirección de Entrega</label>
+                   <textarea 
+                    placeholder="Describe la dirección exacta a la cual quieres que llegue tu pedido..." 
+                    className={styles.input}
+                    value={localAddress}
+                    onChange={(e) => setLocalAddress(e.target.value)}
+                    rows={3}
+                   />
+                </div>
+                <div className={styles.formGroup}>
+                   <label>Hora de Entrega (Dentro del rango 3pm-7pm)</label>
+                   <input 
+                    type="text" 
+                    placeholder="Ej: 4:30 PM" 
+                    className={styles.input}
+                    value={localTime}
+                    onChange={(e) => setLocalTime(e.target.value)}
+                   />
+                </div>
+              </div>
+            )}
+
+            {/* Level 2: Otros Municipios */}
+            {shippingLevel === 2 && (
+              <div className={`${styles.agencyData} glass`}>
+                <h4>SELECCIONA TU AGENCIA</h4>
                 <div className={styles.agencySelect}>
                    {['MRW', 'ZOOM', 'TEALCA'].map(a => (
                      <button 
@@ -73,12 +120,55 @@ export default function CheckoutPage() {
                      </button>
                    ))}
                 </div>
-                <input 
-                  type="text" 
-                  placeholder="Indica el nombre/dirección de la oficina donde retirarás" 
-                  className={styles.input} 
-                />
-                <p className={styles.note}>Nota: El flete es Cobro en Destino (C.O.D).</p>
+                <div className={styles.formGroup}>
+                  <label>Tu Ubicación / Municipio</label>
+                  <input 
+                    type="text" 
+                    placeholder="Coloca tu ubicación o municipio aquí..." 
+                    className={styles.input}
+                    value={muniLocation}
+                    onChange={(e) => setMuniLocation(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Level 3: Envíos Nacionales */}
+            {shippingLevel === 3 && (
+              <div className={`${styles.agencyData} glass`}>
+                <h4>ENVIÓ NACIONAL (C.O.D)</h4>
+                <div className={styles.agencySelect}>
+                   {['MRW', 'ZOOM', 'TEALCA'].map(a => (
+                     <button 
+                      key={a}
+                      className={agency === a ? styles.activeAgency : ''}
+                      onClick={() => setAgency(a)}
+                     >
+                       {a}
+                     </button>
+                   ))}
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Seleccionar Estado</label>
+                  <select 
+                    className={styles.input}
+                    value={nationalState}
+                    onChange={(e) => setNationalState(e.target.value)}
+                  >
+                    <option value="">-- Elige un estado --</option>
+                    {statesOfVenezuelaByAgency.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Dirección de la Agencia</label>
+                  <input 
+                    type="text" 
+                    placeholder="Dirección exacta de la oficina para retirar..." 
+                    className={styles.input}
+                    value={nationalAgency}
+                    onChange={(e) => setNationalAgency(e.target.value)}
+                  />
+                </div>
               </div>
             )}
           </section>
@@ -111,12 +201,29 @@ export default function CheckoutPage() {
                </div>
              ))}
           </div>
+
           <div className={styles.finalTotal}>
              <span>TOTAL A PAGAR</span>
              <div className={styles.amount}>
                 {formatPrice(cartTotal)} / {totalInVES.toLocaleString('es-VE')} BS
              </div>
           </div>
+
+          <div className={styles.summaryActions}>
+            <div className={styles.discountRow}>
+               <input 
+                type="text" 
+                placeholder="Código de descuento..." 
+                className={styles.discountInput}
+                value={discountCode}
+                onChange={(e) => setDiscountCode(e.target.value)}
+               />
+               <button className={styles.modifyCartBtn} onClick={() => setCartOpen(true)}>
+                 MODIFICAR CARRITO
+               </button>
+            </div>
+          </div>
+
           <button 
             className={styles.finishBtn} 
             disabled={!fileUploaded}

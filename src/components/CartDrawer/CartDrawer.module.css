@@ -89,15 +89,64 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
+  margin-bottom: 5px;
+}
+
+.qtyControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px 10px;
+  border-radius: 30px;
+  border: 1px solid var(--glass-border);
+}
+
+.qtyBtn {
+  background: transparent;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.qtyBtn:hover {
+  background: var(--color-accent);
+  color: black;
+  border-color: var(--color-accent);
+}
+
+.qtyNumber {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  color: white;
+  font-size: 0.9rem;
+  min-width: 15px;
+  text-align: center;
+}
+
+.itemPrice {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  color: var(--color-accent);
+  font-size: 1rem;
 }
 
 .removeBtn {
-  font-size: 0.75rem;
-  color: var(--color-accent);
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  margin-top: 10px;
   text-decoration: underline;
-  font-weight: 600;
 }
 
 .footer {

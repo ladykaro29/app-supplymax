@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '@/components/Header/Header';
 import { useAppContext } from '@/context/AppContext';
 import { useRouter } from 'next/navigation';
@@ -11,14 +11,25 @@ import Link from 'next/link';
 export default function LoginPage() {
   const { login } = useAppContext();
   const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleMockLogin = (role: any) => {
-    login(role);
-    if (role === 'Influencer') {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Simple logic for the demo: 
+    // admin@supplymax.com -> Admin
+    // influencer@supplymax.com -> Influencer
+    // anyone else -> User
+    
+    if (email === 'admin@supplymax.com' && password === 'admin123') {
+      login('Admin');
+      router.push('/admin/applications');
+    } else if (email === 'influencer@supplymax.com' && password === 'pass123') {
+      login('Influencer');
       router.push('/dashboard/influencer');
-    } else if (role === 'Admin') {
-      router.push('/dashboard/admin');
     } else {
+      login('User');
       router.push('/');
     }
   };
@@ -35,23 +46,37 @@ export default function LoginPage() {
           <h1>Iniciar Sesión</h1>
           <p>Accede a tu cuenta de Supply Max</p>
           
-          <div className={styles.form}>
+          <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.inputGroup}>
               <label>Usuario o Email</label>
-              <input type="text" placeholder="Tu nombre de usuario o email" className={styles.input} />
+              <input 
+                type="text" 
+                placeholder="Tu nombre de usuario o email (ej: admin@supplymax.com)" 
+                className={styles.input} 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
             
             <div className={styles.inputGroup}>
               <label>Contraseña</label>
-              <input type="password" placeholder="Tu contraseña" className={styles.input} />
+              <input 
+                type="password" 
+                placeholder="Tu contraseña (ej: admin123)" 
+                className={styles.input} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </div>
             
             <span className={styles.forgot}>¿Olvidaste tu contraseña?</span>
             
-            <button className={styles.submitBtn} onClick={() => handleMockLogin('User')}>
+            <button className={styles.submitBtn} type="submit">
               INICIAR SESIÓN
             </button>
-          </div>
+          </form>
 
           <div className={styles.roleSection}>
             <h4>¿Quieres ser parte del equipo?</h4>

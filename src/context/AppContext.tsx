@@ -39,6 +39,7 @@ interface AppContextType {
   login: (role: UserRole) => void;
   logout: () => void;
   addToCart: (product: Product) => void;
+  updateQuantity: (productId: number, amount: number) => void;
   removeFromCart: (productId: number) => void;
   clearCart: () => void;
   completeOrder: () => void;
@@ -100,6 +101,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const updateQuantity = (productId: number, amount: number) => {
+    setCart(prev => {
+      return prev.map(item => {
+        if (item.id === productId) {
+          const newQty = item.quantity + amount;
+          // Floor validation: remove if <= 0
+          return newQty > 0 ? { ...item, quantity: newQty } : null;
+        }
+        return item;
+      }).filter((item): item is CartItem => item !== null);
+    });
+  };
+
   const removeFromCart = (productId: number) => {
     setCart(prev => prev.filter(item => item.id !== productId));
   };
@@ -148,11 +162,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         login,
         logout,
         addToCart,
+        updateQuantity,
         removeFromCart,
         clearCart,
         completeOrder,
         cartTotal,
-              isCartOpen,
+        isCartOpen,
         setCartOpen,
         isMenuOpen,
         setMenuOpen,
