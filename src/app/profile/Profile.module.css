@@ -1,98 +1,97 @@
 .container {
   min-height: 100vh;
+  background: var(--color-bg);
 }
 
 .dashboardLayout {
-  display: flex;
-  max-width: 1600px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  max-width: 1400px;
   margin: 0 auto;
+  padding: 120px 2rem 4rem;
 }
 
 .content {
-  flex: 1;
-  padding: 60px 5%;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
 }
 
-.pageHeader {
-  margin-bottom: 4rem;
-}
-
-.pageHeader h1 {
-  font-size: 3rem;
-  font-family: 'Oswald', sans-serif;
-}
-
-.pageHeader h1 span {
-  color: var(--color-accent);
-}
-
-.pageHeader p {
-  color: var(--color-text-muted);
-  letter-spacing: 2px;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.overviewGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+/* 1. Identity Header */
+.identityHeader {
+  display: flex;
+  align-items: center;
   gap: 2rem;
-  margin-bottom: 4rem;
-}
-
-.infoCard {
-  padding: 3rem;
-  border-radius: var(--radius-lg);
+  padding: 2.5rem;
   background: var(--color-bg-alt);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-.infoCard h3 {
-  font-size: 0.9rem;
+.identityHeader::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--color-accent);
+}
+
+.avatar {
+  width: 90px;
+  height: 90px;
+  background: var(--color-bg);
+  border: 2px solid var(--color-accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--color-accent);
+  text-shadow: 0 0 10px var(--color-accent);
+}
+
+.userInfo h1 {
+  font-size: 2.2rem;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 1px;
+}
+
+.roleBadge {
+  display: inline-block;
+  padding: 6px 14px;
+  background: var(--color-accent);
+  color: black;
+  font-size: 0.75rem;
+  font-weight: 900;
+  border-radius: 4px;
+  text-transform: uppercase;
+  box-shadow: 0 0 15px var(--color-accent-glow);
+}
+
+.subLevel {
+  margin-left: 12px;
+  font-size: 0.85rem;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 2rem;
 }
 
-.bigValue {
-  font-size: 4rem;
-  font-family: 'Oswald', sans-serif;
-  font-weight: 900;
-  margin-bottom: 1rem;
-}
-
-.levelBadge {
-  font-size: 2.5rem;
-  font-family: 'Oswald', sans-serif;
-  color: var(--color-accent);
-  margin-bottom: 1rem;
-}
-
-.actionBtn {
-  margin-top: 2rem;
-  padding: 12px 30px;
-  background: white;
-  color: black;
-  font-weight: 700;
-  font-size: 0.8rem;
+/* 2. Activity / Orders */
+.sectionCard {
+  background: var(--color-bg-alt);
+  padding: 2rem;
   border-radius: var(--radius-md);
-}
-
-.progressBar {
-  height: 6px;
-  background: rgba(255,255,255,0.05);
-  margin-top: 2rem;
-}
-
-.progress {
-  height: 100%;
-  background: var(--color-accent);
-  box-shadow: 0 0 10px var(--color-accent-glow);
-}
-
-.recentActivity {
-  border-top: 1px solid var(--glass-border);
-  padding-top: 4rem;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .sectionHeader {
@@ -100,177 +99,277 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 1rem;
 }
 
 .sectionHeader h2 {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: white;
 }
 
-.sectionHeader button {
-  font-size: 0.8rem;
-  color: var(--color-accent);
-  text-decoration: underline;
+.orderList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
 }
 
-.orderStrip {
-  background: #0D0D0D;
-  border: 1px solid var(--glass-border);
-  padding: 20px 40px;
-  border-radius: var(--radius-md);
-}
-
-.latestOrder {
+.orderItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1.2rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
 }
 
-.latestOrder span {
+.orderItem:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: var(--glass-border);
+}
+
+.status {
+  padding: 5px 12px;
+  background: rgba(0, 229, 255, 0.1);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* 3. Configuration / Addresses */
+.addressGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.addressCard {
+  padding: 1.5rem;
+  background: var(--color-bg);
+  border: 1px dashed var(--glass-border);
+  border-radius: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.addressCard:hover {
+  border-style: solid;
+  border-color: var(--color-accent);
+}
+
+.addressCard h4 {
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.addressCard p {
   font-size: 0.9rem;
   color: var(--color-text-muted);
+  line-height: 1.4;
 }
 
-.empty {
-  text-align: center;
-  padding: 40px;
+.removeAddressBtn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: #ff4d4d;
+  background: transparent;
+  padding: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.removeAddressBtn:hover {
+  opacity: 1;
+}
+
+.addAddressForm {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: 200px 1fr 150px;
+  gap: 10px;
+  padding-top: 2rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.input {
+  background: var(--color-bg);
+  border: 1px solid var(--glass-border);
+  padding: 12px 15px;
+  color: white;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.addBtn {
+  background: var(--color-accent);
+  color: black;
+  font-weight: 900;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 6px;
+}
+
+/* 4. Specialization: Influencer */
+.tokensWallet {
+  background: radial-gradient(circle at top left, #002b30 0%, #000 70%);
+  border: 2px solid var(--color-accent);
+  padding: 3rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 0 40px rgba(0, 229, 255, 0.15);
+}
+
+.tokensWallet::after {
+  content: "BILLETERA DE TOKENS EXCLUSIVA";
+  position: absolute;
+  top: 15px;
+  left: 3rem;
+  font-size: 0.65rem;
+  color: var(--color-accent);
+  letter-spacing: 3px;
+  font-weight: 900;
+}
+
+.tokenAmount {
+  font-size: 4.5rem;
+  font-family: 'Oswald', sans-serif;
+  color: var(--color-accent);
+  line-height: 1;
+  margin-top: 1rem;
+  filter: drop-shadow(0 0 10px var(--color-accent-glow));
+}
+
+.tokenAmount span {
+  font-size: 1.5rem;
+  font-family: 'Inter', sans-serif;
+  margin-left: 10px;
+}
+
+.affiliateBox {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.affiliateLabel {
+  font-size: 0.75rem;
   color: var(--color-text-muted);
+  letter-spacing: 1px;
+}
+
+.affiliateCode {
+  padding: 15px 30px;
+  background: var(--color-accent);
+  color: black;
+  font-weight: 900;
+  border-radius: 4px;
+  font-size: 1.5rem;
+  letter-spacing: 3px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+/* Specialization: Coach Featured */
+.coachFeaturedCard {
+  background: linear-gradient(135deg, var(--color-bg-alt) 0%, #111 100%);
+  border: 1px solid var(--color-accent);
+  padding: 3rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+  box-shadow: 0 0 50px rgba(0, 229, 255, 0.1);
+}
+
+.coachFeaturedCard h3 {
+  font-size: 1.8rem;
+  font-family: 'Oswald', sans-serif;
+  margin-bottom: 1rem;
+}
+
+.coachFeaturedCard p {
+  color: var(--color-text-muted);
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.previewProfileBtn {
+  background: transparent;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  padding: 15px 40px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.previewProfileBtn:hover {
+  background: var(--color-accent);
+  color: black;
+  box-shadow: 0 0 20px var(--color-accent-glow);
+}
+
+/* 5. Security */
+.logoutSection {
+  margin-top: 4rem;
+  padding: 3rem;
+  text-align: center;
+  border-top: 1px solid var(--glass-border);
+}
+
+.logoutBtn {
+  color: #ff4d4d;
+  font-weight: 900;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: transparent;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.logoutBtn:hover {
+  border-color: #ff4d4d;
+  box-shadow: 0 0 15px rgba(255, 77, 77, 0.2);
 }
 
 @media (max-width: 1024px) {
   .dashboardLayout {
+    grid-template-columns: 1fr;
+    padding-top: 110px;
+  }
+  .tokensWallet {
     flex-direction: column;
+    text-align: center;
+    gap: 2rem;
   }
-  .overviewGrid {
+  .affiliateBox {
+    align-items: center;
+    text-align: center;
+  }
+  .addAddressForm {
     grid-template-columns: 1fr;
   }
-}
-/* Re-buy Alert Area */
-.reminderSection {
-  grid-column: 1 / -1;
-  margin-bottom: 3rem;
-}
-
-.reminderCard {
-  padding: 2.5rem;
-  background: linear-gradient(90deg, var(--color-accent-glow) 0%, transparent 100%);
-  border-left: 5px solid var(--color-accent);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-  border-radius: var(--radius-md);
-}
-
-.reminderText h3 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.buyNowBtn {
-  padding: 1rem 2rem;
-  background: var(--color-accent);
-  color: var(--color-bg);
-  border-radius: 12px;
-  font-weight: 900;
-  box-shadow: 0 10px 20px var(--color-accent-glow);
-}
-
-.emptyOrders {
-  text-align: center;
-  padding: 5rem;
-  color: var(--color-text-muted);
-}
-
-@media (max-width: 900px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.addressGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-}
-
-.defaultBadge {
-  font-size: 0.65rem;
-  background: var(--color-accent);
-  color: black;
-  padding: 2px 8px;
-  font-weight: 800;
-  border-radius: var(--radius-sm);
-}
-
-.miniBtn {
-  font-size: 0.7rem;
-  color: var(--color-accent);
-  text-decoration: underline;
-  font-weight: 700;
-}
-
-.addAddressCard {
-  border: 1px dashed var(--glass-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem;
-  color: var(--color-text-muted);
-  transition: var(--transition-fast);
-  background: transparent;
-  border-radius: var(--radius-md);
-}
-
-.addAddressCard:hover {
-  border-color: var(--color-accent);
-  color: white;
-}
-
-.ordersList {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.orderHeaderCompact {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  padding-bottom: 1rem;
-}
-
-.statusBadge {
-  font-size: 0.7rem;
-  padding: 4px 12px;
-  background: var(--color-bg);
-  border: 1px solid var(--color-accent);
-  color: var(--color-accent);
-  font-weight: 700;
-  border-radius: var(--radius-sm);
-}
-
-.itemListCompact {
-  margin-bottom: 2rem;
-}
-
-.itemRow {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  margin-bottom: 0.5rem;
-}
-
-.orderTotal {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  padding-top: 1rem;
-}
-
-.orderTotal strong {
-  font-size: 1.2rem;
-  color: var(--color-accent);
 }

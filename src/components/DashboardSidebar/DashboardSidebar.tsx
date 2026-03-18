@@ -47,7 +47,7 @@ export default function DashboardSidebar() {
 
   const menuItems = [
     ...commonItems,
-    ...(user?.role === 'Influencer' ? influencerItems : []),
+    ...(user?.role_id === 'Influencer' ? influencerItems : []),
     ...userItems,
     { 
       label: 'Configuración', 

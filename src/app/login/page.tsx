@@ -17,20 +17,41 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simple logic for the demo: 
-    // admin@supplymax.com -> Admin
-    // influencer@supplymax.com -> Influencer
-    // anyone else -> User
-    
+    // Technical Profile Definitions
     if (email === 'admin@supplymax.com' && password === 'admin123') {
-      login('Admin');
+      login({ id: '0', name: 'Admin Master', role_id: 'Admin', status: 'Active' });
       router.push('/admin/applications');
     } else if (email === 'influencer@supplymax.com' && password === 'pass123') {
-      login('Influencer');
-      router.push('/dashboard/influencer');
+      login({ 
+        id: '1', 
+        name: 'Alex Trainer', 
+        email: 'alex@supply.com', 
+        role_id: 'Influencer', 
+        status: 'Active', 
+        tokens: 4500, 
+        affiliate_code: 'ALEX10' 
+      });
+      router.push('/profile');
+    } else if (email === 'coach@supplymax.com' && password === 'coach123') {
+      login({ 
+        id: '2', 
+        name: 'Coach Pro', 
+        email: 'coach@supply.com', 
+        role_id: 'Coach', 
+        coach_tier: 2, 
+        is_featured: true, 
+        status: 'Active' 
+      });
+      router.push('/profile');
     } else {
-      login('User');
-      router.push('/');
+      login({ 
+        id: '100', 
+        name: 'Juan Perez', 
+        email: email || 'user@email.com', 
+        role_id: 'User', 
+        status: 'Active' 
+      });
+      router.push('/profile');
     }
   };
 

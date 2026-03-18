@@ -4,15 +4,31 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product } from '@/data/products';
 
 type Currency = 'USD' | 'VES';
-type UserRole = 'Guest' | 'User' | 'Influencer' | 'Coach' | 'Admin';
+type UserStatus = 'Active' | 'Pending' | 'Suspended';
+
+interface Address {
+  id: string;
+  label: string; // e.g. "Casa", "Oficina"
+  value: string;
+}
 
 interface User {
   id: string;
   name: string;
-  role: UserRole;
-  tokens?: number;
-  level?: 'Bronce' | 'Plata' | 'Oro';
-  influencerCode?: string;
+  email: string;
+  role_id: 'User' | 'Influencer' | 'Coach' | 'Admin';
+  sub_level?: string; 
+  status: UserStatus;
+  
+  // Influencer specific
+  tokens?: number | null;
+  affiliate_code?: string;
+  
+  // Coach specific
+  coach_tier?: 1 | 2;
+  is_featured?: boolean;
+
+  addresses: Address[];
 }
 
 interface CartItem extends Product {
@@ -36,11 +52,13 @@ interface AppContextType {
   toggleCurrency: () => void;
   setExchangeRate: (rate: number) => void;
   formatPrice: (usdPrice: number) => string;
-  login: (role: UserRole) => void;
+  login: (userData: any) => void;
   logout: () => void;
   addToCart: (product: Product) => void;
   updateQuantity: (productId: number, amount: number) => void;
   removeFromCart: (productId: number) => void;
+  addAddress: (label: string, value: string) => void;
+  removeAddress: (id: string) => void;
   clearCart: () => void;
   completeOrder: () => void;
   cartTotal: number;
@@ -78,18 +96,37 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCurrency((prev) => (prev === 'USD' ? 'VES' : 'USD'));
   };
 
-  const login = (role: UserRole) => {
+  const login = (userData: any) => {
+    // Normalizing the JSON object received from "server"
     setUser({
-      id: '123',
-      name: role === 'Influencer' ? 'Alex Trainer' : 'Juan Perez',
-      role: role,
-      tokens: role === 'Influencer' ? 4500 : 0,
-      level: role === 'Influencer' ? 'Plata' : undefined,
-      influencerCode: role === 'Influencer' ? 'ALEX10' : undefined
+      id: userData.id || '123',
+      name: userData.name || 'Usuario Supply',
+      email: userData.email || 'user@email.com',
+      role_id: userData.role_id || 'User',
+      sub_level: userData.sub_level,
+      status: userData.status || 'Active',
+      tokens: userData.tokens ?? (userData.role_id === 'Influencer' ? 0 : null),
+      affiliate_code: userData.affiliate_code,
+      coach_tier: userData.coach_tier,
+      is_featured: userData.is_featured || false,
+      addresses: userData.addresses || [
+        { id: '1', label: 'Principal', value: 'Av. Libertador, Mérida' }
+      ]
     });
   };
 
   const logout = () => setUser(null);
+
+  const addAddress = (label: string, value: string) => {
+    if (!user) return;
+    const newAddress: Address = { id: Date.now().toString(), label, value };
+    setUser({ ...user, addresses: [...user.addresses, newAddress] });
+  };
+
+  const removeAddress = (id: string) => {
+    if (!user) return;
+    setUser({ ...user, addresses: user.addresses.filter(a => a.id !== id) });
+  };
 
   const addToCart = (product: Product) => {
     setCart(prev => {
@@ -137,7 +174,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isChatOpen, setChatOpen] = useState(false);
 
-  const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  // 3. Calculation Engine (Total) with Price Middleware logic
+  const cartTotal = cart.reduce((acc, item) => {
+    let itemPrice = item.price;
+    
+    // Logic: Coach N1/N2 get 10% discount (FinalPrice = BasePrice * 0.90)
+    if (user?.role_id === 'Coach') {
+      itemPrice = item.price * 0.90;
+    }
+    
+    return acc + (itemPrice * item.quantity);
+  }, 0);
 
   const formatPrice = (usdPrice: number) => {
     if (currency === 'USD') {
@@ -164,6 +211,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         addToCart,
         updateQuantity,
         removeFromCart,
+        addAddress,
+        removeAddress,
         clearCart,
         completeOrder,
         cartTotal,
