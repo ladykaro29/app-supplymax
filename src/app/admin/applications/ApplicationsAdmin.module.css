@@ -9,7 +9,39 @@
 }
 
 .header {
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tabBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.tabBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.activeTab {
+  background: var(--color-accent);
+  color: black;
+  border-color: var(--color-accent);
 }
 
 .header h1 span {

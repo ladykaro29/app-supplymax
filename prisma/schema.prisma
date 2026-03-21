@@ -13,10 +13,14 @@ model User {
   name           String
   email          String    @unique
   password       String
-  role           String    @default("User")
+  role_id        String    @default("User") // Matches frontend logic
   level          String?   @default("Bronce")
+  sub_level      String?   
+  status         String    @default("Active")
   tokens         Int       @default(0)
-  influencerCode String?   @unique
+  affiliate_code String?   @unique // Renamed from influencerCode for consistency
+  coach_tier     Int?      
+  is_featured    Boolean?  @default(false)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   addresses      Address[]
@@ -27,11 +31,18 @@ model Product {
   id             Int         @id @default(autoincrement())
   name           String
   category       String
-  goal           String
+  goal           String?
   price          Float
+  purchasePrice  Float?
   image          String
   description    String
-  durationInDays Int?
+  portions       String?
+  flavor         String?
+  weight         String?
+  sizes          String?     // Stored as comma-separated: 'S,M,L'
+  isFeatured     Boolean     @default(false)
+  isOffer        Boolean     @default(false)
+  discount       Float?
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   orderItems     OrderItem[]

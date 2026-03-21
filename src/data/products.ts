@@ -1,14 +1,19 @@
 export interface Product {
   id: number;
   name: string;
-  category: string;
-  goal: string;
-  price: number;
+  category: string; // 'Suplementos' | 'Ropa' | etc.
+  goal?: string;
+  price: number; // Selling price
+  purchasePrice?: number; // Manufacturing/Purchase price
   image: string;
   description: string;
-  durationInDays?: number | null;
-  flavors?: string[];
-  sizes?: string[];
+  portions?: string; // For supplements
+  flavor?: string; // For supplements
+  weight?: string; // For supplements
+  sizes?: string[]; // For clothing ['S', 'M', 'L', 'XL']
+  isFeatured?: boolean;
+  isOffer?: boolean;
+  discount?: number;
   highlights?: string[];
 }
 
@@ -16,53 +21,58 @@ export const PRODUCTS: Product[] = [
   {
     id: 1,
     name: "Pure Whey Impact",
-    category: "Proteínas",
+    category: "Suplementos",
     goal: "Ganancia",
     price: 49.99,
+    purchasePrice: 25.00,
     image: "/protein.png",
-    description: "Proteína de suero de alta calidad para máxima recuperación muscular. Nuestra fórmula aislada garantiza la absorción más rápida para tus músculos.",
-    durationInDays: 30,
-    flavors: ["Vainilla Ice Cream", "Double Chocolate", "Strawberry Glaze"],
-    sizes: ["2 lbs (30 servicios)", "5 lbs (75 servicios)"],
-    highlights: ["25g Proteína por servicio", "0g Azúcar añadida", "BCAAs naturales"]
+    description: "Proteína de suero de alta calidad para máxima recuperación muscular.",
+    portions: "30",
+    flavor: "Vainilla Ice Cream",
+    weight: "2 lbs",
+    isFeatured: true,
+    highlights: ["25g Proteína por servicio", "0g Azúcar añadida"]
   },
   {
     id: 2,
     name: "Creatine Micronized",
-    category: "Creatinas",
+    category: "Suplementos",
     goal: "Potencia",
     price: 34.99,
+    purchasePrice: 15.00,
     image: "/creatine.png",
-    description: "Creatina monohidratada micronizada de grado farmacéutico. Aumenta tu fuerza explosiva y mejora la hidratación celular.",
-    durationInDays: 60,
-    flavors: ["Unflavored", "Fruit Punch", "Blue Raspberry"],
-    sizes: ["300g", "600g"],
-    highlights: ["100% Monohidrato puro", "Micronizada para mejor mezcla", "Sin rellenos"]
+    description: "Creatina monohidratada micronizada de grado farmacéutico.",
+    portions: "60",
+    flavor: "Unflavored",
+    weight: "300g",
+    isOffer: true,
+    discount: 5,
+    highlights: ["100% Monohidrato puro"]
   },
   {
     id: 3,
     name: "Amino Recovery Complex",
-    category: "Aminoácidos/BCAA",
+    category: "Suplementos",
     goal: "Recuperación",
     price: 29.99,
+    purchasePrice: 12.00,
     image: "/amino.png",
-    description: "Matriz de aminoácidos esenciales y electrolitos para mantenerte hidratado y recuperado durante tus entrenamientos más intensos.",
-    durationInDays: 45,
-    flavors: ["Lemon Lime", "Watermelon", "Orange Burst"],
-    sizes: ["30 serv", "60 serv"],
-    highlights: ["Electrolitos añadidos", "7g BCAA ratio 2:1:1", "Sin cafeína"]
+    description: "Matriz de aminoácidos esenciales y electrolitos.",
+    portions: "45",
+    flavor: "Lemon Lime",
+    weight: "450g",
+    highlights: ["Electrolitos añadidos"]
   },
   {
     id: 4,
-    name: "Pre-Workout Nitro",
-    category: "Pre-Entrenos",
-    goal: "Energía",
-    price: 42.00,
-    image: "/pre-workout.png",
-    description: "Fuerza explosiva y enfoque mental láser. Diseñado para empujarte más allá de tus límites en cada sesión de entrenamiento.",
-    durationInDays: 30,
-    flavors: ["Grape Soda", "Green Apple", "Nuclear Mango"],
-    sizes: ["30 servicios"],
-    highlights: ["Beta-Alanina para resistencia", "Citrulina Malato 2:1", "300mg Cafeína"]
+    name: "Camiseta SupplyMax Gym",
+    category: "Ropa",
+    price: 25.00,
+    purchasePrice: 10.00,
+    image: "/clothing.png",
+    description: "Camiseta técnica para entrenamiento de alta intensidad.",
+    sizes: ["S", "M", "L", "XL"],
+    isFeatured: true,
+    highlights: ["Tejido transpirable", "Ajuste atlético"]
   }
 ];

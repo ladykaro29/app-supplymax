@@ -72,7 +72,16 @@ export default function HomeClient({ featuredProducts }: HomeClientProps) {
                 <div className={styles.productInfo}>
                   <span className={styles.category}>{product.category}</span>
                   <h3>{product.name}</h3>
-                  <div className={styles.price}>{formatPrice(product.price)}</div>
+                  <div className={styles.priceRow}>
+                    {product.isOffer && product.discount ? (
+                      <>
+                        <span className={styles.price}>{formatPrice(product.price - product.discount)}</span>
+                        <span className={styles.oldPrice}>{formatPrice(product.price)}</span>
+                      </>
+                    ) : (
+                      <div className={styles.price}>{formatPrice(product.price)}</div>
+                    )}
+                  </div>
                 </div>
               </Link>
               <div className={styles.infoAction}>

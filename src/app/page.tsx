@@ -9,8 +9,8 @@ export const dynamic = 'force-dynamic';
 export default async function Home() {
   // Fetch featured products from DB
   const featuredProducts = await prisma.product.findMany({
-    take: 2,
-    orderBy: { id: 'asc' }
+    where: { isFeatured: true },
+    orderBy: { id: 'desc' }
   });
 
   return (

@@ -11,12 +11,12 @@ export default function ApplicationsAdminPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!user || user.role !== 'Admin') {
+    if (!user || user.role_id !== 'Admin') {
       router.push('/login');
     }
   }, [user, router]);
 
-  if (!user || user.role !== 'Admin') return null;
+  if (!user || user.role_id !== 'Admin') return null;
 
   return (
     <div>

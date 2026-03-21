@@ -209,12 +209,26 @@
   margin-bottom: 1rem;
 }
 
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
 .price {
   font-size: 2rem;
   font-weight: 700;
   font-family: 'Oswald', sans-serif;
   color: white;
-  margin-bottom: 2rem;
+}
+
+.oldPrice {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+  opacity: 0.6;
 }
 
 .addBtn {

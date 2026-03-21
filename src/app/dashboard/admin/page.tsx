@@ -12,7 +12,7 @@ export default function AdminDashboard() {
   const [newRate, setNewRate] = useState<string>(exchangeRate.toString());
   const [localOrders, setLocalOrders] = useState(orders);
 
-  if (!user || user.role !== 'Admin') {
+  if (!user || user.role_id !== 'Admin') {
     return (
       <div className={styles.unauthorized}>
         <Header />

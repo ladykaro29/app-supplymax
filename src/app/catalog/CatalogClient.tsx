@@ -38,7 +38,16 @@ export default function CatalogClient({ initialProducts }: CatalogClientProps) {
             <div className={styles.info}>
               <span className={styles.categoryBadge}>{product.category}</span>
               <h3>{product.name}</h3>
-              <div className={styles.price}>{formatPrice(product.price)}</div>
+              <div className={styles.priceRow}>
+                {product.isOffer && product.discount ? (
+                  <>
+                    <span className={styles.price}>{formatPrice(product.price - product.discount)}</span>
+                    <span className={styles.oldPrice}>{formatPrice(product.price)}</span>
+                  </>
+                ) : (
+                  <div className={styles.price}>{formatPrice(product.price)}</div>
+                )}
+              </div>
             </div>
           </Link>
           <div className={styles.infoAction}>
@@ -89,30 +98,23 @@ export default function CatalogClient({ initialProducts }: CatalogClientProps) {
         {activeCategory === 'Todos' ? (
           /* "Lineas de Productos" View */
           <div className={styles.linesContainer}>
-            {/* Featured Line (Just taking first 4 for now) */}
+            {/* Featured Line */}
             <section className={styles.categorySection}>
               <div className={styles.sectionHeader}>
                 <h2>💣 LO MÁS <span>DESTACADO</span></h2>
-                <Link href="/catalog?filter=Proteínas" className={styles.viewMore}>VER TODO</Link>
+                <button className={styles.viewMore} onClick={() => setActiveCategory('Destacados')}>VER TODO</button>
               </div>
-              {renderProductGrid(initialProducts.slice(0, 4))}
+              {renderProductGrid(initialProducts.filter(p => p.isFeatured).slice(0, 4))}
             </section>
 
-            {/* Dynamically render other categories */}
-            {categories.map(cat => {
-              const catProducts = initialProducts.filter(p => p.category === cat).slice(0, 4);
-              if (catProducts.length === 0) return null;
-              
-              return (
-                <section key={cat} className={styles.categorySection}>
-                  <div className={styles.sectionHeader}>
-                    <h2>⚡ LÍNEA DE <span>{cat.toUpperCase()}</span></h2>
-                    <button className={styles.viewMore} onClick={() => setActiveCategory(cat)}>VER TODO</button>
-                  </div>
-                  {renderProductGrid(catProducts)}
-                </section>
-              );
-            })}
+            {/* Offers Line */}
+            <section className={styles.categorySection}>
+              <div className={styles.sectionHeader}>
+                <h2>💸 PRODUCTOS EN <span>OFERTA</span></h2>
+                <button className={styles.viewMore} onClick={() => setActiveCategory('Oferta')}>VER TODO</button>
+              </div>
+              {renderProductGrid(initialProducts.filter(p => p.isOffer).slice(0, 4))}
+            </section>
           </div>
         ) : (
           /* Filtered List View */
@@ -126,7 +128,13 @@ export default function CatalogClient({ initialProducts }: CatalogClientProps) {
                 LIMPIAR FILTROS
               </button>
             </div>
-            {renderProductGrid(initialProducts.filter(p => p.category === activeCategory))}
+            {renderProductGrid(
+              activeCategory === 'Destacados' 
+                ? initialProducts.filter(p => p.isFeatured)
+                : activeCategory === 'Oferta' 
+                  ? initialProducts.filter(p => p.isOffer) 
+                  : initialProducts.filter(p => p.category === activeCategory)
+            )}
           </div>
         )}
       </div>

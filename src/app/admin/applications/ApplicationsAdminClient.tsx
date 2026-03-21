@@ -34,6 +34,15 @@ export default function ApplicationsAdminClient() {
     }
   };
 
+  const [activeTab, setActiveTab] = useState<'Afiliado' | 'Coach'>('Afiliado');
+
+  const filteredApps = apps.filter(app => {
+    const type = app.type?.toLowerCase();
+    if (activeTab === 'Afiliado') return type === 'afiliado';
+    if (activeTab === 'Coach') return type === 'coach';
+    return true;
+  });
+
   if (!mounted || loading) return <div className={styles.loading}>Cargando solicitudes...</div>;
 
   return (
@@ -41,7 +50,20 @@ export default function ApplicationsAdminClient() {
       <div className={styles.container}>
         <header className={styles.header}>
           <h1>GESTIÓN DE <span>SOLICITUDES</span></h1>
-          <p>COACHES Y AFILIADOS PENDIENTES</p>
+          <div className={styles.tabs}>
+            <button 
+              className={`${styles.tabBtn} ${activeTab === 'Afiliado' ? styles.activeTab : ''}`}
+              onClick={() => setActiveTab('Afiliado')}
+            >
+              Solicitudes de Afiliados
+            </button>
+            <button 
+              className={`${styles.tabBtn} ${activeTab === 'Coach' ? styles.activeTab : ''}`}
+              onClick={() => setActiveTab('Coach')}
+            >
+              Solicitudes de Coach
+            </button>
+          </div>
         </header>
 
         <div className={styles.tableWrapper}>
@@ -49,23 +71,17 @@ export default function ApplicationsAdminClient() {
             <thead>
               <tr>
                 <th>FECHA</th>
-                <th>TIPO</th>
                 <th>NOMBRE</th>
                 <th>CONTACTO</th>
-                <th>SOCIAL</th>
+                <th>SOCIAL / INFO</th>
                 <th>ESTADO</th>
                 <th>ACCIONES</th>
               </tr>
             </thead>
             <tbody>
-              {apps.map((app) => (
+              {filteredApps.map((app) => (
                 <tr key={app.id}>
                   <td>{new Date(app.createdAt).toLocaleDateString()}</td>
-                  <td>
-                    <span className={`${styles.typeBadge} ${styles[app.type.toLowerCase()]}`}>
-                      {app.type.toUpperCase()}
-                    </span>
-                  </td>
                   <td>{app.firstName} {app.lastName}</td>
                   <td className={styles.contactCell}>
                     <p>{app.email}</p>
@@ -74,7 +90,7 @@ export default function ApplicationsAdminClient() {
                   <td className={styles.socialCell}>
                     <p>IG: {app.instagram}</p>
                     {app.tiktok && <p>TT: {app.tiktok}</p>}
-                    {app.affiliatesCount && <p>Alums: {app.affiliatesCount}</p>}
+                    {app.affiliatesCount && <p>Referidos: {app.affiliatesCount}</p>}
                     {app.degrees && (
                       <a href={app.degrees} target="_blank" rel="noopener noreferrer" className={styles.degreeLink}>
                          📄 Ver Títulos
@@ -91,12 +107,14 @@ export default function ApplicationsAdminClient() {
                       <button 
                         className={styles.approveBtn}
                         onClick={() => updateStatus(app.id, 'ACEPTADA')}
+                        title="Aceptar Solicitud"
                       >
                         ✓
                       </button>
                       <button 
                         className={styles.rejectBtn}
                         onClick={() => updateStatus(app.id, 'RECHAZADA')}
+                        title="Rechazar Solicitud"
                       >
                         ✕
                       </button>
@@ -104,9 +122,9 @@ export default function ApplicationsAdminClient() {
                   </td>
                 </tr>
               ))}
-              {apps.length === 0 && (
+              {filteredApps.length === 0 && (
                 <tr>
-                  <td colSpan={7} className={styles.noData}>No hay solicitudes pendientes.</td>
+                  <td colSpan={7} className={styles.noData}>No hay solicitudes de {activeTab} pendientes.</td>
                 </tr>
               )}
             </tbody>
