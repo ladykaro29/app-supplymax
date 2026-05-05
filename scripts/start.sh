@@ -1,14 +1,15 @@
 #!/bin/sh
 
-# Ensure the DB schema is up to date in the runtime environment
-# For SQLite, this creates the file if it doesn't exist
-echo "Running database schema sync..."
-npx prisma db push --accept-data-loss
+echo "=== SupplyMax Startup ==="
 
-# Seed the database if it's empty (first run only)
-echo "Checking if database needs seeding..."
-npx prisma db seed 2>/dev/null || echo "Seeding skipped or already done."
+# Ensure the DB file and schema exist
+echo "Syncing database schema..."
+npx prisma db push --accept-data-loss 2>&1 || echo "WARNING: prisma db push had issues"
+
+# Seed the database if it's empty
+echo "Checking seed..."
+npx tsx prisma/seed.ts 2>&1 || echo "WARNING: seed had issues (may already be seeded)"
 
 # Start the application
 echo "Starting Next.js server..."
-node server.js
+exec node server.js
