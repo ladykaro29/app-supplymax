@@ -29,8 +29,8 @@ export async function POST(request: Request) {
     const { password: _, ...userWithoutPassword } = user;
 
     return NextResponse.json(userWithoutPassword);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Login error:', error);
-    return NextResponse.json({ error: 'Error en el servidor' }, { status: 500 });
+    return NextResponse.json({ error: `Error en el servidor: ${error.message || 'Error desconocido'}` }, { status: 500 });
   }
 }

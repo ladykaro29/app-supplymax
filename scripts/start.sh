@@ -1,14 +1,20 @@
 #!/bin/sh
 
-echo "=== SupplyMax Startup ==="
+echo "=== SupplyMax Production Startup ==="
 
-# If the runtime DB doesn't exist, copy the pre-seeded template
-if [ ! -f /app/prisma/dev.db ]; then
-  echo "No database found. Copying pre-seeded template..."
-  cp /app/prisma/template.db /app/prisma/dev.db
-  echo "Database ready with seed data."
+# Define Prisma CLI path
+PRISMA_CLI="./node_modules/prisma/build/index.js"
+
+# Ensure the DB schema is up to date
+echo "Syncing database schema..."
+node $PRISMA_CLI db push --accept-data-loss
+
+# Run the compiled seed script
+echo "Running database seed..."
+if [ -f prisma/seed.js ]; then
+  node prisma/seed.js
 else
-  echo "Existing database found, using it."
+  echo "WARNING: prisma/seed.js not found!"
 fi
 
 # Start the application
