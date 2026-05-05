@@ -29,7 +29,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL="file:/app/prisma/dev.db"
+# Match the start.sh relative path
+ENV DATABASE_URL="file:./prisma/v2_production.db"
 
 # Security: run as non-root
 RUN addgroup --system --gid 1001 nodejs
@@ -44,7 +45,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Prisma files needed for runtime ops (push/seed)
 COPY --from=builder /app/prisma ./prisma
-# We need the Prisma CLI and engines to run 'db push'
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
@@ -55,8 +55,8 @@ USER root
 RUN tr -d '\r' < start.sh > start_unix.sh && mv start_unix.sh start.sh
 RUN chmod +x start.sh
 
-# Ensure nextjs user owns the prisma directory for SQLite writes
-RUN chown -R nextjs:nodejs /app/prisma
+# Ensure nextjs user owns the prisma directory
+RUN mkdir -p /app/prisma && chown -R nextjs:nodejs /app/prisma
 USER nextjs
 
 EXPOSE 3000

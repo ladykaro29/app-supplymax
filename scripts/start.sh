@@ -2,29 +2,33 @@
 
 echo "=== SupplyMax Production Startup ==="
 
-# Define paths
+# Define paths - using relative paths which are often more reliable in SQLite/Prisma containers
 PRISMA_CLI="./node_modules/prisma/build/index.js"
 SCHEMA_PATH="./prisma/schema.prisma"
-DB_FILE="/app/prisma/dev.db"
+# We change the filename to v2 to force a fresh start and bypass any "sticky" volume files
+DB_FILE="./prisma/v2_production.db"
 
-# FORCE RESET: Delete the existing DB to ensure the new schema (role_id, etc.) is applied correctly
-if [ -f "$DB_FILE" ]; then
-  echo "Found existing database at $DB_FILE. Removing it to force a clean schema sync..."
-  rm "$DB_FILE"
-fi
+echo "Current directory: $(pwd)"
+echo "Target DB: $DB_FILE"
 
-# Ensure the DB schema is up to date
-echo "Syncing database schema..."
+# Ensure prisma directory exists
+mkdir -p ./prisma
+
+# Sync schema to the NEW database file
+echo "Pushing schema to $DB_FILE..."
 node $PRISMA_CLI db push --schema=$SCHEMA_PATH --accept-data-loss
 
 # Run the compiled seed script
-echo "Running database seed..."
+echo "Seeding $DB_FILE..."
 if [ -f prisma/seed.js ]; then
-  node prisma/seed.js
+  # Ensure seed uses the same DB_FILE if it relies on env
+  DATABASE_URL="file:$DB_FILE" node prisma/seed.js
 else
   echo "WARNING: prisma/seed.js not found!"
 fi
 
 # Start the application
 echo "Starting Next.js server..."
+# Ensure the app uses the NEW database file
+export DATABASE_URL="file:$DB_FILE"
 exec node server.js
