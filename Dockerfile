@@ -12,15 +12,20 @@ COPY . .
 
 # --- CRITICAL BUILD-TIME SETUP ---
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL="file:./dev.db"
 
-# Generate Prisma Client
+# 1. Generate Prisma Client for the Alpine target
 RUN npx prisma generate
 
-# Compile seed.ts to seed.js
-RUN npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --external:@prisma/client --external:dotenv
+# 2. Create the production database with correct schema AT BUILD TIME
+#    Use the SAME relative path that the runtime will use
+ENV DATABASE_URL="file:./prisma/production.db"
+RUN npx prisma db push --accept-data-loss
 
-# Build the project
+# 3. Compile and run seed to populate the build-time DB
+RUN npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --external:@prisma/client --external:dotenv
+RUN node prisma/seed.js
+
+# 4. Build the Next.js project (with DATABASE_URL set so Prisma resolves correctly)
 RUN npm run build
 
 # Runner Stage
@@ -29,8 +34,9 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# Use absolute path
-ENV DATABASE_URL="file:/app/prisma/v2_production.db"
+
+# CRITICAL: Same relative path as build time
+ENV DATABASE_URL="file:./prisma/production.db"
 
 # Security: run as non-root
 RUN addgroup --system --gid 1001 nodejs
@@ -39,28 +45,24 @@ RUN adduser --system --uid 1001 nextjs
 # Assets
 COPY --from=builder /app/public ./public
 
-# Standalone output (includes its own node_modules)
+# Standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Prisma files needed for runtime ops (push/seed)
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+# Prisma: copy the schema, the BUILT database, and the engine files
+COPY --from=builder --chown=nextjs:nodejs /app/prisma/schema.prisma ./prisma/schema.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/prisma/production.db ./prisma/production.db
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
-# Startup script
-COPY --from=builder /app/scripts/start.sh ./start.sh
+# Ensure the nextjs user can write to the prisma dir (SQLite needs write for WAL/journal)
 USER root
-RUN tr -d '\r' < start.sh > start_unix.sh && mv start_unix.sh start.sh
-RUN chmod +x start.sh
-
-# Create prisma dir and ensure it's owned by nextjs for SQLite writes
-RUN mkdir -p /app/prisma && chown -R nextjs:nodejs /app/prisma
+RUN chown -R nextjs:nodejs /app/prisma
 USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["./start.sh"]
+# Start directly - no startup script needed, DB is already built and seeded
+CMD ["node", "server.js"]
