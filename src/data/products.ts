@@ -2,19 +2,21 @@ export interface Product {
   id: number;
   name: string;
   category: string; // 'Suplementos' | 'Ropa' | etc.
-  goal?: string;
+  goal?: string | null;
   price: number; // Selling price
-  purchasePrice?: number; // Manufacturing/Purchase price
+  purchasePrice?: number | null; // Manufacturing/Purchase price
   image: string;
   description: string;
-  portions?: string; // For supplements
-  flavor?: string; // For supplements
-  weight?: string; // For supplements
-  sizes?: string[]; // For clothing ['S', 'M', 'L', 'XL']
-  isFeatured?: boolean;
-  isOffer?: boolean;
-  discount?: number;
-  highlights?: string[];
+  portions?: string | null; // For supplements
+  flavor?: string | null; // For supplements
+  flavors?: string[] | null; // Added to match UI requirements
+  weight?: string | null; // For supplements
+  sizes?: string | string[] | null; // Supports comma-separated string from DB or array
+  isFeatured?: boolean | null;
+  isOffer?: boolean | null;
+  discount?: number | null;
+  highlights?: string[] | null;
+  durationInDays?: string | null;
 }
 
 export const PRODUCTS: Product[] = [

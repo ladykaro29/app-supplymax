@@ -25,10 +25,74 @@ export default function CheckoutPage() {
 
   const totalInVES = cartTotal * exchangeRate;
 
-  const handleOrder = () => {
-    completeOrder();
-    alert('Orden recibida. Un administrador verificará tu pago.');
-    router.push('/');
+  const [loading, setLoading] = useState(false);
+  const [appliedDiscount, setAppliedDiscount] = useState<{ val: number, type: string } | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
+
+  const applyDiscount = async () => {
+    if (!discountCode) return;
+    setIsValidating(true);
+    try {
+      const res = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: discountCode })
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setAppliedDiscount({ val: data.discount, type: data.discountType });
+        alert(`Código aplicado con éxito: ${data.discountType === 'PERCENT' ? (data.discount * 100) + '%' : '$' + data.discount} de descuento.`);
+      } else {
+        setAppliedDiscount(null);
+        alert(data.error || 'Código no válido');
+      }
+    } catch (err) {
+      alert('Error al validar código');
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const calculateFinalTotal = () => {
+    if (!appliedDiscount) return cartTotal;
+    if (appliedDiscount.type === 'PERCENT') {
+      return cartTotal * (1 - appliedDiscount.val);
+    }
+    return Math.max(0, cartTotal - appliedDiscount.val);
+  };
+
+  const finalTotal = calculateFinalTotal();
+  const finalTotalInVES = finalTotal * exchangeRate;
+
+  const handleOrder = async () => {
+    setLoading(true);
+    
+    const shippingInfo = shippingLevel === 1 
+      ? `Local: ${localAddress} (${localTime})`
+      : shippingLevel === 2
+        ? `Municipio: ${muniLocation} via ${agency}`
+        : `Nacional: ${nationalState} - ${nationalAgency} via ${agency}`;
+
+    try {
+      const res = await completeOrder({
+        referralCode: discountCode,
+        agency: shippingInfo,
+        paymentRef: 'VERIFICACIÓN PENDIENTE', // In a real app, this might come from the upload
+        total: finalTotal, // Pass the discounted total
+      });
+
+      if (res) {
+        alert('Orden recibida con éxito. Un administrador verificará tu pago.');
+        router.push('/profile/orders');
+      } else {
+        alert('Hubo un error al procesar tu pedido.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error de conexión.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const statesOfVenezuelaByAgency = [
@@ -205,19 +269,33 @@ export default function CheckoutPage() {
           <div className={styles.finalTotal}>
              <span>TOTAL A PAGAR</span>
              <div className={styles.amount}>
-                {formatPrice(cartTotal)} / {totalInVES.toLocaleString('es-VE')} BS
+                {formatPrice(finalTotal)} / {finalTotalInVES.toLocaleString('es-VE')} BS
              </div>
+             {appliedDiscount && (
+               <div className={styles.savings}>
+                 ¡Ahorraste {formatPrice(cartTotal - finalTotal)}!
+               </div>
+             )}
           </div>
-
+ 
           <div className={styles.summaryActions}>
             <div className={styles.discountRow}>
-               <input 
-                type="text" 
-                placeholder="Código de descuento..." 
-                className={styles.discountInput}
-                value={discountCode}
-                onChange={(e) => setDiscountCode(e.target.value)}
-               />
+               <div className={styles.inputWrap}>
+                <input 
+                  type="text" 
+                  placeholder="Código de descuento..." 
+                  className={styles.discountInput}
+                  value={discountCode}
+                  onChange={(e) => setDiscountCode(e.target.value)}
+                />
+                <button 
+                  className={styles.applyBtn} 
+                  onClick={applyDiscount}
+                  disabled={isValidating}
+                >
+                  {isValidating ? '...' : 'APLICAR'}
+                </button>
+               </div>
                <button className={styles.modifyCartBtn} onClick={() => setCartOpen(true)}>
                  MODIFICAR CARRITO
                </button>
@@ -226,10 +304,10 @@ export default function CheckoutPage() {
 
           <button 
             className={styles.finishBtn} 
-            disabled={!fileUploaded}
+            disabled={!fileUploaded || loading}
             onClick={handleOrder}
           >
-            FINALIZAR PEDIDO Y REGISTRAR PAGO
+            {loading ? 'PROCESANDO...' : 'FINALIZAR PEDIDO Y REGISTRAR PAGO'}
           </button>
         </aside>
       </div>

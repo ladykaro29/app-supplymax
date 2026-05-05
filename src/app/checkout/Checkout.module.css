@@ -283,7 +283,36 @@
 
 .discountRow {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inputWrap {
+  display: flex;
+  gap: 8px;
+}
+
+.applyBtn {
+  background: white;
+  color: black;
+  border: none;
+  padding: 0 15px;
+  font-weight: 800;
+  font-size: 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.applyBtn:disabled {
+  opacity: 0.5;
+}
+
+.savings {
+  color: var(--color-accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-top: 8px;
+  text-transform: uppercase;
 }
 
 .discountInput {

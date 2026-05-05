@@ -58,9 +58,13 @@ export default function SideMenu() {
           ) : (
             <>
               {/* REGULAR USER OPTIONS */}
-              <Link href="/profile" className={styles.navItem} onClick={() => setMenuOpen(false)}>
+              <Link 
+                href={user ? '/profile' : '/login'} 
+                className={styles.navItem} 
+                onClick={() => setMenuOpen(false)}
+              >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                Mi Cuenta
+                {user ? 'Mi Cuenta' : 'Iniciar Sesión'}
               </Link>
               <Link href="/catalog" className={styles.navItem} onClick={() => setMenuOpen(false)}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>

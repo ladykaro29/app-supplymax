@@ -35,8 +35,15 @@ export default function EditProductsPage() {
   }, [products, searchTerm]);
 
   const handleEdit = (product: Product) => {
-    // Clone to avoid direct mutations
-    setEditingProduct({ ...product });
+    // Clone and ensure sizes is an array for the UI
+    let sizesArr: string[] = [];
+    if (Array.isArray(product.sizes)) {
+      sizesArr = product.sizes;
+    } else if (typeof product.sizes === 'string') {
+      sizesArr = product.sizes.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    
+    setEditingProduct({ ...product, sizes: sizesArr });
   };
 
   const closeModal = () => {
@@ -57,7 +64,7 @@ export default function EditProductsPage() {
 
   const toggleSize = (size: string) => {
     if (!editingProduct) return;
-    const currentSizes = editingProduct.sizes || [];
+    const currentSizes = (editingProduct.sizes as string[]) || [];
     const newSizes = currentSizes.includes(size)
       ? currentSizes.filter(s => s !== size)
       : [...currentSizes, size];
@@ -188,7 +195,7 @@ export default function EditProductsPage() {
                     {['S', 'M', 'L', 'XL'].map(size => (
                       <button 
                         key={size}
-                        className={`${styles.sizeBtn} ${editingProduct.sizes?.includes(size) ? styles.sizeBtnActive : ''}`}
+                        className={`${styles.sizeBtn} ${(editingProduct.sizes as string[])?.includes(size) ? styles.sizeBtnActive : ''}`}
                         onClick={() => toggleSize(size)}
                       >
                         {size}
@@ -232,7 +239,7 @@ export default function EditProductsPage() {
                 <label className={styles.checkboxLabel}>
                   <input 
                     type="checkbox" 
-                    checked={editingProduct.isFeatured}
+                    checked={!!editingProduct.isFeatured}
                     onChange={(e) => setEditingProduct({...editingProduct, isFeatured: e.target.checked})}
                   />
                   Producto Destacado
@@ -240,7 +247,7 @@ export default function EditProductsPage() {
                 <label className={styles.checkboxLabel}>
                   <input 
                     type="checkbox" 
-                    checked={editingProduct.isOffer}
+                    checked={!!editingProduct.isOffer}
                     onChange={(e) => setEditingProduct({...editingProduct, isOffer: e.target.checked})}
                   />
                   Producto en Oferta

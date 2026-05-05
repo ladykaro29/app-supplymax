@@ -15,8 +15,18 @@ interface ProductDetailClientProps {
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const { addToCart, formatPrice } = useAppContext();
   const [quantity, setQuantity] = useState(1);
-  const [selectedFlavor, setSelectedFlavor] = useState(product.flavors?.[0] || '');
-  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '');
+  
+  // Normalize flavors and sizes to arrays
+  const flavorsArr = Array.isArray(product.flavors) 
+    ? product.flavors 
+    : (product.flavor ? product.flavor.split(',').map(s => s.trim()) : []);
+    
+  const sizesArr = Array.isArray(product.sizes)
+    ? product.sizes
+    : (typeof product.sizes === 'string' ? product.sizes.split(',').map(s => s.trim()) : []);
+
+  const [selectedFlavor, setSelectedFlavor] = useState(flavorsArr[0] || '');
+  const [selectedSize, setSelectedSize] = useState(sizesArr[0] || '');
 
   const handleAddToCart = () => {
     // Construct variant name if applicable
@@ -83,11 +93,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </p>
 
           <div className={styles.variationSection}>
-            {product.flavors && product.flavors.length > 0 && (
+            {flavorsArr.length > 0 && (
               <div>
                 <span className={styles.variationTitle}>SABOR SELECCIONADO: {selectedFlavor}</span>
                 <div className={styles.variationGrid}>
-                  {product.flavors.map(f => (
+                  {flavorsArr.map(f => (
                     <button 
                       key={f} 
                       className={`${styles.varBtn} ${selectedFlavor === f ? styles.active : ''}`}
@@ -100,11 +110,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               </div>
             )}
 
-            {product.sizes && product.sizes.length > 0 && (
+            {sizesArr.length > 0 && (
               <div>
                 <span className={styles.variationTitle}>PRESENTACIÓN: {selectedSize}</span>
                 <div className={styles.variationGrid}>
-                  {product.sizes.map(s => (
+                  {sizesArr.map(s => (
                     <button 
                       key={s} 
                       className={`${styles.varBtn} ${selectedSize === s ? styles.active : ''}`}

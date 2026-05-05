@@ -11,7 +11,7 @@ import commonStyles from '../../profile/Profile.module.css';
 export default function InfluencerDashboard() {
   const { user } = useAppContext();
 
-  if (!user || user.role !== 'Influencer') return null;
+  if (!user || user.role_id !== 'Influencer') return null;
 
   const withdrawLimit = 5000;
   const canWithdraw = (user.tokens || 0) >= withdrawLimit;
@@ -52,7 +52,7 @@ export default function InfluencerDashboard() {
           <section className={styles.influencerTools}>
             <div className={`${commonStyles.infoCard} glass`}>
                <h3>Tu Código de Descuento</h3>
-               <div className={styles.promoCode}>{user.influencerCode}</div>
+               <div className={styles.promoCode}>{user.affiliate_code}</div>
                <p>Comparte este código para dar 10% de descuento a tus seguidores y ganar comisiones.</p>
                <button className={styles.copyBtn}>COPIAR ENLACE ÚNICO</button>
             </div>

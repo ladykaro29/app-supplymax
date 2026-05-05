@@ -17,6 +17,7 @@ interface User {
   name: string;
   email: string;
   role_id: 'User' | 'Influencer' | 'Coach' | 'Admin';
+  level?: string;
   sub_level?: string; 
   status: UserStatus;
   
@@ -60,7 +61,7 @@ interface AppContextType {
   addAddress: (label: string, value: string) => void;
   removeAddress: (id: string) => void;
   clearCart: () => void;
-  completeOrder: () => void;
+  completeOrder: (orderData?: any) => Promise<any>;
   cartTotal: number;
   isCartOpen: boolean;
   setCartOpen: (open: boolean) => void;
@@ -96,13 +97,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCurrency((prev) => (prev === 'USD' ? 'VES' : 'USD'));
   };
 
+  const fetchOrders = async (userId: string) => {
+    try {
+      const res = await fetch(`/api/orders?userId=${userId}`);
+      if (res.ok) {
+        const data = await res.json();
+        // Map backend order structure to AppContext Order structure if needed
+        setOrders(data);
+      }
+    } catch (err) {
+      console.error('Error fetching orders:', err);
+    }
+  };
+
   const login = (userData: any) => {
     // Normalizing the JSON object received from "server"
-    setUser({
+    const userObj: User = {
       id: userData.id || '123',
       name: userData.name || 'Usuario Supply',
       email: userData.email || 'user@email.com',
       role_id: userData.role_id || 'User',
+      level: userData.level,
       sub_level: userData.sub_level,
       status: userData.status || 'Active',
       tokens: userData.tokens ?? (userData.role_id === 'Influencer' ? 0 : null),
@@ -112,10 +127,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       addresses: userData.addresses || [
         { id: '1', label: 'Principal', value: 'Av. Libertador, Mérida' }
       ]
-    });
+    };
+    setUser(userObj);
+    fetchOrders(userObj.id);
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    setUser(null);
+    setOrders([]);
+  };
 
   const addAddress = (label: string, value: string) => {
     if (!user) return;
@@ -157,30 +177,66 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = () => setCart([]);
 
-  const completeOrder = () => {
-    if (cart.length === 0) return;
-    const newOrder: Order = {
-      id: `ORD-${Math.floor(Math.random() * 10000)}`,
-      date: new Date().toISOString(),
-      status: 'Pendiente',
-      items: [...cart],
-      total: cartTotal
+  const [settings, setSettings] = useState<any>({});
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch('/api/settings');
+        if (res.ok) setSettings(await res.json());
+      } catch (err) {
+        console.error('Settings fetch error:', err);
+      }
     };
-    setOrders(prev => [newOrder, ...prev]);
-    clearCart();
+    fetchSettings();
+  }, []);
+
+  const completeOrder = async (orderData?: any) => {
+    if (cart.length === 0 || !user) return;
+
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          items: cart,
+          total: cartTotal,
+          ...orderData
+        }),
+      });
+
+      if (res.ok) {
+        const newOrder = await res.json();
+        setOrders(prev => [newOrder, ...prev]);
+        clearCart();
+        
+        // Refresh user data if tokens were used or awarded
+        const userRes = await fetch(`/api/auth/profile?userId=${user.id}`);
+        if (userRes.ok) login(await userRes.json());
+        
+        return newOrder;
+      }
+    } catch (err) {
+      console.error('Error completing order:', err);
+    }
   };
 
   const [isCartOpen, setCartOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isChatOpen, setChatOpen] = useState(false);
 
-  // 3. Calculation Engine (Total) with Price Middleware logic
+  // 3. Calculation Engine (Total) with Dynamic Settings
   const cartTotal = cart.reduce((acc, item) => {
     let itemPrice = item.price;
     
-    // Logic: Coach N1/N2 get 10% discount (FinalPrice = BasePrice * 0.90)
+    // Coach dynamic discount
     if (user?.role_id === 'Coach') {
-      itemPrice = item.price * 0.90;
+      const discountPercent = user.sub_level === 'Oro' 
+        ? (parseInt(settings.coach_gold_discount) || 15)
+        : (parseInt(settings.coach_silver_discount) || 10);
+        
+      itemPrice = item.price * (1 - (discountPercent / 100));
     }
     
     return acc + (itemPrice * item.quantity);

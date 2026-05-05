@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header/Header';
 import { useAppContext } from '@/context/AppContext';
 import styles from './Admin.module.css';
@@ -8,9 +8,41 @@ import styles from './Admin.module.css';
 export default function AdminDashboard() {
   const { user, orders, exchangeRate, setExchangeRate, formatPrice } = useAppContext();
   
-  // Local state for the admin controls
-  const [newRate, setNewRate] = useState<string>(exchangeRate.toString());
-  const [localOrders, setLocalOrders] = useState(orders);
+  const [localOrders, setLocalOrders] = useState<any[]>([]);
+  const [reminders, setReminders] = useState<any[]>([]);
+  const [stats, setStats] = useState({ totalSalesUSD: 0, pendingOrdersCount: 0 });
+  const [loading, setLoading] = useState(true);
+  const [newRate, setNewRate] = useState(exchangeRate.toString());
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [statsRes, remindersRes] = await Promise.all([
+          fetch('/api/admin/stats'),
+          fetch('/api/admin/reminders')
+        ]);
+
+        if (statsRes.ok) {
+          const data = await statsRes.json();
+          setLocalOrders(data.orders);
+          setStats({
+            totalSalesUSD: data.totalSalesUSD,
+            pendingOrdersCount: data.pendingOrdersCount
+          });
+        }
+
+        if (remindersRes.ok) {
+          const data = await remindersRes.json();
+          setReminders(data);
+        }
+      } catch (err) {
+        console.error('Error fetching admin data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   if (!user || user.role_id !== 'Admin') {
     return (
@@ -34,16 +66,24 @@ export default function AdminDashboard() {
     }
   };
 
-  const verifyOrder = (orderId: string) => {
-    setLocalOrders(prev => prev.map(order => 
-      order.id === orderId ? { ...order, status: 'Verificado' } : order
-    ));
-    // In a real app, this would also update the AppContext/Backend
-  };
+  const verifyOrder = async (orderId: string) => {
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'VERIFICADO' }),
+      });
 
-  // Calculate stats
-  const pendingOrders = localOrders.filter(o => o.status === 'Pendiente');
-  const totalSalesUSD = localOrders.reduce((sum, order) => sum + order.total, 0);
+      if (res.ok) {
+        setLocalOrders(prev => prev.map(order => 
+          order.id === orderId ? { ...order, status: 'VERIFICADO' } : order
+        ));
+        setStats(prev => ({ ...prev, pendingOrdersCount: prev.pendingOrdersCount - 1 }));
+      }
+    } catch (err) {
+      console.error('Error verifying order:', err);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -89,17 +129,41 @@ export default function AdminDashboard() {
             <div className={`${styles.statsGrid} glass`}>
               <div className={styles.statBox}>
                 <span>Ventas (USD)</span>
-                <strong>{formatPrice(totalSalesUSD)}</strong>
+                <strong>{formatPrice(stats.totalSalesUSD)}</strong>
               </div>
               <div className={styles.statBox}>
                 <span>Ventas (VES aprox)</span>
-                <strong>Bs. {(totalSalesUSD * exchangeRate).toLocaleString('es-VE')}</strong>
+                <strong>Bs. {(stats.totalSalesUSD * exchangeRate).toLocaleString('es-VE')}</strong>
               </div>
               <div className={styles.statBox}>
                 <span>Órdenes Pendientes</span>
-                <strong className={styles.pendingNumber}>{pendingOrders.length}</strong>
+                <strong className={styles.pendingNumber}>{stats.pendingOrdersCount}</strong>
               </div>
             </div>
+
+            <section className={`${styles.remindersCard} glass`}>
+              <h3>🔔 Próximas Recompras</h3>
+              <p>Clientes que podrían estar por agotar sus productos.</p>
+              
+              <div className={styles.remindersList}>
+                {reminders.length === 0 ? (
+                  <p className={styles.emptySmall}>No hay recordatorios pendientes.</p>
+                ) : (
+                  reminders.map((rem, idx) => (
+                    <div key={idx} className={styles.reminderRow}>
+                      <div className={styles.remInfo}>
+                        <strong>{rem.userName}</strong>
+                        <span>{rem.productName}</span>
+                      </div>
+                      <div className={`${styles.remBadge} ${styles[rem.status.toLowerCase().replace(' ', '')] || styles.pending}`}>
+                        {rem.status} ({rem.daysRemaining}d)
+                      </div>
+                      <button className={styles.contactBtn}>WhatsApp</button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </section>
           </div>
 
           {/* Orders Management */}

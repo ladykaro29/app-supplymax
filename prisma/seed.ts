@@ -4,6 +4,16 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
+  console.log('Cleaning existing data...');
+  await prisma.review.deleteMany();
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.setting.deleteMany();
+  await prisma.verificationToken.deleteMany();
+
+  console.log('Seeding products...');
   const products = [
     {
       name: "Pure Whey Impact 5lb",
@@ -12,7 +22,11 @@ async function main() {
       price: 65.00,
       image: "/protein.png",
       description: "Proteína de suero de alta calidad para máxima recuperación muscular.",
-      durationInDays: 30
+      isFeatured: true,
+      portions: "70",
+      flavor: "Vainilla",
+      weight: "2.2kg",
+      durationInDays: "30"
     },
     {
       name: "Creatine Micronized 300g",
@@ -21,7 +35,10 @@ async function main() {
       price: 35.00,
       image: "/creatine.png",
       description: "Creatina monohidratada pura para aumento de fuerza y potencia.",
-      durationInDays: 60
+      isOffer: true,
+      discount: 10,
+      weight: "300g",
+      durationInDays: "60"
     },
     {
       name: "Elite Amino Recovery",
@@ -30,7 +47,8 @@ async function main() {
       price: 29.99,
       image: "/amino.png",
       description: "BCAA premium para evitar el catabolismo.",
-      durationInDays: 45
+      weight: "400g",
+      durationInDays: "45"
     },
     {
       name: "Pre-Workout Nitro",
@@ -39,35 +57,81 @@ async function main() {
       price: 45.00,
       image: "/pre-workout.png",
       description: "Explosión de energía para tus entrenamientos más pesados.",
-      durationInDays: 20
+      portions: "30",
+      flavor: "Fruit Punch",
+      durationInDays: "30"
+    },
+    {
+      name: "SupplyMax Oversized Tee",
+      category: "Ropa",
+      goal: "LIFESTYLE",
+      price: 25.00,
+      image: "/clothing1.png",
+      description: "Camiseta oversized de algodón premium para el gimnasio.",
+      isFeatured: true,
+      sizes: "S,M,L,XL"
+    },
+    {
+      name: "Performance Joggers",
+      category: "Ropa",
+      goal: "ENTRENAMIENTO",
+      price: 45.00,
+      image: "/clothing2.png",
+      description: "Pantalones deportivos ajustados con tecnología dry-fit.",
+      isFeatured: true,
+      sizes: "M,L,XL"
     }
-  ]
+  ];
 
-  console.log('Seeding products...')
   for (const p of products) {
-    await prisma.product.upsert({
-      where: { id: products.indexOf(p) + 1 },
-      update: {},
-      create: p,
-    })
+    await prisma.product.create({ data: p });
   }
 
-  // Create a mock Influencer
-  await prisma.user.upsert({
-    where: { email: 'influencer@supplymax.com' },
-    update: {},
-    create: {
-      name: 'Carlos Mendoza',
-      email: 'influencer@supplymax.com',
-      password: 'password123', // In a real app, hash this
-      role: 'Influencer',
-      level: 'Plata',
-      tokens: 2450,
-      influencerCode: 'MENDOZA5'
-    }
-  })
+  console.log('Seeding users & partners...');
+  // Note: Using role_id as defined in schema.prisma
+  await prisma.user.createMany({
+    data: [
+      {
+        name: 'Admin Supplymax',
+        email: 'admin@supplymax.com',
+        password: 'adminpassword',
+        role_id: 'Admin',
+        status: 'Active'
+      },
+      {
+        name: 'Carlos Mendoza',
+        email: 'influencer@supplymax.com',
+        password: 'password123',
+        role_id: 'Influencer',
+        level: 'Plata',
+        tokens: 2450,
+        affiliate_code: 'MENDOZA5',
+        is_featured: true,
+        image: '/partners/alex.jpg'
+      },
+      {
+        name: 'Maria Coach',
+        email: 'coach@supplymax.com',
+        password: 'coachpassword',
+        role_id: 'Coach',
+        sub_level: 'Oro',
+        status: 'Active',
+        is_featured: true,
+        image: '/partners/maria.jpg'
+      }
+    ]
+  });
 
-  console.log('Seed completed.')
+  console.log('Seeding settings...');
+  await prisma.setting.createMany({
+    data: [
+      { key: 'coach_silver_discount', value: '10' },
+      { key: 'coach_gold_discount', value: '15' },
+      { key: 'affiliate_commission', value: '5' }
+    ]
+  });
+
+  console.log('Seed completed.');
 }
 
 main()

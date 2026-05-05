@@ -11,47 +11,41 @@ import Link from 'next/link';
 export default function LoginPage() {
   const { login } = useAppContext();
   const router = useRouter();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
     
-    // Technical Profile Definitions
-    if (email === 'admin@supplymax.com' && password === 'admin123') {
-      login({ id: '0', name: 'Admin Master', role_id: 'Admin', status: 'Active' });
-      router.push('/admin/applications');
-    } else if (email === 'influencer@supplymax.com' && password === 'pass123') {
-      login({ 
-        id: '1', 
-        name: 'Alex Trainer', 
-        email: 'alex@supply.com', 
-        role_id: 'Influencer', 
-        status: 'Active', 
-        tokens: 4500, 
-        affiliate_code: 'ALEX10' 
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
-      router.push('/profile');
-    } else if (email === 'coach@supplymax.com' && password === 'coach123') {
-      login({ 
-        id: '2', 
-        name: 'Coach Pro', 
-        email: 'coach@supply.com', 
-        role_id: 'Coach', 
-        coach_tier: 2, 
-        is_featured: true, 
-        status: 'Active' 
-      });
-      router.push('/profile');
-    } else {
-      login({ 
-        id: '100', 
-        name: 'Juan Perez', 
-        email: email || 'user@email.com', 
-        role_id: 'User', 
-        status: 'Active' 
-      });
-      router.push('/profile');
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al iniciar sesión');
+      }
+
+      login(data);
+      
+      // Redirect based on role
+      if (data.role_id === 'Admin') {
+        router.push('/dashboard/admin');
+      } else {
+        router.push('/profile');
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,8 +58,7 @@ export default function LoginPage() {
           <div className={styles.logoGlow}>
              <Image src="/logo.jpg" alt="Logo" width={60} height={60} />
           </div>
-          <h1>Iniciar Sesión</h1>
-          <p>Accede a tu cuenta de Supply Max</p>
+          {error && <div className={styles.errorAlert}>{error}</div>}
           
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.inputGroup}>
@@ -84,7 +77,7 @@ export default function LoginPage() {
               <label>Contraseña</label>
               <input 
                 type="password" 
-                placeholder="Tu contraseña (ej: admin123)" 
+                placeholder="Tu contraseña (ej: adminpassword)" 
                 className={styles.input} 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -94,8 +87,8 @@ export default function LoginPage() {
             
             <span className={styles.forgot}>¿Olvidaste tu contraseña?</span>
             
-            <button className={styles.submitBtn} type="submit">
-              INICIAR SESIÓN
+            <button className={styles.submitBtn} type="submit" disabled={loading}>
+              {loading ? 'CARGANDO...' : 'INICIAR SESIÓN'}
             </button>
           </form>
 

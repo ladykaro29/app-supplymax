@@ -18,18 +18,43 @@ export default function RegisterPage() {
     password: '',
     confirmPassword: ''
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate register
-    login({
-      name: formData.name || 'Nuevo Usuario',
-      email: formData.email,
-      role: 'User',
-      level: 1,
-      tokens: 0
-    } as any);
-    router.push('/');
+    if (formData.password !== formData.confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+    
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al crear cuenta');
+      }
+
+      login(data);
+      router.push('/profile');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,8 +66,7 @@ export default function RegisterPage() {
           <div className={styles.logoGlow}>
              <Image src="/logo.jpg" alt="Logo" width={60} height={60} />
           </div>
-          <h1>Crear Cuenta</h1>
-          <p>ÚNETE AL EQUIPO SUPPLY MAX</p>
+          {error && <div className={styles.errorAlert}>{error}</div>}
           
           <form className={styles.form} onSubmit={handleRegister}>
             <div className={styles.inputGroup}>
@@ -93,8 +117,8 @@ export default function RegisterPage() {
               />
             </div>
             
-            <button type="submit" className={styles.submitBtn}>
-              CREAR CUENTA
+            <button type="submit" className={styles.submitBtn} disabled={loading}>
+              {loading ? 'CREANDO CUENTA...' : 'CREAR CUENTA'}
             </button>
           </form>
 

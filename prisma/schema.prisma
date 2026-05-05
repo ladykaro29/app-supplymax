@@ -17,14 +17,16 @@ model User {
   level          String?   @default("Bronce")
   sub_level      String?   
   status         String    @default("Active")
-  tokens         Int       @default(0)
+  tokens         Float     @default(0)
   affiliate_code String?   @unique // Renamed from influencerCode for consistency
   coach_tier     Int?      
   is_featured    Boolean?  @default(false)
+  image          String?   // Avatar for partners/coaches
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   addresses      Address[]
   orders         Order[]
+  reviews        Review[]
 }
 
 model Product {
@@ -40,12 +42,41 @@ model Product {
   flavor         String?
   weight         String?
   sizes          String?     // Stored as comma-separated: 'S,M,L'
+  durationInDays String?     // Logic: re-purchase after X days
   isFeatured     Boolean     @default(false)
   isOffer        Boolean     @default(false)
   discount       Float?
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   orderItems     OrderItem[]
+  reviews        Review[]
+}
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model Coupon {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  discount    Float    // e.g. 0.05 for 5%
+  type        String   @default("PERCENT") // PERCENT or FIXED
+  isActive    Boolean  @default(true)
+  expiresAt   DateTime?
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  productId   Int
+  product     Product  @relation(fields: [productId], references: [id])
+  rating      Int      @default(5)
+  comment     String?
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
 }
 
 model Order {
@@ -96,4 +127,14 @@ model Application {
   status          String   @default("PENDIENTE")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([email, token])
 }
