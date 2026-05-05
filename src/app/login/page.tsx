@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,14 +76,23 @@ export default function LoginPage() {
             
             <div className={styles.inputGroup}>
               <label>Contraseña</label>
-              <input 
-                type="password" 
-                placeholder="Tu contraseña (ej: adminpassword)" 
-                className={styles.input} 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className={styles.passwordWrapper}>
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="Tu contraseña (ej: adminpassword)" 
+                  className={styles.input} 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button 
+                  type="button" 
+                  className={styles.eyeBtn}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
             </div>
             
             <span className={styles.forgot}>¿Olvidaste tu contraseña?</span>

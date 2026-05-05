@@ -29,8 +29,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# Match the start.sh relative path
-ENV DATABASE_URL="file:./prisma/v2_production.db"
+# Use absolute path
+ENV DATABASE_URL="file:/app/prisma/v2_production.db"
 
 # Security: run as non-root
 RUN addgroup --system --gid 1001 nodejs
@@ -55,7 +55,7 @@ USER root
 RUN tr -d '\r' < start.sh > start_unix.sh && mv start_unix.sh start.sh
 RUN chmod +x start.sh
 
-# Ensure nextjs user owns the prisma directory
+# Create prisma dir and ensure it's owned by nextjs for SQLite writes
 RUN mkdir -p /app/prisma && chown -R nextjs:nodejs /app/prisma
 USER nextjs
 
