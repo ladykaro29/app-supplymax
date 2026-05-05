@@ -4,6 +4,13 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
+  // Skip seeding if data already exists (idempotent)
+  const existingProducts = await prisma.product.count();
+  if (existingProducts > 0) {
+    console.log('Database already seeded, skipping...');
+    return;
+  }
+
   console.log('Cleaning existing data...');
   await prisma.review.deleteMany();
   await prisma.orderItem.deleteMany();
