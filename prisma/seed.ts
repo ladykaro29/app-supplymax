@@ -73,7 +73,7 @@ async function main() {
       category: "Ropa",
       goal: "LIFESTYLE",
       price: 25.00,
-      image: "/clothing1.png",
+      image: "/hoodie.png",
       description: "Camiseta oversized de algodón premium para el gimnasio.",
       isFeatured: true,
       sizes: "S,M,L,XL"
@@ -83,7 +83,7 @@ async function main() {
       category: "Ropa",
       goal: "ENTRENAMIENTO",
       price: 45.00,
-      image: "/clothing2.png",
+      image: "/hoodie.png",
       description: "Pantalones deportivos ajustados con tecnología dry-fit.",
       isFeatured: true,
       sizes: "M,L,XL"
@@ -114,7 +114,7 @@ async function main() {
         tokens: 2450,
         affiliate_code: 'MENDOZA5',
         is_featured: true,
-        image: '/partners/alex.jpg'
+        image: '/logo.jpg'
       },
       {
         name: 'Maria Coach',
@@ -124,7 +124,7 @@ async function main() {
         sub_level: 'Oro',
         status: 'Active',
         is_featured: true,
-        image: '/partners/maria.jpg'
+        image: '/logo.jpg'
       }
     ]
   });

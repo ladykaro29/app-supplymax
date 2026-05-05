@@ -18,6 +18,9 @@ ENV DATABASE_URL="file:./build-time.db"
 RUN npx prisma generate
 RUN npx prisma db push --accept-data-loss
 
+# Compile seed.ts to seed.js so we can run it with plain node at runtime
+RUN npx tsx --compile prisma/seed.ts 2>/dev/null || npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --external:@prisma/client --external:dotenv 2>/dev/null || echo "Will use tsx at runtime"
+
 # Build the project
 RUN npm run build
 
@@ -27,8 +30,6 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-
-# This is the path to your Easypanel VOLUME
 ENV DATABASE_URL="file:/app/data/prod.db"
 
 # Security: run as non-root
@@ -51,11 +52,7 @@ COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 COPY --from=builder /app/package.json ./package.json
 
-# Copy tsx for seeding (needed by prisma db seed)
-COPY --from=builder /app/node_modules/tsx ./node_modules/tsx
-COPY --from=builder /app/node_modules/.bin/tsx ./node_modules/.bin/tsx
-COPY --from=builder /app/node_modules/esbuild ./node_modules/esbuild
-COPY --from=builder /app/node_modules/.bin/esbuild ./node_modules/.bin/esbuild
+# Copy dotenv for seed script
 COPY --from=builder /app/node_modules/dotenv ./node_modules/dotenv
 
 # Startup script
