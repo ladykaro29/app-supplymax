@@ -10,18 +10,16 @@ RUN npm ci --include=dev
 # Copy source code
 COPY . .
 
-# --- CRITICAL BUILD-TIME SETUP ---
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Use a build-time DB for Prisma generation and build
-ENV DATABASE_URL="file:./build-time.db"
+# === DATABASE SETUP (build-time) ===
+# Create, migrate, and SEED the database during the build
+ENV DATABASE_URL="file:./prisma/template.db"
 RUN npx prisma generate
 RUN npx prisma db push --accept-data-loss
+RUN npx tsx prisma/seed.ts
 
-# Compile seed.ts to seed.js so we can run it with plain node at runtime
-RUN npx tsx --compile prisma/seed.ts 2>/dev/null || npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --external:@prisma/client --external:dotenv 2>/dev/null || echo "Will use tsx at runtime"
-
-# Build the project
+# Build Next.js
 RUN npm run build
 
 # Runner Stage
@@ -30,30 +28,23 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL="file:/app/data/prod.db"
+ENV DATABASE_URL="file:/app/prisma/dev.db"
 
-# Security: run as non-root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
-
-# Create persistent data directory with proper permissions
-RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
 
 # Assets
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Prisma runtime files
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
-COPY --from=builder /app/package.json ./package.json
+# Prisma runtime (client + engine)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
-# Copy dotenv for seed script
-COPY --from=builder /app/node_modules/dotenv ./node_modules/dotenv
+# Prisma schema + the pre-seeded template DB
+COPY --from=builder --chown=nextjs:nodejs /app/prisma/schema.prisma ./prisma/schema.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/prisma/template.db ./prisma/template.db
 
 # Startup script
 COPY --from=builder /app/scripts/start.sh ./start.sh
@@ -61,8 +52,8 @@ USER root
 RUN tr -d '\r' < start.sh > start_unix.sh && mv start_unix.sh start.sh
 RUN chmod +x start.sh
 
-# Ensure nextjs user owns everything it needs
-RUN chown -R nextjs:nodejs /app/prisma /app/data
+# Ensure nextjs can write to prisma dir (for SQLite)
+RUN chown -R nextjs:nodejs /app/prisma
 USER nextjs
 
 EXPOSE 3000

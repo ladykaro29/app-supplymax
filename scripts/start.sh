@@ -2,17 +2,13 @@
 
 echo "=== SupplyMax Startup ==="
 
-# Ensure the DB file and schema exist
-echo "Syncing database schema..."
-npx prisma db push --accept-data-loss 2>&1
-
-# Seed the database - try compiled JS first, then tsx
-echo "Running seed..."
-if [ -f prisma/seed.js ]; then
-  node prisma/seed.js 2>&1
+# If the runtime DB doesn't exist, copy the pre-seeded template
+if [ ! -f /app/prisma/dev.db ]; then
+  echo "No database found. Copying pre-seeded template..."
+  cp /app/prisma/template.db /app/prisma/dev.db
+  echo "Database ready with seed data."
 else
-  echo "No compiled seed.js found, trying tsx..."
-  npx tsx prisma/seed.ts 2>&1 || echo "Seed failed - will start without seed data"
+  echo "Existing database found, using it."
 fi
 
 # Start the application
