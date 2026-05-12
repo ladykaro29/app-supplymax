@@ -17,15 +17,16 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npx prisma generate
 
 # 2. Create the production database with correct schema AT BUILD TIME
-#    Use the SAME relative path that the runtime will use
-ENV DATABASE_URL="file:./prisma/production.db"
+ARG DATABASE_URL="file:/app/prisma/production.db"
+ENV DATABASE_URL=$DATABASE_URL
+
 RUN npx prisma db push --accept-data-loss
 
 # 3. Compile and run seed to populate the build-time DB
 RUN npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --external:@prisma/client --external:dotenv
 RUN node prisma/seed.js
 
-# 4. Build the Next.js project (with DATABASE_URL set so Prisma resolves correctly)
+# 4. Build the Next.js project
 RUN npm run build
 
 # Runner Stage
@@ -35,8 +36,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# CRITICAL: Same relative path as build time
-ENV DATABASE_URL="file:./prisma/production.db"
+# Use the same DB path as build time
+ARG DATABASE_URL="file:/app/prisma/production.db"
+ENV DATABASE_URL=$DATABASE_URL
 
 # Security: run as non-root
 RUN addgroup --system --gid 1001 nodejs
@@ -49,9 +51,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Prisma: copy the schema, the BUILT database, and the engine files
-COPY --from=builder --chown=nextjs:nodejs /app/prisma/schema.prisma ./prisma/schema.prisma
-COPY --from=builder --chown=nextjs:nodejs /app/prisma/production.db ./prisma/production.db
+# Prisma: copy the entire prisma directory which contains the BUILT database
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
