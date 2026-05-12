@@ -55,6 +55,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+
+# Copy startup script
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/start.sh ./scripts/start.sh
+RUN chmod +x ./scripts/start.sh
 
 # Ensure the nextjs user can write to the prisma dir (SQLite needs write for WAL/journal)
 USER root
@@ -65,5 +70,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Start directly - no startup script needed, DB is already built and seeded
-CMD ["node", "server.js"]
+# Start using the wrapper script to ensure runtime DB schema synchronization
+CMD ["sh", "./scripts/start.sh"]

@@ -5,19 +5,20 @@ echo "=== SupplyMax Production Startup ==="
 # Define paths
 PRISMA_CLI="./node_modules/prisma/build/index.js"
 SCHEMA_PATH="./prisma/schema.prisma"
-# Use absolute path for reliability
-DB_FILE="/app/prisma/v2_production.db"
+
+# Fallback if DATABASE_URL is not set
+if [ -z "$DATABASE_URL" ]; then
+  export DATABASE_URL="file:/app/prisma/production.db"
+fi
 
 echo "Working directory: $(pwd)"
-echo "Target DB: $DB_FILE"
+echo "Target DB: $DATABASE_URL"
 
 # Ensure the parent directory exists and is writable
 mkdir -p /app/prisma
 
 # Sync schema to the database file
-echo "Pushing schema to $DB_FILE..."
-# We export DATABASE_URL as absolute to ensure Prisma finds it
-export DATABASE_URL="file:$DB_FILE"
+echo "Pushing schema to $DATABASE_URL..."
 node $PRISMA_CLI db push --schema=$SCHEMA_PATH --accept-data-loss
 
 # Run the compiled seed script
