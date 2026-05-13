@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -21,13 +20,6 @@ async function main() {
     await prisma.setting.deleteMany();
     await prisma.verificationToken.deleteMany();
   }
-  await prisma.review.deleteMany();
-  await prisma.orderItem.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.setting.deleteMany();
-  await prisma.verificationToken.deleteMany();
 
   if (shouldSeedProducts) {
     console.log('Seeding products...');

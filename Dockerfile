@@ -23,7 +23,7 @@ ENV DATABASE_URL=$DATABASE_URL
 RUN npx prisma db push --accept-data-loss
 
 # 3. Compile and run seed to populate the build-time DB
-RUN npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --external:@prisma/client --external:dotenv
+RUN npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --external:@prisma/client
 RUN node prisma/seed.js
 
 # 4. Build the Next.js project

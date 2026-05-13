@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 echo "=== SupplyMax Production Startup ==="
 
@@ -22,7 +23,7 @@ echo "Pushing schema to $DATABASE_URL..."
 node $PRISMA_CLI db push --schema=$SCHEMA_PATH --accept-data-loss
 
 # Run the compiled seed script
-echo "Seeding $DB_FILE..."
+echo "Running seed script..."
 if [ -f prisma/seed.js ]; then
   node prisma/seed.js
 else
