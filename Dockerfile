@@ -17,7 +17,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npx prisma generate
 
 # 2. Create the production database with correct schema AT BUILD TIME
-ARG DATABASE_URL="file:/app/prisma/production.db"
+ARG DATABASE_URL="file:/app/prisma/supplymax_v3.db"
 ENV DATABASE_URL=$DATABASE_URL
 
 RUN npx prisma db push --accept-data-loss
@@ -37,7 +37,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Use the same DB path as build time
-ARG DATABASE_URL="file:/app/prisma/production.db"
+ARG DATABASE_URL="file:/app/prisma/supplymax_v3.db"
 ENV DATABASE_URL=$DATABASE_URL
 
 # Security: run as non-root

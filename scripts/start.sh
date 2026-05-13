@@ -9,7 +9,7 @@ SCHEMA_PATH="./prisma/schema.prisma"
 
 # Fallback if DATABASE_URL is not set
 if [ -z "$DATABASE_URL" ]; then
-  export DATABASE_URL="file:/app/prisma/production.db"
+  export DATABASE_URL="file:/app/prisma/supplymax_v3.db"
 fi
 
 echo "Working directory: $(pwd)"
