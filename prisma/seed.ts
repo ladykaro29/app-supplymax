@@ -107,11 +107,16 @@ async function main() {
 
   console.log('Ensuring users & partners exist...');
   
+  // Explicitly remove the old admin user as requested
+  await prisma.user.deleteMany({
+    where: { email: 'admin@supplymax.com' }
+  });
+
   const users = [
     {
       name: 'Admin Supplymax',
-      email: 'admin@supplymax.com',
-      password: 'adminpassword',
+      email: 'admin@supplymax.app',
+      password: '123Suppli',
       role_id: 'Admin',
       status: 'Active'
     },
