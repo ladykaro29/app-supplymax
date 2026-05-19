@@ -13,6 +13,12 @@ COPY . .
 # --- CRITICAL BUILD-TIME SETUP ---
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Strip any .env files that may have leaked into the build context.
+# Prisma CLI auto-loads .env which would override the DATABASE_URL we
+# set below, causing seed/db-push to target the wrong file.
+RUN rm -f .env .env.local .env.production .env.development && \
+    echo "Build context env state:" && ls -la .env* 2>&1 || true
+
 # 1. Generate Prisma Client for the Alpine target
 RUN npx prisma generate
 
@@ -20,7 +26,8 @@ RUN npx prisma generate
 ARG DATABASE_URL="file:/app/prisma/supplymax_v3.db"
 ENV DATABASE_URL=$DATABASE_URL
 
-RUN npx prisma db push --accept-data-loss
+RUN echo "Building with DATABASE_URL=$DATABASE_URL" && \
+    npx prisma db push --accept-data-loss
 
 # 3. Compile and run seed to populate the build-time DB
 RUN npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --external:@prisma/client

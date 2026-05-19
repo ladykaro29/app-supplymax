@@ -7,13 +7,27 @@ echo "=== SupplyMax Production Startup ==="
 PRISMA_CLI="./node_modules/prisma/build/index.js"
 SCHEMA_PATH="./prisma/schema.prisma"
 
-# Fallback if DATABASE_URL is not set
-if [ -z "$DATABASE_URL" ]; then
-  export DATABASE_URL="file:/app/prisma/supplymax_v3.db"
-fi
+# FORCE the canonical DB path. We intentionally override whatever may
+# have leaked from .env / build args / platform UI env vars, because
+# the build was observed using /app/prisma/dev.db while runtime
+# expected supplymax_v3.db, leading to login lookups against an empty
+# DB. Single source of truth from here on.
+export DATABASE_URL="file:/app/prisma/supplymax_v3.db"
+
+# Some platforms (Easypanel, Coolify) inject .env files into the
+# build context or runtime container. Prisma's CLI auto-loads .env,
+# which would re-override DATABASE_URL. Strip them defensively.
+for f in /app/.env /app/.env.production /app/.env.development /app/.env.local; do
+  if [ -f "$f" ]; then
+    echo "[STARTUP] Removing leaked env file: $f"
+    rm -f "$f"
+  fi
+done
 
 echo "Working directory: $(pwd)"
 echo "Target DB: $DATABASE_URL"
+echo "Contents of /app/prisma BEFORE migrations:"
+ls -la /app/prisma/ || true
 
 # Ensure the parent directory exists and is writable
 mkdir -p /app/prisma
