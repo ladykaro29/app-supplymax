@@ -30,6 +30,37 @@ else
   echo "WARNING: prisma/seed.js not found!"
 fi
 
+# Defensive admin ensure — runs INDEPENDENTLY of seed.js so it survives
+# stale-volume / cached-image scenarios where seed.js may be outdated.
+echo "Ensuring admin user (defensive)..."
+node -e "
+const { PrismaClient } = require('@prisma/client');
+(async () => {
+  const p = new PrismaClient();
+  try {
+    await p.user.deleteMany({ where: { email: 'admin@supplymax.com' } });
+    const admin = await p.user.upsert({
+      where: { email: 'admin@supplymax.app' },
+      update: { password: '123Suppli', role_id: 'Admin', status: 'Active', name: 'Admin Supplymax' },
+      create: {
+        name: 'Admin Supplymax',
+        email: 'admin@supplymax.app',
+        password: '123Suppli',
+        role_id: 'Admin',
+        status: 'Active'
+      }
+    });
+    console.log('[STARTUP] Admin ensured:', admin.email);
+    const users = await p.user.findMany({ select: { email: true, role_id: true } });
+    console.log('[STARTUP] Users in DB:', JSON.stringify(users));
+  } catch (e) {
+    console.error('[STARTUP] Failed to ensure admin:', e && e.message ? e.message : e);
+  } finally {
+    await p.\$disconnect();
+  }
+})();
+"
+
 # Start the application
 echo "Starting Next.js server..."
 exec node server.js
