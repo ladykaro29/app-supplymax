@@ -5,13 +5,107 @@
   overflow: hidden;
 }
 
+/* 0. Top Announcement Bar Marquee */
+.announcementBar {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  z-index: 50;
+}
+
+.marqueeTrack {
+  display: flex;
+  width: max-content;
+  animation: scrollMarquee 30s linear infinite;
+  white-space: nowrap;
+}
+
+.marqueeText {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  padding-right: 60px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.marqueeHighlight {
+  color: var(--color-accent);
+  text-shadow: 0 0 10px rgba(0, 209, 255, 0.3);
+}
+
+.marqueeSeparator {
+  opacity: 0.3;
+  color: var(--color-text-muted);
+}
+
+@keyframes scrollMarquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* Product Tabs Explorer */
+.tabsContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin: -20px auto 50px;
+  max-width: 800px;
+  flex-wrap: wrap;
+  padding: 0 20px;
+}
+
+.tabButton {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
+}
+
+.tabButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.tabButtonActive {
+  background: rgba(0, 209, 255, 0.08);
+  border-color: var(--color-accent);
+  color: white;
+  box-shadow: 0 0 20px rgba(0, 209, 255, 0.15), inset 0 0 8px rgba(0, 209, 255, 0.1);
+  text-shadow: 0 0 8px rgba(0, 209, 255, 0.2);
+}
+
 /* 1. Value Pillars Section */
 .pillarsSection {
-  padding: 60px 5%;
+  padding: 80px 5%;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(10, 10, 10, 1) 100%);
   position: relative;
   z-index: 10;
-  margin-top: -20px;
+  margin-top: -2px;
 }
 
 .pillarsGrid {
@@ -290,9 +384,19 @@
   z-index: 1;
 }
 
-.zoneCard:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 15px 30px rgba(0, 209, 255, 0.08);
+.zoneCard:nth-child(1):hover {
+  border-color: #00f0ff;
+  box-shadow: 0 15px 35px rgba(0, 240, 255, 0.15);
+}
+
+.zoneCard:nth-child(2):hover {
+  border-color: #ff3b30;
+  box-shadow: 0 15px 35px rgba(255, 59, 48, 0.15);
+}
+
+.zoneCard:nth-child(3):hover {
+  border-color: #ffaa00;
+  box-shadow: 0 15px 35px rgba(255, 170, 0, 0.15);
 }
 
 .zoneCard:hover .zoneImg {
@@ -314,8 +418,19 @@
   letter-spacing: 1px;
 }
 
+.zoneCard:nth-child(1) h3 span {
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
 .zoneCard:nth-child(2) h3 span {
   color: #ff3b30;
+  text-shadow: 0 0 10px rgba(255, 59, 48, 0.2);
+}
+
+.zoneCard:nth-child(3) h3 span {
+  color: #ffaa00;
+  text-shadow: 0 0 10px rgba(255, 170, 0, 0.2);
 }
 
 .zoneContent button {

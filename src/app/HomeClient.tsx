@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import Image from 'next/image';
 import Link from 'next/link';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import styles from './page.module.css';
 import PartnerCarousel from '@/components/PartnerCarousel/PartnerCarousel';
 import PremiumHero from '@/components/PremiumHero/PremiumHero';
@@ -25,15 +27,117 @@ export default function HomeClient({
   
   // React State for interactive FAQ Accordion
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  
+  // React State for Product tab explorer
+  const [activeTab, setActiveTab] = useState<string>('Todos');
+
+  const mainRef = useRef<HTMLDivElement>(null);
 
   const toggleFaq = (index: number) => {
     setActiveFaq(activeFaq === index ? null : index);
   };
 
+  // GSAP ScrollTrigger Section Entrance Animations
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    let ctx = gsap.context(() => {
+      // 1. Stagger Value Pillars
+      gsap.from(`.${styles.pillarCard}`, {
+        scrollTrigger: {
+          trigger: `.${styles.pillarsGrid}`,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse',
+        },
+        opacity: 0,
+        y: 40,
+        stagger: 0.15,
+        duration: 0.8,
+        ease: 'power3.out',
+      });
+
+      // 2. Section Headers
+      const headers = document.querySelectorAll(`.${styles.sectionHeader}`);
+      headers.forEach((header) => {
+        gsap.from(header, {
+          scrollTrigger: {
+            trigger: header,
+            start: 'top 90%',
+            toggleActions: 'play none none reverse',
+          },
+          opacity: 0,
+          y: 35,
+          duration: 0.8,
+          ease: 'power2.out',
+        });
+      });
+
+      // 3. Category Zones Cards
+      gsap.from(`.${styles.zoneCard}`, {
+        scrollTrigger: {
+          trigger: `.${styles.zoneGrid}`,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse',
+        },
+        opacity: 0,
+        y: 45,
+        stagger: 0.18,
+        duration: 0.9,
+        ease: 'power3.out',
+      });
+
+      // 4. Recruitment Banner Box
+      gsap.from(`.${styles.recruitmentBanner}`, {
+        scrollTrigger: {
+          trigger: `.${styles.recruitment}`,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse',
+        },
+        opacity: 0,
+        scale: 0.96,
+        y: 40,
+        duration: 0.8,
+        ease: 'power3.out',
+      });
+
+      // 5. Testimonial Cards
+      gsap.from(`.${styles.testimonialCard}`, {
+        scrollTrigger: {
+          trigger: `.${styles.testimonialGrid}`,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse',
+        },
+        opacity: 0,
+        y: 30,
+        stagger: 0.12,
+        duration: 0.7,
+        ease: 'power2.out',
+      });
+
+      // 6. FAQ Items
+      gsap.from(`.${styles.faqItem}`, {
+        scrollTrigger: {
+          trigger: `.${styles.faqContainer}`,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse',
+        },
+        opacity: 0,
+        y: 20,
+        stagger: 0.1,
+        duration: 0.6,
+        ease: 'power2.out',
+      });
+    }, mainRef);
+
+    return () => ctx.revert();
+  }, []);
+
   const faqData = [
     {
       q: '¿Cómo funciona la facturación bimonetaria?',
-      a: 'En SupplyMax te mostramos los precios tanto en dólares (USD) como en pesos argentinos (ARS) utilizando una tasa de conversión de mercado transparente. Puedes elegir pagar con tarjeta de crédito, débito, transferencia bancaria o criptomonedas, y la conversión se aplicará automáticamente al finalizar la compra sin cargos ocultos.'
+      a: 'En SupplyMax te mostramos los precios tanto en dólares (USD) como en bolívares venezolanos (VES) utilizando una tasa de conversión oficial y transparente. Puedes elegir pagar con transferencia bancaria, pago móvil o criptomonedas, y la conversión se aplicará automáticamente al finalizar la compra sin cargos ocultos.'
     },
     {
       q: '¿Los suplementos cuentan con certificación de laboratorio?',
@@ -41,7 +145,7 @@ export default function HomeClient({
     },
     {
       q: '¿Cuáles son los tiempos y costos de envío?',
-      a: 'Ofrecemos envío express gratuito en compras superiores a USD 50 en toda el área metropolitana, con entregas en 24 a 48 horas hábiles. Para envíos nacionales, trabajamos con Andreani y Correo Argentino, despachando en el mismo día del pedido.'
+      a: 'Ofrecemos envío express gratuito en Mérida en compras superiores a USD 50, con entregas en 24 a 48 horas hábiles. Para envíos nacionales, trabajamos con Zoom, Tealca y MRW, despachando el mismo día de la confirmación del pago.'
     },
     {
       q: '¿Cómo puedo unirme como Coach o Embajador de marca?',
@@ -50,7 +154,33 @@ export default function HomeClient({
   ];
 
   return (
-    <main className={styles.main}>
+    <main ref={mainRef} className={styles.main}>
+      {/* 0. Scrolling Announcement Bar */}
+      <div className={styles.announcementBar}>
+        <div className={styles.marqueeTrack}>
+          <div className={styles.marqueeText}>
+            <span>🔥 ENVÍO EXPRESS <span className={styles.marqueeHighlight}>GRATUITO</span> EN MÉRIDA EN COMPRAS MAYORES A $50</span>
+            <span className={styles.marqueeSeparator}>●</span>
+            <span>⚡ CONVERSIÓN OFICIAL <span className={styles.marqueeHighlight}>VES / USD</span> ACTUALIZADA AL INSTANTE</span>
+            <span className={styles.marqueeSeparator}>●</span>
+            <span>💪 10% DE DESCUENTO ADICIONAL EN SUPLIS PAGANDO CON <span className={styles.marqueeHighlight}>CRIPTOMONEDAS</span></span>
+            <span className={styles.marqueeSeparator}>●</span>
+            <span>🏆 ÚNETE A NUESTRO PROGRAMA DE <span className={styles.marqueeHighlight}>COACHES</span> Y MONETIZA TU ASESORÍA</span>
+            <span className={styles.marqueeSeparator}>●</span>
+          </div>
+          <div className={styles.marqueeText}>
+            <span>🔥 ENVÍO EXPRESS <span className={styles.marqueeHighlight}>GRATUITO</span> EN MÉRIDA EN COMPRAS MAYORES A $50</span>
+            <span className={styles.marqueeSeparator}>●</span>
+            <span>⚡ CONVERSIÓN OFICIAL <span className={styles.marqueeHighlight}>VES / USD</span> ACTUALIZADA AL INSTANTE</span>
+            <span className={styles.marqueeSeparator}>●</span>
+            <span>💪 10% DE DESCUENTO ADICIONAL EN SUPLIS PAGANDO CON <span className={styles.marqueeHighlight}>CRIPTOMONEDAS</span></span>
+            <span className={styles.marqueeSeparator}>●</span>
+            <span>🏆 ÚNETE A NUESTRO PROGRAMA DE <span className={styles.marqueeHighlight}>COACHES</span> Y MONETIZA TU ASESORÍA</span>
+            <span className={styles.marqueeSeparator}>●</span>
+          </div>
+        </div>
+      </div>
+
       {/* 1. Interactive Premium Hero Section (GSAP powered real products) */}
       <PremiumHero featuredProducts={featuredProducts} />
 
@@ -74,7 +204,7 @@ export default function HomeClient({
               </svg>
             </div>
             <h3>Despacho en 24 horas</h3>
-            <p>Envíos express prioritarios a todo el país para que tu nutrición nunca sufra interrupciones.</p>
+            <p>Envíos express prioritarios locales y nacionales para que tu nutrición nunca sufra interrupciones.</p>
           </div>
 
           <div className={styles.pillarCard}>
@@ -85,7 +215,7 @@ export default function HomeClient({
               </svg>
             </div>
             <h3>Puntos Bimonetarios</h3>
-            <p>Visualiza y gestiona tu balance inteligentemente en USD y ARS de forma transparente en el checkout.</p>
+            <p>Visualiza y gestiona tu balance inteligentemente en USD y VES de forma transparente en el checkout.</p>
           </div>
 
           <div className={styles.pillarCard}>
@@ -106,7 +236,37 @@ export default function HomeClient({
           <p>EL COMBUSTIBLE DE LOS CAMPEONES</p>
           <h2>Suplementos <span>Destacados</span></h2>
         </div>
-        <ProductGrid products={featuredProducts} formatPrice={formatPrice} addToCart={addToCart} />
+
+        {/* Dynamic Interactive Category Tabs */}
+        <div className={styles.tabsContainer}>
+          {['Todos', 'Proteínas', 'Creatinas', 'Pre-Entrenos', 'Aminoácidos'].map((tabName) => {
+            const isActive = activeTab === tabName;
+            return (
+              <button
+                key={tabName}
+                onClick={() => setActiveTab(tabName)}
+                className={`${styles.tabButton} ${isActive ? styles.tabButtonActive : ''}`}
+              >
+                {tabName}
+              </button>
+            );
+          })}
+        </div>
+
+        <ProductGrid 
+          products={
+            activeTab === 'Todos'
+              ? featuredProducts
+              : featuredProducts.filter(p => {
+                  if (activeTab === 'Aminoácidos') {
+                    return p.category.toLowerCase().includes('amino') || p.category.toLowerCase().includes('bcaa');
+                  }
+                  return p.category.toLowerCase().includes(activeTab.toLowerCase().slice(0, 5));
+                })
+          } 
+          formatPrice={formatPrice} 
+          addToCart={addToCart} 
+        />
       </section>
 
       {/* 4. Supply Max Anchored Category Zones */}
