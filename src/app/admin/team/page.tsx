@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header/Header';
 import { useAppContext } from '@/context/AppContext';
 import styles from './Team.module.css';
@@ -24,6 +24,19 @@ export default function TeamPage() {
   const [team, setTeam] = useState<TeamMember[]>(INITIAL_TEAM);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newMember, setNewMember] = useState({ name: '', email: '', role: 'Empleado' });
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'sans-serif' }}>
+        <p>Cargando panel...</p>
+      </div>
+    );
+  }
 
   // Only Admin can manage team
   if (!user || user.role_id !== 'Admin') {

@@ -13,6 +13,11 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ totalSalesUSD: 0, pendingOrdersCount: 0 });
   const [loading, setLoading] = useState(true);
   const [newRate, setNewRate] = useState(exchangeRate.toString());
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +48,14 @@ export default function AdminDashboard() {
     };
     fetchData();
   }, []);
+
+  if (!isMounted) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'sans-serif' }}>
+        <p>Cargando panel...</p>
+      </div>
+    );
+  }
 
   if (!user || user.role_id !== 'Admin') {
     return (

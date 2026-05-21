@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Header from '@/components/Header/Header';
 import { useAppContext } from '@/context/AppContext';
 import { PRODUCTS } from '@/data/products';
@@ -8,9 +8,23 @@ import styles from './Performance.module.css';
 
 export default function PerformancePage() {
   const { user, formatPrice } = useAppContext();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Redirect or block if not authorized
   const allowedRoles = ['Admin', 'Subgerente']; // Managers/Admins only
+
+  if (!isMounted) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'sans-serif' }}>
+        <p>Cargando panel...</p>
+      </div>
+    );
+  }
+
   if (!user || !allowedRoles.includes(user.role_id)) {
     return (
       <div className={styles.unauthorized}>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header/Header';
 import { useAppContext } from '@/context/AppContext';
 import styles from './AffiliatesAndCoaches.module.css';
@@ -26,6 +26,19 @@ const INITIAL_LIST: AffiliateCoach[] = [
 export default function AffiliatesAndCoaches() {
   const { user } = useAppContext();
   const [list, setList] = useState<AffiliateCoach[]>(INITIAL_LIST);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'sans-serif' }}>
+        <p>Cargando panel...</p>
+      </div>
+    );
+  }
 
   if (!user || user.role_id !== 'Admin') {
     return (

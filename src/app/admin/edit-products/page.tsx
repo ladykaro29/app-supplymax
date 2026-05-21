@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Header from '@/components/Header/Header';
 import { useAppContext } from '@/context/AppContext';
 import { PRODUCTS, Product } from '@/data/products';
@@ -9,14 +9,27 @@ import Image from 'next/image';
 
 export default function EditProductsPage() {
   const { user, formatPrice } = useAppContext();
+  const [isMounted, setIsMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>(PRODUCTS);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Admin and restricted role check (from prompt: Administrador de inventarios, repartidor, empleado, subgerente)
   // For now, let's allow Admin and Subgerente/Inventarios to access this.
   const allowedRoles = ['Admin', 'Subgerente', 'Administrador de inventarios'];
   
+  if (!isMounted) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'sans-serif' }}>
+        <p>Cargando panel...</p>
+      </div>
+    );
+  }
+
   if (!user || !allowedRoles.includes(user.role_id)) {
     return (
       <div className={styles.unauthorized}>
