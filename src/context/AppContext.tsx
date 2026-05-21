@@ -84,14 +84,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const savedCart = localStorage.getItem('supplymax_cart');
     const savedOrders = localStorage.getItem('supplymax_orders');
+    const savedUser = localStorage.getItem('supplymax_user');
     if (savedCart) setCart(JSON.parse(savedCart));
     if (savedOrders) setOrders(JSON.parse(savedOrders));
+    if (savedUser) {
+      const parsed = JSON.parse(savedUser);
+      setUser(parsed);
+      fetchOrders(parsed.id);
+    }
   }, []);
 
   useEffect(() => {
     localStorage.setItem('supplymax_cart', JSON.stringify(cart));
     localStorage.setItem('supplymax_orders', JSON.stringify(orders));
   }, [cart, orders]);
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('supplymax_user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('supplymax_user');
+    }
+  }, [user]);
 
   const toggleCurrency = () => {
     setCurrency((prev) => (prev === 'USD' ? 'VES' : 'USD'));
