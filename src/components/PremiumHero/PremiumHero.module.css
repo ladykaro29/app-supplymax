@@ -1,0 +1,379 @@
+.premiumHeroContainer {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 120px 5% 60px 5%;
+  background-color: #05010a; /* Dark default fallback */
+  transition: background-color 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 5;
+}
+
+.gridOverlay {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 14px 24px;
+  pointer-events: none;
+  opacity: 0.25;
+}
+
+.gradientTop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 300px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.heroGrid {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.copyArea {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+}
+
+.badgePulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  animation: pulseLight 2s infinite ease-in-out;
+}
+
+@keyframes pulseLight {
+  0% { opacity: 0.3; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.25); }
+  100% { opacity: 0.3; transform: scale(0.9); }
+}
+
+.heroTitle {
+  font-size: clamp(2.8rem, 6vw, 5.2rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+  color: #ffffff;
+}
+
+.titleGradient {
+  background: linear-gradient(to right, #ffffff 30%, #a1a1aa 70%, #71717a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: block;
+}
+
+.heroDesc {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  color: #a1a1aa;
+  line-height: 1.6;
+  max-width: 580px;
+  margin-bottom: 36px;
+  font-weight: 300;
+}
+
+.heroControls {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.selectorTitle {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-family: monospace;
+  letter-spacing: 2px;
+  color: #71717a;
+  margin-bottom: 12px;
+}
+
+.colorBubble {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.colorBubbleActive {
+  transform: scale(1.1);
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 4px;
+}
+
+.colorBubble:hover:not(.colorBubbleActive) {
+  transform: scale(1.05);
+}
+
+.bubbleDot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.activeSelectionName {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.priceContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 24px;
+}
+
+.priceLabel {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  font-family: monospace;
+  letter-spacing: 2px;
+  color: #71717a;
+}
+
+.activePrice {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: #ffffff;
+  font-family: 'Oswald', sans-serif;
+  line-height: 1;
+}
+
+.oldPrice {
+  text-decoration: line-through;
+  color: #52525b;
+  font-size: 1.2rem;
+  font-family: 'Oswald', sans-serif;
+}
+
+.specBox {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.specLabel {
+  display: block;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  font-family: monospace;
+  letter-spacing: 1px;
+  color: #71717a;
+}
+
+.specValue {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.primaryCta {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 36px;
+  background-color: #ffffff;
+  color: #09090b;
+  font-weight: 900;
+  font-size: 0.9rem;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.primaryCta:hover {
+  background-color: #e4e4e7;
+  transform: translateY(-2px);
+}
+
+.primaryCta:active {
+  transform: translateY(0);
+}
+
+.secondaryCta {
+  padding: 16px 32px;
+  background-color: rgba(255, 255, 255, 0.03);
+  color: #e4e4e7;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.secondaryCta:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Right Side: Showcase Area */
+.showcaseArea {
+  position: relative;
+  width: 100%;
+  height: 550px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dynamicGlow {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.45;
+  transition: background-color 1s ease, scale 0.8s ease, opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.orbitalRing {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+.orbitalRingOuter {
+  width: 440px;
+  height: 440px;
+  animation: spinRing 220s linear infinite;
+}
+
+.orbitalRingInner {
+  width: 360px;
+  height: 360px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  animation: spinRingBack 180s linear infinite;
+}
+
+@keyframes spinRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinRingBack {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+.floorShadow {
+  position: absolute;
+  bottom: 40px;
+  width: 220px;
+  height: 15px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  filter: blur(16px);
+  transform: scaleX(1.1);
+  pointer-events: none;
+  animation: pulseShadow 6s ease-in-out infinite;
+}
+
+@keyframes pulseShadow {
+  0% { transform: scaleX(1.1) scaleY(1); opacity: 0.7; }
+  50% { transform: scaleX(1.15) scaleY(0.9); opacity: 0.55; }
+  100% { transform: scaleX(1.1) scaleY(1); opacity: 0.7; }
+}
+
+.rotatingProductImg {
+  position: relative;
+  width: 75%;
+  max-width: 360px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.85));
+  z-index: 15;
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+.rotatingProductImg:hover {
+  transform: scale(1.03);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .showcaseArea {
+    height: 420px;
+    order: -1; /* Image first on mobile */
+  }
+  .rotatingProductImg {
+    width: 60%;
+  }
+  .premiumHeroContainer {
+    padding-top: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .premiumHeroContainer {
+    padding: 100px 4% 40px 4%;
+  }
+  .showcaseArea {
+    height: 320px;
+  }
+  .rotatingProductImg {
+    width: 70%;
+  }
+  .priceContainer {
+    gap: 16px;
+  }
+}

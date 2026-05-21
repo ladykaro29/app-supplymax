@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from './page.module.css';
 import PartnerCarousel from '@/components/PartnerCarousel/PartnerCarousel';
+import PremiumHero from '@/components/PremiumHero/PremiumHero';
 
 interface HomeClientProps {
   featuredProducts: any[];
@@ -24,25 +25,8 @@ export default function HomeClient({
 
   return (
     <main className={styles.main}>
-      {/* 1. Hero Section (Above the Fold) */}
-      <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <div className={styles.capsule}>
-             ⚡ NUEVA COLECCIÓN DISPONIBLE
-          </div>
-          <h1>SUPPLY MAX <br /><span>ENERGY & PERFORMANCE</span></h1>
-          <p>Potencia tu entrenamiento con suplementación premium y la ropa deportiva con mejor calce del mercado.</p>
-          
-          <div className={styles.heroActions}>
-            <Link href="/catalog">
-              <button className={`${styles.btnLarge} ${styles.btnPrimary}`}>COMPRA RÁPIDA (GUEST)</button>
-            </Link>
-            <Link href="/catalog">
-              <button className={`${styles.btnLarge} ${styles.btnSecondary}`}>VER TODO EL CATÁLOGO</button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* 1. Interactive Premium Hero Section (GSAP powered real products) */}
+      <PremiumHero featuredProducts={featuredProducts} />
 
       {/* 2. Grilla 1: Suplementos Destacados */}
       <section className={styles.featured}>
