@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -22,13 +22,85 @@ export default function HomeClient({
   reviews 
 }: HomeClientProps) {
   const { formatPrice, addToCart } = useAppContext();
+  
+  // React State for interactive FAQ Accordion
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
+
+  const toggleFaq = (index: number) => {
+    setActiveFaq(activeFaq === index ? null : index);
+  };
+
+  const faqData = [
+    {
+      q: '¿Cómo funciona la facturación bimonetaria?',
+      a: 'En SupplyMax te mostramos los precios tanto en dólares (USD) como en pesos argentinos (ARS) utilizando una tasa de conversión de mercado transparente. Puedes elegir pagar con tarjeta de crédito, débito, transferencia bancaria o criptomonedas, y la conversión se aplicará automáticamente al finalizar la compra sin cargos ocultos.'
+    },
+    {
+      q: '¿Los suplementos cuentan con certificación de laboratorio?',
+      a: 'Totalmente. Cada lote de proteínas, creatinas y pre-entrenos en SupplyMax pasa por rigurosos análisis de pureza microbiológica y HPLC. Garantizamos que lo que se declara en la etiqueta nutricional es exactamente lo que consumes, libre de rellenos y sustancias prohibidas.'
+    },
+    {
+      q: '¿Cuáles son los tiempos y costos de envío?',
+      a: 'Ofrecemos envío express gratuito en compras superiores a USD 50 en toda el área metropolitana, con entregas en 24 a 48 horas hábiles. Para envíos nacionales, trabajamos con Andreani y Correo Argentino, despachando en el mismo día del pedido.'
+    },
+    {
+      q: '¿Cómo puedo unirme como Coach o Embajador de marca?',
+      a: 'Buscamos entrenadores, nutricionistas y atletas comprometidos. Al unirte a nuestro equipo de poder, obtienes un enlace de afiliado único, descuentos masivos del 25% para ti y tus clientes, y comisiones en dólares por cada recomendación exitosa. Haz clic en "Unirme al Equipo" para postularte.'
+    }
+  ];
 
   return (
     <main className={styles.main}>
       {/* 1. Interactive Premium Hero Section (GSAP powered real products) */}
       <PremiumHero featuredProducts={featuredProducts} />
 
-      {/* 2. Grilla 1: Suplementos Destacados */}
+      {/* 2. Value Pillars / Core Benefits Section (New Structural Enhancement) */}
+      <section className={styles.pillarsSection}>
+        <div className={styles.pillarsGrid}>
+          <div className={styles.pillarCard}>
+            <div className={styles.pillarIcon}>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+              </svg>
+            </div>
+            <h3>Fórmulas Certificadas</h3>
+            <p>Análisis de lote rigurosos y pureza química superior aprobada por laboratorios deportivos.</p>
+          </div>
+
+          <div className={styles.pillarCard}>
+            <div className={styles.pillarIcon}>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3>Despacho en 24 horas</h3>
+            <p>Envíos express prioritarios a todo el país para que tu nutrición nunca sufra interrupciones.</p>
+          </div>
+
+          <div className={styles.pillarCard}>
+            <div className={styles.pillarIcon}>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+            </div>
+            <h3>Puntos Bimonetarios</h3>
+            <p>Visualiza y gestiona tu balance inteligentemente en USD y ARS de forma transparente en el checkout.</p>
+          </div>
+
+          <div className={styles.pillarCard}>
+            <div className={styles.pillarIcon}>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+              </svg>
+            </div>
+            <h3>Comunidad y Coaching</h3>
+            <p>Acceso directo a planes y asesorías personalizadas por nuestro staff de entrenadores de élite.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Supplements Featured Products Grid */}
       <section className={styles.featured}>
         <div className={styles.sectionHeader}>
           <p>EL COMBUSTIBLE DE LOS CAMPEONES</p>
@@ -37,14 +109,14 @@ export default function HomeClient({
         <ProductGrid products={featuredProducts} formatPrice={formatPrice} addToCart={addToCart} />
       </section>
 
-      {/* 3. Zonas Supply Max (Banners de Anclaje) */}
+      {/* 4. Supply Max Anchored Category Zones */}
       <section className={styles.zones}>
         <div className={styles.zoneGrid}>
           <Link href="/catalog?category=Creatinas" className={styles.zoneCard}>
             <div className={styles.zoneOverlay}></div>
             <Image src="/banners/creatina-zone.jpg" alt="Zona Creatina" fill className={styles.zoneImg} />
             <div className={styles.zoneContent}>
-              <h3>ZONA CREATINA</h3>
+              <h3>ZONA <span>CREATINA</span></h3>
               <button>Ver todas</button>
             </div>
           </Link>
@@ -52,7 +124,7 @@ export default function HomeClient({
             <div className={styles.zoneOverlay}></div>
             <Image src="/banners/proteina-zone.jpg" alt="Zona Proteína" fill className={styles.zoneImg} />
             <div className={styles.zoneContent}>
-              <h3>ZONA PROTEÍNA</h3>
+              <h3>ZONA <span>PROTEÍNA</span></h3>
               <button>Ver todas</button>
             </div>
           </Link>
@@ -60,14 +132,14 @@ export default function HomeClient({
             <div className={styles.zoneOverlay}></div>
             <Image src="/banners/pre-zone.jpg" alt="Zona Pre Entrenos" fill className={styles.zoneImg} />
             <div className={styles.zoneContent}>
-              <h3>ZONA PRE-ENTRENO</h3>
+              <h3>ZONA <span>PRE-ENTRENO</span></h3>
               <button>Ver todas</button>
             </div>
           </Link>
         </div>
       </section>
 
-      {/* 4. Grilla 2: Ropa Destacada (NUEVA) */}
+      {/* 5. Apparel & Lifestyle Clothing Section */}
       <section className={styles.featured}>
         <div className={styles.sectionHeader}>
           <p>ENTRENA CON ESTILO</p>
@@ -76,7 +148,34 @@ export default function HomeClient({
         <ProductGrid products={apparelProducts} formatPrice={formatPrice} addToCart={addToCart} />
       </section>
 
-      {/* 5. Carrusel de Socios (NUEVO) */}
+      {/* 6. Recruitment Dynamic Conversional Banner (New Structural Enhancement) */}
+      <section className={styles.recruitment}>
+        <div className={styles.recruitmentBanner}>
+          <span className={styles.recruitmentBadge}>PROGRAMA DE SINDICATO</span>
+          <h2 className={styles.recruitmentTitle}>
+            ¿Eres Entrenador, Nutricionista o Influencer? <br />
+            <span>Monetiza tu Pasión con SupplyMax</span>
+          </h2>
+          <p className={styles.recruitmentDesc}>
+            Únete a nuestra red de coaches y embajadores. Recomienda suplementación científica respaldada, 
+            provee descuentos masivos a tus asesorados y cobra comisiones directas en dólares cada fin de mes.
+          </p>
+          <div className={styles.recruitmentActions}>
+            <Link href="/join-team">
+              <button className={`${styles.primaryCta} !bg-white !text-zinc-950 font-bold hover:!bg-zinc-200 transition-colors`}>
+                Postularme al Equipo
+              </button>
+            </Link>
+            <Link href="/coaches">
+              <button className={styles.secondaryCta}>
+                Ver Coaches Activos
+              </button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Partners & Coaches Carousel */}
       <section className={styles.partnersSection}>
         <div className={styles.sectionHeader}>
           <p>NUESTRO EQUIPO DE PODER</p>
@@ -85,7 +184,7 @@ export default function HomeClient({
         <PartnerCarousel partners={partners} />
       </section>
 
-      {/* 6. Panel de Experiencias (Testimonios) */}
+      {/* 8. Testimonials & Verified Athletes Section */}
       <section className={styles.testimonials}>
         <div className={styles.sectionHeader}>
           <p>LO QUE DICEN NUESTROS ATLETAS</p>
@@ -93,10 +192,12 @@ export default function HomeClient({
         </div>
         <div className={styles.testimonialGrid}>
           {reviews.length > 0 ? reviews.map((review: any) => (
-            <div key={review.id} className={`${styles.testimonialCard} glass`}>
+            <div key={review.id} className={styles.testimonialCard}>
               <div className={styles.stars}>
                 {[...Array(review.rating)].map((_, i) => (
-                  <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill="var(--color-accent)"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                  <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill="#00d1ff">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                  </svg>
                 ))}
               </div>
               <p>"{review.comment}"</p>
@@ -110,6 +211,38 @@ export default function HomeClient({
           )}
         </div>
       </section>
+
+      {/* 9. Interactive FAQ Accordion Section (New Structural Enhancement) */}
+      <section className={styles.faqSection}>
+        <div className={styles.sectionHeader}>
+          <p>RESOLVEMOS TUS DUDAS</p>
+          <h2>Preguntas <span>Frecuentes</span></h2>
+        </div>
+        <div className={styles.faqContainer}>
+          {faqData.map((faq, index) => {
+            const isActive = activeFaq === index;
+            return (
+              <div 
+                key={index} 
+                className={`${styles.faqItem} ${isActive ? styles.faqItemActive : ''}`}
+              >
+                <button 
+                  onClick={() => toggleFaq(index)}
+                  className={`${styles.faqQuestion} ${isActive ? styles.faqQuestionActive : ''}`}
+                >
+                  {faq.q}
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </button>
+                <div className={`${styles.faqAnswer} ${isActive ? styles.faqAnswerActive : ''}`}>
+                  <p>{faq.a}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
     </main>
   );
 }
@@ -121,7 +254,7 @@ function ProductGrid({ products, formatPrice, addToCart }: any) {
         <div key={product.id} className={styles.productCard}>
           <Link href={`/catalog/${product.id}`} className={styles.cardLink}>
             <div className={styles.productImageArea}>
-               <div className={styles.cardBadge}>{product.goal}</div>
+               {product.goal && <div className={styles.cardBadge}>{product.goal}</div>}
                <div className={styles.imgContainer}>
                 <Image 
                   src={product.image} 
