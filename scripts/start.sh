@@ -7,12 +7,10 @@ echo "=== SupplyMax Production Startup ==="
 PRISMA_CLI="./node_modules/prisma/build/index.js"
 SCHEMA_PATH="./prisma/schema.prisma"
 
-# FORCE the canonical DB path. We intentionally override whatever may
-# have leaked from .env / build args / platform UI env vars, because
-# the build was observed using /app/prisma/dev.db while runtime
-# expected supplymax_v3.db, leading to login lookups against an empty
-# DB. Single source of truth from here on.
-export DATABASE_URL="file:/app/prisma/supplymax_v3.db"
+# FORCE the canonical DB path — must match the Dockerfile ENV exactly.
+# We use dev.db because Easypanel injects DATABASE_URL=file:/app/prisma/dev.db
+# and we need build + runtime to always target the same file.
+export DATABASE_URL="file:/app/prisma/dev.db"
 
 # Some platforms (Easypanel, Coolify) inject .env files into the
 # build context or runtime container. Prisma's CLI auto-loads .env,

@@ -23,8 +23,10 @@ RUN rm -f .env .env.local .env.production .env.development && \
 RUN npx prisma generate
 
 # 2. Create the production database with correct schema AT BUILD TIME
-ARG DATABASE_URL="file:/app/prisma/supplymax_v3.db"
-ENV DATABASE_URL=$DATABASE_URL
+# IMPORTANT: We hardcode ENV (not ARG) so Easypanel/Coolify cannot override it.
+# The canonical database file is ALWAYS dev.db — any platform-injected
+# DATABASE_URL that also points to dev.db will be consistent.
+ENV DATABASE_URL="file:/app/prisma/dev.db"
 
 RUN echo "Building with DATABASE_URL=$DATABASE_URL" && \
     npx prisma db push --accept-data-loss
@@ -43,9 +45,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Use the same DB path as build time
-ARG DATABASE_URL="file:/app/prisma/supplymax_v3.db"
-ENV DATABASE_URL=$DATABASE_URL
+# Canonical DB path — must match build stage exactly.
+ENV DATABASE_URL="file:/app/prisma/dev.db"
 
 # Security: run as non-root
 RUN addgroup --system --gid 1001 nodejs
