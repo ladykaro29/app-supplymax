@@ -69,16 +69,18 @@ interface AppContextType {
   setMenuOpen: (open: boolean) => void;
   isChatOpen: boolean;
   setChatOpen: (open: boolean) => void;
+  authLoading: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currency, setCurrency] = useState<Currency>('USD');
-  const [exchangeRate, setExchangeRate] = useState<number>(60);
+  const [exchangeRate, setExchangeRateInternal] = useState<number>(60);
   const [user, setUser] = useState<User | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [authLoading, setAuthLoading] = useState(true);
 
   // Local Storage Persistence
   useEffect(() => {
@@ -92,7 +94,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setUser(parsed);
       fetchOrders(parsed.id);
     }
+    setAuthLoading(false);
   }, []);
+
+  const setExchangeRate = async (rate: number) => {
+    setExchangeRateInternal(rate);
+    try {
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'exchange_rate', value: rate.toString() })
+      });
+    } catch (err) {
+      console.error('Error saving exchange rate to database:', err);
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem('supplymax_cart', JSON.stringify(cart));
@@ -197,7 +213,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const fetchSettings = async () => {
       try {
         const res = await fetch('/api/settings');
-        if (res.ok) setSettings(await res.json());
+        if (res.ok) {
+          const data = await res.json();
+          setSettings(data);
+          if (data.exchange_rate) {
+            setExchangeRateInternal(Number(data.exchange_rate));
+          }
+        }
       } catch (err) {
         console.error('Settings fetch error:', err);
       }
@@ -291,7 +313,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         isMenuOpen,
         setMenuOpen,
         isChatOpen,
-        setChatOpen
+        setChatOpen,
+        authLoading
       }}
     >
       {children}

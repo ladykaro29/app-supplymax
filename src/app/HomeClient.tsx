@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -23,7 +24,15 @@ export default function HomeClient({
   partners, 
   reviews 
 }: HomeClientProps) {
-  const { formatPrice, addToCart } = useAppContext();
+  const { formatPrice, addToCart, user, authLoading } = useAppContext();
+  const router = useRouter();
+
+  // Redirigir administradores al panel ejecutivo
+  useEffect(() => {
+    if (!authLoading && user && user.role_id === 'Admin') {
+      router.push('/dashboard/admin');
+    }
+  }, [user, authLoading, router]);
   
   // React State for interactive FAQ Accordion
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -114,6 +123,20 @@ export default function HomeClient({
         stagger: 0.12,
         duration: 0.7,
         ease: 'power2.out',
+      });
+
+      // 5.5. Real Deliveries Cards
+      gsap.from(`.${styles.deliveryCard}`, {
+        scrollTrigger: {
+          trigger: `.${styles.deliveriesGrid}`,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse',
+        },
+        opacity: 0,
+        y: 35,
+        stagger: 0.15,
+        duration: 0.8,
+        ease: 'power3.out',
       });
 
       // 6. FAQ Items
@@ -369,6 +392,92 @@ export default function HomeClient({
           )) : (
             <p className={styles.emptyMsg}>Sé el primero en compartir tu experiencia.</p>
           )}
+        </div>
+      </section>
+
+      {/* 8.5. Envíos Nacionales / Entregas Reales Gallery (New Structural Enhancement) */}
+      <section className={styles.deliveriesSection}>
+        <div className={styles.sectionHeader}>
+          <p>COMPRA SEGURA Y COMPROBADA</p>
+          <h2>Entregas Reales & <span>Envíos Garantizados</span></h2>
+        </div>
+        
+        <div className={styles.deliveriesGrid}>
+          {/* Card 1: Real shipment photo 1 */}
+          <div className={`${styles.deliveryCard} ${styles.deliveryImageCard}`}>
+            <div className={styles.deliveryImageContainer}>
+              <Image 
+                src="/brand-photos/Envíos nacionales/57573c77-184b-4641-9d35-9ce97c8f3eb2.jpg"
+                alt="Empaque real de pedido de suplementos"
+                width={400}
+                height={500}
+                className={styles.deliveryImg}
+              />
+              <div className={styles.deliveryImageOverlay}>
+                <span className={styles.deliveryImageTag}>Mérida, VE</span>
+                <h4>Listo para Despacho Express</h4>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Shipments Info Panel */}
+          <div className={`${styles.deliveryCard} ${styles.deliveryInfoCard}`}>
+            <div className={styles.deliveryBadgeRow}>
+              <span className={styles.courierBadge}>Zoom</span>
+              <span className={styles.courierBadge}>Tealca</span>
+              <span className={styles.courierBadge}>MRW</span>
+            </div>
+            <h3>Despachos Nacionales desde Mérida</h3>
+            <p>
+              Enviamos tu pedido el mismo día de la confirmación del pago. Todos los paquetes 
+              son embalados bajo estrictas normas de seguridad y protección para asegurar que 
+              tus proteínas y suplementos lleguen perfectos.
+            </p>
+            
+            <div className={styles.deliveryFeaturesList}>
+              <div className={styles.deliveryFeatureItem}>
+                <div className={styles.featureIcon}>⚡</div>
+                <div>
+                  <strong>Despacho Express:</strong> En Mérida en menos de 24-48 horas hábiles.
+                </div>
+              </div>
+              <div className={styles.deliveryFeatureItem}>
+                <div className={styles.featureIcon}>📦</div>
+                <div>
+                  <strong>Embalaje Reforzado:</strong> Mayor seguridad contra golpes y temperatura.
+                </div>
+              </div>
+              <div className={styles.deliveryFeatureItem}>
+                <div className={styles.featureIcon}>🛡️</div>
+                <div>
+                  <strong>Código de Tracking:</strong> Enviado inmediatamente para seguimiento online.
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.deliveryCtaBox}>
+              <Link href="/catalog" className={styles.deliveryCtaBtn}>
+                Comprar Ahora & Recibir
+              </Link>
+            </div>
+          </div>
+
+          {/* Card 3: Real shipment photo 2 */}
+          <div className={`${styles.deliveryCard} ${styles.deliveryImageCard}`}>
+            <div className={styles.deliveryImageContainer}>
+              <Image 
+                src="/brand-photos/Envíos nacionales/73F6A189-5ABD-47E7-90A4-695ED13BF547.jpg"
+                alt="Despacho real de pedido"
+                width={400}
+                height={500}
+                className={styles.deliveryImg}
+              />
+              <div className={styles.deliveryImageOverlay}>
+                <span className={styles.deliveryImageTag}>Nacional</span>
+                <h4>Entregas 100% Aseguradas</h4>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

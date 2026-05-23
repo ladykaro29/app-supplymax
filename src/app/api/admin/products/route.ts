@@ -39,6 +39,7 @@ export async function POST(request: Request) {
       isFeatured,
       isOffer,
       discount,
+      stock,
     } = body;
 
     if (!name || !category || price === undefined || price === null) {
@@ -73,6 +74,7 @@ export async function POST(request: Request) {
         isFeatured: !!isFeatured,
         isOffer: !!isOffer,
         discount: discount !== undefined && discount !== null ? parseFloat(discount) : null,
+        stock: stock !== undefined && stock !== null ? parseInt(stock) : 10,
       }
     });
 
@@ -107,6 +109,7 @@ export async function PUT(request: Request) {
       isFeatured,
       isOffer,
       discount,
+      stock,
     } = body;
 
     if (!id) {
@@ -149,6 +152,7 @@ export async function PUT(request: Request) {
         isFeatured: !!isFeatured,
         isOffer: !!isOffer,
         discount: discount !== undefined && discount !== null ? parseFloat(discount) : null,
+        stock: stock !== undefined && stock !== null ? parseInt(stock) : 10,
       }
     });
 
