@@ -44,8 +44,68 @@ export default function HomeClient({
   // React State for Hero Slider Principal
   const [currentHeroSlide, setCurrentHeroSlide] = useState<number>(0);
 
+  // React State for Bottom Banner Slider
+  const [currentBottomSlide, setCurrentBottomSlide] = useState<number>(0);
+
   // React State for Shipment square slider
   const [currentShipmentSlide, setCurrentShipmentSlide] = useState<number>(0);
+
+  const heroSlides = [
+    {
+      src: '/sliders/hero/1.jpg',
+      title: <>SUPLEMENTACIÓN <span>CIENTÍFICA</span></>,
+      desc: 'Construye tu mejor versión con compuestos ultra puros validados por laboratorios de élite.',
+      btnText: 'COMPRAR SUPLEMENTOS',
+      btnLink: '/suplementos'
+    },
+    {
+      src: '/sliders/hero/2.png',
+      title: <>ENTRENA CON <span>ESTILO</span></>,
+      desc: 'DENTRO Y FUERA DEL GIMNASIO. Indumentaria urbana oversized y de alto rendimiento.',
+      btnText: 'COMPRAR MERCH',
+      btnLink: '/ropa'
+    },
+    {
+      src: '/sliders/hero/3.png',
+      title: <>MÁXIMA <span>POTENCIA</span></>,
+      desc: 'Supera tus límites con fórmulas diseñadas para atletas y entrenadores exigentes.',
+      btnText: 'VER SUPLEMENTOS',
+      btnLink: '/suplementos'
+    },
+    {
+      src: '/sliders/hero/4.png',
+      title: <>ESTILO & <span>RENDIMIENTO</span></>,
+      desc: 'Prendas confeccionadas con cortes que destacan el físico y soportan las sesiones más pesadas.',
+      btnText: 'VER COLECCIÓN',
+      btnLink: '/ropa'
+    },
+    {
+      src: '/sliders/hero/5.png',
+      title: <>CALIDAD <span>GARANTIZADA</span></>,
+      desc: 'Resultados reales con suplementación original y despacho asegurado a toda Venezuela.',
+      btnText: 'COMPRAR AHORA',
+      btnLink: '/suplementos'
+    },
+    {
+      src: '/sliders/hero/6.png',
+      title: <>TEAM <span>SUPPLYMAX</span></>,
+      desc: 'CONSTRUIDO POR ATLETAS, PARA ATLETAS. Únete al movimiento deportivo de mayor crecimiento.',
+      btnText: 'UNIRME AL TEAM',
+      btnLink: '/join-team'
+    }
+  ];
+
+  const bottomSlides = [
+    '/sliders/footer/1.png',
+    '/sliders/footer/2.png',
+    '/sliders/footer/3.png',
+    '/sliders/footer/4.png'
+  ];
+
+  const shipmentImages = [
+    '/sliders/envios/envio1.jpg',
+    '/sliders/envios/envio2.jpg'
+  ];
 
   const mainRef = useRef<HTMLDivElement>(null);
 
@@ -56,18 +116,26 @@ export default function HomeClient({
   // Hero Slider Autoplay
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentHeroSlide((prev) => (prev + 1) % 3);
+      setCurrentHeroSlide((prev) => (prev + 1) % heroSlides.length);
     }, 6000);
     return () => clearInterval(interval);
-  }, []);
+  }, [heroSlides.length]);
+
+  // Bottom Banner Slider Autoplay
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBottomSlide((prev) => (prev + 1) % bottomSlides.length);
+    }, 5500);
+    return () => clearInterval(interval);
+  }, [bottomSlides.length]);
 
   // Shipment Slider Autoplay
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentShipmentSlide((prev) => (prev + 1) % 2);
-    }, 5000);
+      setCurrentShipmentSlide((prev) => (prev + 1) % shipmentImages.length);
+    }, 4500);
     return () => clearInterval(interval);
-  }, []);
+  }, [shipmentImages.length]);
 
   // Reset active FAQ when changing FAQ category
   useEffect(() => {
@@ -304,63 +372,33 @@ export default function HomeClient({
         </div>
       </div>
 
-      {/* 1. Slider 1: Hero Principal (Carrusel Mixto Full-Width) */}
+      {/* 1. Slider 1: Hero Principal (Carrusel Mixto Full-Width con 6 Slides) */}
       <section className={styles.heroSlider}>
-        {/* Slide 1: Suplementos */}
-        <div className={`${styles.heroSlide} ${currentHeroSlide === 0 ? styles.heroSlideActive : ''}`}>
-          <Image 
-            src="/brand-photos/Suplementos/IMG_5676.png" 
-            alt="Suplementos Premium" 
-            fill 
-            className={styles.heroSlideImage}
-            priority
-          />
-          <div className={styles.heroSlideContent}>
-            <h2>SUPLEMENTACIÓN <span>CIENTÍFICA</span></h2>
-            <p>Construye tu mejor versión con compuestos ultra puros validados por laboratorios de élite.</p>
-            <Link href="/suplementos" className={styles.heroSlideBtn}>
-              COMPRAR SUPLEMENTOS
-            </Link>
+        {heroSlides.map((slide, idx) => (
+          <div 
+            key={idx} 
+            className={`${styles.heroSlide} ${currentHeroSlide === idx ? styles.heroSlideActive : ''}`}
+          >
+            <Image 
+              src={slide.src} 
+              alt={`SupplyMax Banner ${idx + 1}`} 
+              fill 
+              className={styles.heroSlideImage}
+              priority={idx === 0}
+            />
+            <div className={styles.heroSlideContent}>
+              <h2>{slide.title}</h2>
+              <p>{slide.desc}</p>
+              <Link href={slide.btnLink} className={styles.heroSlideBtn}>
+                {slide.btnText}
+              </Link>
+            </div>
           </div>
-        </div>
-
-        {/* Slide 2: Ropa / Merch */}
-        <div className={`${styles.heroSlide} ${currentHeroSlide === 1 ? styles.heroSlideActive : ''}`}>
-          <Image 
-            src="/brand-photos/Ropa con modelo/IMG_7282.png" 
-            alt="Entrena con Estilo" 
-            fill 
-            className={styles.heroSlideImage}
-          />
-          <div className={styles.heroSlideContent}>
-            <h2>ENTRENA CON <span>ESTILO</span></h2>
-            <p>DENTRO Y FUERA DEL GIMNASIO. Indumentaria urbana oversized y de alto rendimiento.</p>
-            <Link href="/ropa" className={styles.heroSlideBtn}>
-              COMPRAR MERCH
-            </Link>
-          </div>
-        </div>
-
-        {/* Slide 3: Comunidad / Team */}
-        <div className={`${styles.heroSlide} ${currentHeroSlide === 2 ? styles.heroSlideActive : ''}`}>
-          <Image 
-            src="/brand-photos/Suplementos + ropa/IMG_3482.heif" 
-            alt="Team SupplyMax" 
-            fill 
-            className={styles.heroSlideImage}
-          />
-          <div className={styles.heroSlideContent}>
-            <h2>TEAM <span>SUPPLYMAX</span></h2>
-            <p>CONSTRUIDO POR ATLETAS, PARA ATLETAS. Únete al movimiento de alto rendimiento.</p>
-            <Link href="/join-team" className={styles.heroSlideBtn}>
-              UNIRME AL TEAM
-            </Link>
-          </div>
-        </div>
+        ))}
 
         {/* Slide dots indicators */}
         <div className={styles.heroSlideDots}>
-          {[0, 1, 2].map((idx) => (
+          {heroSlides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentHeroSlide(idx)}
@@ -371,13 +409,25 @@ export default function HomeClient({
         </div>
       </section>
 
-      {/* 1.5 COMPONENTE: BOTONES DE ACCESO RÁPIDO */}
+      {/* 1.5 COMPONENTE: BOTONES DE ACCESO RÁPIDO VISUALES */}
       <section className={styles.quickAccess}>
-        <Link href="/suplementos" className={styles.quickBtn}>
-          CATÁLOGO SUPLEMENTOS
+        <Link href="/suplementos" className={styles.quickBannerCard} aria-label="Catálogo de Suplementos">
+          <Image 
+            src="/sliders/buttons/suplementos.png" 
+            alt="Catálogo Suplementos" 
+            width={600} 
+            height={260} 
+            className={styles.quickBannerImg}
+          />
         </Link>
-        <Link href="/ropa" className={styles.quickBtn}>
-          CATÁLOGO ROPA
+        <Link href="/ropa" className={styles.quickBannerCard} aria-label="Catálogo de Ropa">
+          <Image 
+            src="/sliders/buttons/ropa.png" 
+            alt="Catálogo Ropa" 
+            width={600} 
+            height={260} 
+            className={styles.quickBannerImg}
+          />
         </Link>
       </section>
 
@@ -537,7 +587,7 @@ export default function HomeClient({
             <div className={styles.deliverySlider}>
               <div className={`${styles.deliverySliderSlide} ${currentShipmentSlide === 0 ? styles.deliverySliderSlideActive : ''}`}>
                 <Image 
-                  src="/brand-photos/Envíos nacionales/57573c77-184b-4641-9d35-9ce97c8f3eb2.jpg"
+                  src={shipmentImages[0]}
                   alt="Empaque real de pedido de suplementos"
                   fill
                   className={styles.deliveryImg}
@@ -549,7 +599,7 @@ export default function HomeClient({
               </div>
               <div className={`${styles.deliverySliderSlide} ${currentShipmentSlide === 1 ? styles.deliverySliderSlideActive : ''}`}>
                 <Image 
-                  src="/brand-photos/Envíos nacionales/73F6A189-5ABD-47E7-90A4-695ED13BF547.jpg"
+                  src={shipmentImages[1]}
                   alt="Despacho nacional real"
                   fill
                   className={styles.deliveryImg}
@@ -618,7 +668,7 @@ export default function HomeClient({
           <div className={`${styles.deliveryCard} ${styles.deliveryImageCard}`}>
             <div className={styles.deliveryImageContainer}>
               <Image 
-                src="/brand-photos/Envíos nacionales/73F6A189-5ABD-47E7-90A4-695ED13BF547.jpg"
+                src="/sliders/envios/envio2.jpg"
                 alt="Despacho real de pedido"
                 fill
                 className={styles.deliveryImg}
@@ -702,6 +752,35 @@ export default function HomeClient({
           )) : (
             <p className={styles.emptyMsg}>Sé el primero en compartir tu experiencia.</p>
           )}
+        </div>
+      </section>
+
+      {/* 8.5 Bottom Banner Slider (Slider final) */}
+      <section className={styles.bottomSliderSection}>
+        <div className={styles.bottomSlider}>
+          {bottomSlides.map((slide, idx) => (
+            <div 
+              key={idx}
+              className={`${styles.bottomSlide} ${currentBottomSlide === idx ? styles.bottomSlideActive : ''}`}
+            >
+              <Image 
+                src={slide}
+                alt={`SupplyMax Promoción ${idx + 1}`}
+                fill
+                className={styles.bottomSlideImage}
+              />
+            </div>
+          ))}
+          <div className={styles.bottomSlideDots}>
+            {bottomSlides.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentBottomSlide(idx)}
+                className={`${styles.bottomSlideDot} ${currentBottomSlide === idx ? styles.bottomSlideDotActive : ''}`}
+                aria-label={`Ir al banner ${idx + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </section>
 

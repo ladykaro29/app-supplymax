@@ -13,17 +13,23 @@ interface SuplementosClientProps {
 export default function SuplementosClient({ products }: SuplementosClientProps) {
   const { formatPrice, addToCart } = useAppContext();
   
-  // Hero Slider for Creatines (we have 4 seeded)
-  const creatinas = products.filter(p => p.category === 'Creatinas');
+  // Catálogo Slider de Suplementos (6 banners oficiales)
+  const suplementoBanners = [
+    '/sliders/suplementos/1.png',
+    '/sliders/suplementos/2.png',
+    '/sliders/suplementos/3.png',
+    '/sliders/suplementos/4.png',
+    '/sliders/suplementos/5.png',
+    '/sliders/suplementos/6.png'
+  ];
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-    if (creatinas.length === 0) return;
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % Math.min(4, creatinas.length));
-    }, 5000);
+      setCurrentSlide((prev) => (prev + 1) % suplementoBanners.length);
+    }, 5500);
     return () => clearInterval(interval);
-  }, [creatinas.length]);
+  }, [suplementoBanners.length]);
 
   // Filters for separate rows
   const proteinas = products.filter(p => p.category === 'Proteínas' && p.stock > 0);
@@ -77,46 +83,34 @@ export default function SuplementosClient({ products }: SuplementosClientProps) 
 
   return (
     <main className={styles.main}>
-      {/* 1. Slider de Creatinas (Hero dedicated full width) */}
-      {creatinas.length > 0 && (
-        <section className={styles.creatineHero}>
-          {creatinas.slice(0, 4).map((c, idx) => (
-            <div 
-              key={c.id} 
-              className={`${styles.creatineSlide} ${currentSlide === idx ? styles.activeSlide : ''}`}
-            >
-              <div className={styles.creatineSlideOverlay} />
-              <Image 
-                src={c.image} 
-                alt={c.name} 
-                fill 
-                className={styles.creatineSlideImg} 
-                priority={idx === 0}
-              />
-              <div className={styles.creatineSlideContent}>
-                <span className={styles.creatineSlideBadge}>CREATINA SUPREME</span>
-                <h2>{c.name}</h2>
-                <p>{c.description}</p>
-                <div className={styles.creatineSlidePrice}>{formatPrice(c.price)}</div>
-                <Link href={`/producto/${c.id}`} className={styles.creatineSlideBtn}>
-                  Ver Detalle
-                </Link>
-              </div>
-            </div>
-          ))}
-          
-          <div className={styles.slideDots}>
-            {creatinas.slice(0, 4).map((_, idx) => (
-              <button 
-                key={idx}
-                onClick={() => setCurrentSlide(idx)}
-                className={`${styles.slideDot} ${currentSlide === idx ? styles.activeDot : ''}`}
-                aria-label={`Ver slide ${idx + 1}`}
-              />
-            ))}
+      {/* 1. Slider Oficial Catálogo de Suplementos */}
+      <section className={styles.creatineHero}>
+        {suplementoBanners.map((banner, idx) => (
+          <div 
+            key={idx} 
+            className={`${styles.creatineSlide} ${currentSlide === idx ? styles.activeSlide : ''}`}
+          >
+            <Image 
+              src={banner} 
+              alt={`Catálogo Suplementos ${idx + 1}`} 
+              fill 
+              className={styles.creatineSlideImg} 
+              priority={idx === 0}
+            />
           </div>
-        </section>
-      )}
+        ))}
+        
+        <div className={styles.slideDots}>
+          {suplementoBanners.map((_, idx) => (
+            <button 
+              key={idx}
+              onClick={() => setCurrentSlide(idx)}
+              className={`${styles.slideDot} ${currentSlide === idx ? styles.activeDot : ''}`}
+              aria-label={`Ver slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+      </section>
 
       {/* 2. Catálogo de Artículos por Hileras */}
       <div className={styles.catalogContent}>

@@ -1072,6 +1072,106 @@
   color: var(--color-accent);
 }
 
+.quickBannerCard {
+  flex: 1;
+  max-width: 580px;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block;
+}
+
+.quickBannerCard:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: var(--color-accent);
+  box-shadow: 0 16px 36px rgba(0, 209, 255, 0.28);
+}
+
+.quickBannerImg {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.quickBannerCard:hover .quickBannerImg {
+  transform: scale(1.04);
+}
+
+/* Bottom Slider Section */
+.bottomSliderSection {
+  width: 100%;
+  padding: 60px 5%;
+  background: #0B0B0B;
+  position: relative;
+}
+
+.bottomSlider {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 380px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+}
+
+.bottomSlide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+}
+
+.bottomSlideActive {
+  opacity: 1;
+  visibility: visible;
+}
+
+.bottomSlideImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bottomSlideDots {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+}
+
+.bottomSlideDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.bottomSlideDotActive {
+  background: var(--color-accent);
+  box-shadow: 0 0 10px var(--color-accent);
+  width: 28px;
+  border-radius: 5px;
+}
+
 /* Giant Category Zone Card */
 .giantCategoryGrid {
   display: grid;
@@ -1343,11 +1443,16 @@
   }
   .quickAccess {
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
   }
-  .quickBtn {
+  .quickBtn,
+  .quickBannerCard {
     max-width: 100%;
     width: 100%;
+  }
+  .bottomSlider {
+    height: 220px;
+    border-radius: 12px;
   }
   .giantCategoryGrid {
     grid-template-columns: 1fr;

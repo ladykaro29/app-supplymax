@@ -16,9 +16,9 @@ export default function RopaClient({ products }: RopaClientProps) {
   // Hero Slider for Clothing Model Photos (3 slides)
   const [currentSlide, setCurrentSlide] = useState(0);
   const heroImages = [
-    '/brand-photos/Ropa con modelo/IMG_7283.png',
-    '/brand-photos/Ropa con modelo/IMG_7282.png',
-    '/brand-photos/Ropa con modelo/IMG_7284.png'
+    '/sliders/ropa/1.png',
+    '/sliders/ropa/2.png',
+    '/sliders/ropa/3.png'
   ];
 
   useEffect(() => {
