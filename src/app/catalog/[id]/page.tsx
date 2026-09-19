@@ -34,7 +34,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const pageUrl = `${siteUrl}/catalog/${product.id}`;
 
   const title = `${product.name} | SupplyMax`;
-  const description = `${product.name} - $${product.price.toFixed(2)} USD. ${product.description || 'Disponible para envío inmediato en Mérida y a toda Venezuela.'}`;
+  const priceFormatted = (Number(product.price) || 0).toFixed(2);
+  const description = `${product.name} - $${priceFormatted} USD. ${product.description || 'Disponible para envío inmediato en Mérida y a toda Venezuela.'}`;
 
   return {
     title,

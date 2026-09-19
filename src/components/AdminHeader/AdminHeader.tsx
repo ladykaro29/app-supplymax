@@ -101,7 +101,9 @@ export default function AdminHeader() {
               </form>
             ) : (
               <>
-                <span className={styles.rateValue}>{exchangeRate ? exchangeRate.toFixed(2) : '60.00'} VES</span>
+                <span className={styles.rateValue}>
+                  {(typeof exchangeRate === 'number' ? exchangeRate : (parseFloat(String(exchangeRate)) || 60)).toFixed(2)} VES
+                </span>
                 <button 
                   type="button" 
                   className={styles.rateEditBtn} 

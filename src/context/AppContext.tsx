@@ -300,12 +300,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return acc + (itemPrice * item.quantity);
   }, 0);
 
-  const formatPrice = (usdPrice: number) => {
+  const formatPrice = (usdPrice: any) => {
+    const num = typeof usdPrice === 'number' ? usdPrice : (parseFloat(String(usdPrice)) || 0);
     if (currency === 'USD') {
-      return `$${usdPrice.toFixed(2)}`;
+      return `$${num.toFixed(2)}`;
     } else {
-      const vesPrice = usdPrice * exchangeRate;
-      return `Bs. ${vesPrice.toLocaleString('es-VE', { minimumFractionDigits: 2 })}`;
+      const rate = typeof exchangeRate === 'number' ? exchangeRate : (parseFloat(String(exchangeRate)) || 60);
+      const vesPrice = num * rate;
+      return `Bs. ${vesPrice.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
   };
 

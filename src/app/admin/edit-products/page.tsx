@@ -92,10 +92,11 @@ export default function EditProductsPage() {
   // Filter products based on search term and category pills
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
-      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            p.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            (p.flavor && p.flavor.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                            (p.weight && p.weight.toLowerCase().includes(searchTerm.toLowerCase()));
+      const search = (searchTerm || '').toLowerCase();
+      const matchesSearch = (p.name || '').toLowerCase().includes(search) ||
+                            (p.category || '').toLowerCase().includes(search) ||
+                            (p.flavor && String(p.flavor).toLowerCase().includes(search)) ||
+                            (p.weight && String(p.weight).toLowerCase().includes(search));
       
       const matchesCategory = activeCategory === 'Todos' || p.category === activeCategory;
       return matchesSearch && matchesCategory;
@@ -286,7 +287,7 @@ export default function EditProductsPage() {
   const handleMarginPresetClick = (margin: number) => {
     setSelectedMargin(margin);
     if (!editingProduct) return;
-    const cost = editingProduct.purchasePrice || 0;
+    const cost = Number(editingProduct.purchasePrice) || 0;
     if (cost > 0) {
       const calculatedPrice = Math.round((cost * (1 + margin / 100)) * 100) / 100;
       setEditingProduct({
@@ -299,7 +300,7 @@ export default function EditProductsPage() {
   const handleSellingPriceChange = (newPrice: number) => {
     if (!editingProduct) return;
     const price = Math.max(0, newPrice);
-    const cost = editingProduct.purchasePrice || 0;
+    const cost = Number(editingProduct.purchasePrice) || 0;
     if (cost > 0 && price > cost) {
       const effectiveMarkup = Math.round(((price - cost) / cost) * 100);
       setSelectedMargin(effectiveMarkup);
@@ -313,7 +314,7 @@ export default function EditProductsPage() {
   // Flavor Variation Tag Helpers
   const currentFlavorsList = useMemo(() => {
     if (!editingProduct || !editingProduct.flavor) return [];
-    return editingProduct.flavor
+    return String(editingProduct.flavor)
       .split(',')
       .map(f => f.trim())
       .filter(Boolean);
@@ -337,7 +338,7 @@ export default function EditProductsPage() {
   // Weight / Presentation Variation Tag Helpers
   const currentWeightsList = useMemo(() => {
     if (!editingProduct || !editingProduct.weight) return [];
-    return editingProduct.weight
+    return String(editingProduct.weight)
       .split(',')
       .map(w => w.trim())
       .filter(Boolean);
@@ -368,9 +369,9 @@ export default function EditProductsPage() {
   };
 
   // Profitability calculations for the active editing product
-  const costVal = editingProduct?.purchasePrice || 0;
-  const priceVal = editingProduct?.price || 0;
-  const stockVal = editingProduct?.stock || 0;
+  const costVal = Number(editingProduct?.purchasePrice) || 0;
+  const priceVal = Number(editingProduct?.price) || 0;
+  const stockVal = Number(editingProduct?.stock) || 0;
   const unitProfitVal = Math.max(0, priceVal - costVal);
   const marginPctVal = priceVal > 0 ? Math.round((unitProfitVal / priceVal) * 100) : 0;
   const totalProjectedProfitVal = unitProfitVal * stockVal;
@@ -466,11 +467,13 @@ export default function EditProductsPage() {
         ) : (
           <div className={styles.grid}>
             {filteredProducts.map(product => {
-              const cost = product.purchasePrice || 0;
-              const profit = Math.max(0, product.price - cost);
-              const finalPrice = product.isOffer && product.discount 
-                ? product.price - product.discount 
-                : product.price;
+              const cost = Number(product.purchasePrice) || 0;
+              const numPrice = Number(product.price) || 0;
+              const numDiscount = Number(product.discount) || 0;
+              const profit = Math.max(0, numPrice - cost);
+              const finalPrice = product.isOffer && numDiscount 
+                ? Math.max(0, numPrice - numDiscount) 
+                : numPrice;
 
               return (
                 <div key={product.id} className={styles.productCard} onClick={() => handleEdit(product)}>
@@ -518,7 +521,7 @@ export default function EditProductsPage() {
                       <span className={styles.cardCategory}>{product.category}</span>
                       {product.weight && (
                         <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '4px' }}>
-                          {product.weight.split(',')[0]}
+                          {String(product.weight).split(',')[0]}
                         </span>
                       )}
                     </div>
@@ -529,7 +532,7 @@ export default function EditProductsPage() {
                     <div className={styles.priceRow}>
                       <span className={styles.currentPrice}>{formatPrice(finalPrice)}</span>
                       {product.isOffer && (
-                        <span className={styles.oldPrice}>{formatPrice(product.price)}</span>
+                        <span className={styles.oldPrice}>{formatPrice(numPrice)}</span>
                       )}
                     </div>
 
@@ -704,21 +707,21 @@ export default function EditProductsPage() {
                   <div className={styles.profitMetricBox}>
                     <span className={styles.metricLabel}>Ganancia Neta / Unidad</span>
                     <span className={`${styles.metricValue} ${styles.metricValuePositive}`}>
-                      +${unitProfitVal.toFixed(2)} USD
+                      +${(Number(unitProfitVal) || 0).toFixed(2)} USD
                     </span>
                   </div>
 
                   <div className={styles.profitMetricBox}>
                     <span className={styles.metricLabel}>Margen Comercial</span>
                     <span className={`${styles.metricValue} ${styles.metricValueCyan}`}>
-                      {marginPctVal}% <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>(+{selectedMargin}%)</span>
+                      {Number(marginPctVal) || 0}% <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>(+{selectedMargin}%)</span>
                     </span>
                   </div>
 
                   <div className={styles.profitMetricBox}>
                     <span className={styles.metricLabel}>Ganancia Total del Lote</span>
                     <span className={`${styles.metricValue} ${styles.metricValuePositive}`}>
-                      +${totalProjectedProfitVal.toFixed(2)} USD
+                      +${(Number(totalProjectedProfitVal) || 0).toFixed(2)} USD
                     </span>
                   </div>
                 </div>

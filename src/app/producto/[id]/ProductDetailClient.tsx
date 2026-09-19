@@ -40,12 +40,13 @@ export default function ProductDetailClient({
 
   const handleShareWhatsApp = () => {
     const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
-    const shareText = `🔥 *${product.name}*\n💰 Precio: $${product.price.toFixed(2)} USD\n\n👉 Mira todos los detalles y fotos aquí:\n${currentUrl}`;
+    const priceFormatted = (Number(product.price) || 0).toFixed(2);
+    const shareText = `🔥 *${product.name}*\n💰 Precio: $${priceFormatted} USD\n\n👉 Mira todos los detalles y fotos aquí:\n${currentUrl}`;
 
     if (typeof navigator !== 'undefined' && navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
       navigator.share({
         title: product.name,
-        text: `🔥 ${product.name} - $${product.price.toFixed(2)} USD en SupplyMax`,
+        text: `🔥 ${product.name} - $${priceFormatted} USD en SupplyMax`,
         url: currentUrl,
       }).catch(() => {
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
