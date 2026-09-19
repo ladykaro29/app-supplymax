@@ -70,8 +70,6 @@ export default function TeamPage() {
 
   return (
     <div className={styles.container}>
-      <Header />
-      
       <main className={styles.main}>
         <header className={styles.header}>
           <h1 style={{ color: 'white' }}>Equipo de <span>Trabajo</span></h1>

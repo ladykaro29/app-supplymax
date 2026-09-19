@@ -197,8 +197,6 @@ export default function PerformancePage() {
 
   return (
     <div className={styles.container}>
-      <Header />
-      
       <main className={styles.main}>
         {/* HEADER SECTION WITH FILTER */}
         <header className={styles.header}>

@@ -130,8 +130,6 @@ export default function AffiliatesAndCoachesPage() {
 
   return (
     <div className={styles.container}>
-      <Header />
-      
       <main className={styles.main}>
         {/* EXECUTIVE PAGE HEADER */}
         <header className={styles.header}>

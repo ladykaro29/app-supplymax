@@ -33,7 +33,6 @@ export default function ApplicationsAdminPage() {
 
   return (
     <div>
-      <Header />
       <ApplicationsAdminClient />
     </div>
   );
