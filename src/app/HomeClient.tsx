@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '@/context/AppContext';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -25,14 +24,6 @@ export default function HomeClient({
   reviews 
 }: HomeClientProps) {
   const { formatPrice, addToCart, user, authLoading } = useAppContext();
-  const router = useRouter();
-
-  // Redirigir administradores al panel ejecutivo
-  useEffect(() => {
-    if (!authLoading && user && (user.role_id || '').toLowerCase() === 'admin') {
-      router.push('/admin/edit-products');
-    }
-  }, [user, authLoading, router]);
   
   // React State for interactive FAQ Accordion and category tabs
   const [activeFaqCategory, setActiveFaqCategory] = useState<string>('Suplementación');
