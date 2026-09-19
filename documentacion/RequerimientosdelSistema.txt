@@ -1,0 +1,110 @@
+﻿# 📑 DOCUMENTO DE DESARROLLO E-COMMERCE INTEGRAL: SUPPLYMAX
+**Estética General:** *Premium Dark Mode* (fondos oscuros #0B0B0B, textos principales en blanco puro #FFFFFF, textos secundarios legibles, acentos y botones de acción en **Azul Supply** vibrante).
+## 🏛️ PARTE 1: FEED PRINCIPAL / HOME (/)
+*Orden estricto de componentes de arriba hacia abajo.*
+### 1. SLIDER 1: HERO PRINCIPAL (Carrusel Mixto Full-Width)
+ * **Medidas recomendadas para diseño:** 1920 x 800 px (Desktop) / 1080 x 1350 px (Adaptación Móvil vertical).
+ * **Slide 1 (Suplementos):** Imagen de stock de alta calidad. Botón centrado inferior: [ COMPRAR SUPLEMENTOS ] *(Redirige a /suplementos)*.
+ * **Slide 2 (Ropa/Merch):** Texto: *"ENTRENA CON ESTILO. DENTRO Y FUERA DEL GIMNASIO"*. Botón centrado inferior: [ COMPRAR MERCH ] *(Redirige a /ropa)*.
+ * **Slide 3 (Comunidad/Team):** Foto seria y profesional del Team SupplyMax. Texto: *"CONSTRUIDO POR ATLETAS, PARA ATLETAS"*.
+### 1.5 COMPONENTE: BOTONES DE ACCESO RÁPIDO (Justo abajo del Slider Principal)
+ * **Diseño:** Dos botones minimalistas premium posicionados lado a lado (en Desktop) o uno sobre otro (en Móvil), con bordes limpios y color de acento.
+   * **Botón Izquierdo:** Texto: [ CATÁLOGO SUPLEMENTOS ]. Al pulsar, redirige de inmediato a la página /suplementos.
+   * **Botón Derecho:** Texto: [ CATÁLOGO ROPA ]. Al pulsar, redirige de inmediato a la página /ropa.
+### 2. SECCIÓN: PRODUCTOS DESTACADOS
+ * **Formato:** Grid dinámico (4 columnas en Desktop / 2 columnas en Móvil).
+ * **Lógica:** Renderiza automáticamente los artículos más vendidos de la tienda. Al hacer clic, redirige a su respectiva página de detalle individual *(Ver Parte 4)*.
+### 3. SECCIÓN: CATEGORÍAS EN TARJETAS GIGANTES
+ * **⚠️ NOTA CRÍTICA PARA EL PROGRAMADOR:** Queda terminantemente prohibido el uso de imágenes generadas por IA o inventadas para este componente. Se debe trabajar única y exclusivamente con las fotos reales indicadas y provistas por el administrador.
+ * **Medidas recomendadas para diseño de cada tarjeta:** 800 x 600 px (Relación de aspecto 4:3 limpia).
+ * Dos bloques interactivos y limpios que dividen visualmente el negocio:
+   * **Tarjeta Izquierda (SUPLEMENTOS):** Imagen de fondo real de suplementación provista. Al hacer clic o pulsar en cualquier parte de la tarjeta, redirige directamente al catálogo específico de /suplementos.
+   * **Tarjeta Derecha (ROPA):** Imagen de fondo real de indumentaria deportiva provista. Al hacer clic o pulsar en cualquier parte de la tarjeta, redirige directamente al catálogo específico de /ropa.
+### 4. BANNER / FEED ENFOCADO: EL BOLSO SUPPLYMAX
+ * **Medidas recomendadas para diseño:** 1200 x 500 px (Banner horizontal de destaque).
+ * **Visual:** Espacio publicitario dedicado únicamente a resaltar los atributos del Bolso de entrenamiento de la marca.
+ * **Lógica de Redirección:** Al hacer clic en cualquier parte de este banner, el usuario es redirigido automáticamente al catálogo de ropa (/ropa), llevándolo directamente hasta la hilera donde se encuentra ubicado el bolso.
+### 5. SECCIÓN: RESPALDO DE ENVÍOS NACIONALES + SLIDER COMPLEMENTARIO FINAL
+ * **Bloque Informativo (Grid de 3 columnas):**
+   * **Columna 1:** *Envíos gratis a todo el país*.
+   * **Columna 2:** *Despacho inmediato desde la sede central en Mérida*.
+   * **Columna 3:** *Pagos seguros mediante múltiples plataformas de manera rápida y confiable*.
+ * **COMPONENTE (Slider Final de Envíos):** Un slider horizontal complementario que muestra fotos reales de los paquetes sellados con el branding de SupplyMax y sus guías impresas, listos en las agencias de envío (Zoom, MRW, Tealca).
+   * **Medidas sugeridas para las fotos del carrusel:** 1080 x 1080 px (Formato cuadrado).
+### 6. SECCIÓN: PREGUNTAS FRECUENTES (FAQ)
+ * **Formato:** Menú interactivo tipo acordeón (*Collapse / Dropdown*) con fondo oscuro. El usuario toca una duda, el bloque se expande suavemente hacia abajo con animación de transición limpia y se organiza en pestañas filtrables por categorías.
+#### **[CATEGORÍA: SUPLEMENTACIÓN]**
+ * **1. ¿Qué es la proteína y para qué sirve?**
+   * *R:* La proteína es el macronutriente esencial para la reparación y construcción de masa muscular. Al entrenar de forma intensa, las fibras del músculo sufren microdesgarros; el batido de proteína le entrega al cuerpo los aminoácidos necesarios para reconstruir ese tejido de forma rápida, eficiente y limpia.
+ * **2. ¿Qué es la creatina y cómo debo tomarla?**
+   * *R:* La creatina es el suplemento con mayor evidencia científica para aumentar la fuerza, la potencia y el volumen muscular. Funciona recargando las reservas de energía celular (ATP). La dosis estándar y recomendada es de 3 a 5 gramos diarios (un scoop), idealmente todos los días a la misma hora, entrenes o no.
+ * **3. ¿La creatina retiene líquidos o engorda?**
+   * *R:* No, la creatina no engorda porque no contiene calorías. La retención de líquido que produce ocurre exclusivamente a nivel intracelular (dentro del músculo), lo que hace que tus fibras se vean más llenas, densas y saludables, mejorando además la hidratación del tejido.
+ * **4. ¿Qué diferencia hay entre la Proteína Concentrada (Whey) e Isolada (Iso)?**
+   * *R:* La proteína Concentrada mantiene un porcentaje mínimo y natural de grasas y lactosa, siendo ideal para la mayoría de objetivos. La Isolada pasa por un proceso de filtración más estricto para eliminar casi al 100% la grasa y la lactosa, lo que la hace perfecta para etapas de definición extrema o personas con digestión sensible.
+ * **5. ¿Qué es un Pre-Entreno y cuándo debo tomarlo?**
+   * *R:* Es una combinación de estimulantes (como cafeína) y vasodilatadores (como beta-alanina y citrulina) diseñada para maximizar el enfoque mental, la energía y el bombeo de sangre en el músculo. Se debe tomar entre 20 y 30 minutos antes de empezar tu rutina de entrenamiento.
+ * **6. ¿Qué son los aminoácidos (BCAA / EAA) y son necesarios si ya tomo proteína?**
+   * *R:* Los BCAA y EAA son los bloques constructores que forman la proteína. Si ya consumes suficiente proteína en tu dieta o batidos, no son estrictamente obligatorios, pero son un aliado excelente para mantener la hidratación y proteger la masa muscular durante entrenamientos en ayunas o sesiones cardiovasculares prolongadas.
+ * **7. ¿Los suplementos tienen efectos secundarios en la salud?**
+   * *R:* No, los suplementos de marcas certificadas son seguros para adultos saludables. Son extractos purificados de alimentos comunes (como el suero de la leche en la proteína). Siempre recomendamos respetar las dosis sugeridas en cada empaque.
+ * **8. ¿Las mujeres pueden tomar los mismos suplementos que los hombres?**
+   * *R:* ¡Totalmente! Las mujeres tienen los mismos requerimientos de recuperación muscular que los hombres. Tomar proteína, creatina o pre-entreno no alterará tus hormonas de forma negativa; al contrario, te ayudará a tonificar y desarrollar un físico fuerte y estético.
+ * **9. ¿Es obligatorio tomar los suplementos con agua o puedo usar leche/jugos?**
+   * *R:* Puedes mezclarlos a tu gusto. El agua garantiza una absorción más rápida y no añade calorías. Mezclarlos con leche mejora el sabor y la cremosidad, pero añade las calorías y macronutrientes de la leche (ideal si buscas aumentar peso).
+ * **10. ¿A partir de qué edad se pueden consumir suplementos deportivos?**
+   * *R:* El consumo de suplementos base como la proteína de suero o la creatina se considera seguro a partir de los 16-18 años, momento en el que el cuerpo ya realiza entrenamientos con cargas estructuradas de forma regular.
+#### **[CATEGORÍA: INDUMENTARIA & ESTILO]**
+ * **11. ¿Qué significa que una prenda sea estilo “Oversize”?**
+   * *R:* El estilo Oversize es un corte diseñado intencionalmente para quedar holgado, ancho y caído en los hombros, inspirado en la cultura urbana del bodybuilding. No necesitas pedir una talla más grande; pide tu talla normal y la prenda ya tendrá ese ajuste amplio, cómodo y estético.
+ * **12. ¿Cómo sé cuál es mi talla exacta en la indumentaria de la marca?**
+   * *R:* En la sección de cada prenda encontrarás nuestra Tabla de Medidas detallada en centímetros (ancho y largo). Te recomendamos medir una camisa o short que ya uses y te quede cómodo para compararlo con nuestras dimensiones.
+ * **13. ¿Qué tipo de tela utilizan para las prendas de gimnasio?**
+   * *R:* Seleccionamos telas de calidad premium con mezclas de algodón pesado para las prendas lifestyle (oversizes y hoodies) que mantienen la forma y frescura, y fibras elásticas de alta tecnología para los shorts y prendas de rendimiento que permiten un rango completo de movimiento sin deformarse.
+ * **14. ¿Cómo debo lavar la ropa para que no pierda el color ni se encoja?**
+   * *R:* Para garantizar la máxima vida útil de tus prendas, lávalas al revés con agua fría, evita el uso de blanqueadores agresivos y no utilices secadora a temperaturas altas. Deja secar la prenda a la sombra.
+#### **[CATEGORÍA: ENVÍOS, PAGOS Y GARANTÍAS]**
+ * **15. ¿Realizan envíos a toda Venezuela y qué agencias utilizan?**
+   * *R:* Sí, realizamos envíos cobro en destino a nivel nacional a través de las empresas líderes del país: Zoom, MRW, Tealca y Liberty Express, completamente asegurados para tu tranquilidad.
+ * **16. ¿Cómo es el proceso de entrega si me encuentro en Mérida?**
+   * *R:* Si estás en Mérida, contamos con servicio de delivery express directo hasta la puerta de tu casa o gimnasio. Al realizar tu pedido, coordinamos la hora exacta de entrega según tu disponibilidad.
+ * **17. ¿Cuáles son los métodos de pago disponibles?**
+   * *R:* Para tu comodidad, aceptamos múltiples canales de pago seguros: Pago Móvil, transferencias bancarias nacionales, divisas en efectivo (para entregas en Mérida), Binance Pay (USDT) y Zelle.
+ * **18. ¿Cómo puedo hacerle seguimiento a mi envío nacional?**
+   * *R:* Una vez que tu paquete es entregado a la casa de envío (Zoom/MRW), nuestro equipo te enviará de inmediato por WhatsApp el comprobante digital con el número de guía de rastreo para que monitoreees el estatus en tiempo real desde su página web.
+ * **19. ¿Tienen tienda física o son exclusivamente una plataforma en línea?**
+   * *R:* Operamos bajo un modelo digital premium optimizado con almacenes de distribución centralizados. Esto nos permite reducir costos operativos y garantizarte los precios más competitivos del mercado y entregas ultra rápidas sin que tengas que salir de casa.
+ * **20. ¿Qué hago si mi producto llega dañado o hay un error en mi pedido de ropa/suplementos?**
+   * *R:* Tu satisfacción es nuestra prioridad absoluta. Si hay algún error en las tallas enviadas o el empaque de tu suplemento sufre algún daño físico en el traslado nacional, comunícate de inmediato con nuestro soporte técnico para gestionar el caso.
+### 7. PIE DE PÁGINA (Footer Premium)
+ * Logotipo de SupplyMax en alta resolución, enlaces rápidos del mapa de rutas, horarios de atención y datos clave de contacto (Ubicación física en Mérida, Venezuela, enlace a Instagram y soporte directo por WhatsApp).
+## 💊 PARTE 2: SUBPÁGINA CATÁLOGO DE SUPLEMENTOS (/suplementos)
+### 1. SLIDER DEDICADO: HERO DE SUPLEMENTACIÓN (Full-Width)
+ * **Medidas recomendadas para diseño:** 1920 x 600 px.
+ * **Contenido prioritario:** El diseño de las 4 Creatinas en alta resolución con iluminación de estudio profesional sobre fondo oscuro y limpio.
+### 2. CUADRÍCULA DE ARTÍCULOS EN HILERAS SEPARADAS
+ * **Fila 1 [Título: PROTEÍNAS]:** Cuadrícula horizontal/Grid exclusivo de proteínas en stock.
+ * **Fila 2 [Título: CREATINAS]:** Cuadrícula horizontal/Grid dedicado únicamente a las creatinas.
+ * **Fila 3 [Título: MÁS SUPLEMENTOS]:** Grid dinámico para el resto del stock (Pre-entrenos, Colágenos, HGH, etc.).
+## 👕 PARTE 3: SUBPÁGINA CATÁLOGO DE ROPA / MERCH (/ropa)
+### 1. SLIDER DEDICADO: HERO CLOTHING (Full-Width)
+ * **Medidas recomendadas para diseño:** 1920 x 600 px.
+ * **Contenido:** Fotos de estudio de atletas reales vistiendo la indumentaria SupplyMax.
+### 2. CUADRÍCULA DE PRENDAS EN HILERAS SEPARADAS POR COLOR
+ * **Fila 1 [Título: COLECCIÓN BLANCA]:** Grid exclusivo para camisas en color blanco.
+ * **Fila 2 [Título: COLECCIÓN NEGRA]:** Grid exclusivo para camisas en color negro.
+ * **Fila 3 [Título: ACCESORIOS DE TRANSPORTE]:** Espacio dedicado al **Bolso SupplyMax** (aquí aterriza la redirección del Home).
+## 🛒 PARTE 4: VISTA INTERNA DE DETALLE DE PRODUCTO (/producto/:id)
+### 1. BLOQUE SUPERIOR: PANTALLA PRINCIPAL DE COMPRA
+ * **Lado Izquierdo - Galería de Fotos:** Foto principal + carrusel inferior de miniaturas.
+   * **Medidas recomendadas para fotos de producto:** 1200 x 1200 px (Formato cuadrado 1:1 para habilitar el zoom de detalle de textura sin pixelarse).
+ * **Lado Derecho - Panel de Pago:** Nombre del artículo, precio en Azul Supply, dropdowns de tablas nutricionales/guías de tallas, selector de variantes y el botón de acción masivo [ AÑADIR AL CARRITO ].
+### 2. BLOQUE MEDIO: PRUEBA SOCIAL (Scroll hacia abajo)
+ * **SECCIÓN: COMENTARIOS DE LA COMUNIDAD**
+   * Feed Dinámico de Reseñas: Estrellas, comentarios y carrusel de fotos de los clientes usando el producto.
+### 3. BLOQUE INFERIOR: CROSS-SELLING
+ * **SECCIÓN: "TAMBIÉN TE PUEDE INTERESAR"**
+   * Mix de recomendación inteligente de suplementación y ropa para elevar el ticket promedio de compra.
+## ⚙️ ESPECIFICACIONES TÉCNICAS REQUERIDAS PARA EL FRONTEND:
+ 1. **Rutas e Instantaneidad:** El programador debe utilizar rutas limpias (como react-router-dom o el router de Next.js) para que al pulsar los catálogos o productos la navegación sea fluida y cargue en milisegundos.
+ 2. **Regla de Oro CSS min-height: auto;:** Todos los contenedores de las hileras de los catálogos deben llevar esta propiedad. Si el inventario de una fila completa llega a 0 en el panel de administración, la fila se colapsa y oculta automáticamente por código, evitando parches vacíos o pantallas muertas en negro.

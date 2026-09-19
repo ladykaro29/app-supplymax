@@ -1,8 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
 import CartDrawer from '@/components/CartDrawer/CartDrawer';
 import SideMenu from '@/components/SideMenu/SideMenu';
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const metadata: Metadata = {
   title: "Supplymax | Premium Sports Nutrition & Apparel",

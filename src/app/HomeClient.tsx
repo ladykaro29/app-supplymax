@@ -34,17 +34,45 @@ export default function HomeClient({
     }
   }, [user, authLoading, router]);
   
-  // React State for interactive FAQ Accordion
+  // React State for interactive FAQ Accordion and category tabs
+  const [activeFaqCategory, setActiveFaqCategory] = useState<string>('Suplementación');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   
   // React State for Product tab explorer
   const [activeTab, setActiveTab] = useState<string>('Todos');
+
+  // React State for Hero Slider Principal
+  const [currentHeroSlide, setCurrentHeroSlide] = useState<number>(0);
+
+  // React State for Shipment square slider
+  const [currentShipmentSlide, setCurrentShipmentSlide] = useState<number>(0);
 
   const mainRef = useRef<HTMLDivElement>(null);
 
   const toggleFaq = (index: number) => {
     setActiveFaq(activeFaq === index ? null : index);
   };
+
+  // Hero Slider Autoplay
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHeroSlide((prev) => (prev + 1) % 3);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Shipment Slider Autoplay
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentShipmentSlide((prev) => (prev + 1) % 2);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Reset active FAQ when changing FAQ category
+  useEffect(() => {
+    setActiveFaq(null);
+  }, [activeFaqCategory]);
 
   // GSAP ScrollTrigger Section Entrance Animations
   useEffect(() => {
@@ -83,10 +111,10 @@ export default function HomeClient({
         });
       });
 
-      // 3. Category Zones Cards
-      gsap.from(`.${styles.zoneCard}`, {
+      // 3. Giant Category Zone Cards
+      gsap.from(`.${styles.giantCategoryCard}`, {
         scrollTrigger: {
-          trigger: `.${styles.zoneGrid}`,
+          trigger: `.${styles.giantCategoryGrid}`,
           start: 'top 85%',
           toggleActions: 'play none none reverse',
         },
@@ -125,20 +153,6 @@ export default function HomeClient({
         ease: 'power2.out',
       });
 
-      // 5.5. Real Deliveries Cards
-      gsap.from(`.${styles.deliveryCard}`, {
-        scrollTrigger: {
-          trigger: `.${styles.deliveriesGrid}`,
-          start: 'top 85%',
-          toggleActions: 'play none none reverse',
-        },
-        opacity: 0,
-        y: 35,
-        stagger: 0.15,
-        duration: 0.8,
-        ease: 'power3.out',
-      });
-
       // 6. FAQ Items
       gsap.from(`.${styles.faqItem}`, {
         scrollTrigger: {
@@ -159,22 +173,108 @@ export default function HomeClient({
 
   const faqData = [
     {
-      q: '¿Cómo funciona la facturación bimonetaria?',
-      a: 'En SupplyMax te mostramos los precios tanto en dólares (USD) como en bolívares venezolanos (VES) utilizando una tasa de conversión oficial y transparente. Puedes elegir pagar con transferencia bancaria, pago móvil o criptomonedas, y la conversión se aplicará automáticamente al finalizar la compra sin cargos ocultos.'
+      category: 'Suplementación',
+      q: '1. ¿Qué es la proteína y para qué sirve?',
+      a: 'La proteína es el macronutriente esencial para la reparación y construcción de masa muscular. Al entrenar de forma intensa, las fibras del músculo sufren microdesgarros; el batido de proteína le entrega al cuerpo los aminoácidos necesarios para reconstruir ese tejido de forma rápida, eficiente y limpia.'
     },
     {
-      q: '¿Los suplementos cuentan con certificación de laboratorio?',
-      a: 'Totalmente. Cada lote de proteínas, creatinas y pre-entrenos en SupplyMax pasa por rigurosos análisis de pureza microbiológica y HPLC. Garantizamos que lo que se declara en la etiqueta nutricional es exactamente lo que consumes, libre de rellenos y sustancias prohibidas.'
+      category: 'Suplementación',
+      q: '2. ¿Qué es la creatina y cómo debo tomarla?',
+      a: 'La creatina es el suplemento con mayor evidencia científica para aumentar la fuerza, la potencia y el volumen muscular. Funciona recargando las reservas de energía celular (ATP). La dosis estándar y recomendada es de 3 a 5 gramos diarios (un scoop), idealmente todos los días a la misma hora, entrenes o no.'
     },
     {
-      q: '¿Cuáles son los tiempos y costos de envío?',
-      a: 'Ofrecemos envío express gratuito en Mérida en compras superiores a USD 50, con entregas en 24 a 48 horas hábiles. Para envíos nacionales, trabajamos con Zoom, Tealca y MRW, despachando el mismo día de la confirmación del pago.'
+      category: 'Suplementación',
+      q: '3. ¿La creatina retiene líquidos o engorda?',
+      a: 'No, la creatina no engorda porque no contiene calorías. La retención de líquido que produce ocurre exclusivamente a nivel intracelular (dentro del músculo), lo que hace que tus fibras se vean más llenas, densas y saludables, mejorando además la hidratación del tejido.'
     },
     {
-      q: '¿Cómo puedo unirme como Coach o Embajador de marca?',
-      a: 'Buscamos entrenadores, nutricionistas y atletas comprometidos. Al unirte a nuestro equipo de poder, obtienes un enlace de afiliado único, descuentos masivos del 25% para ti y tus clientes, y comisiones en dólares por cada recomendación exitosa. Haz clic en "Unirme al Equipo" para postularte.'
+      category: 'Suplementación',
+      q: '4. ¿Qué diferencia hay entre la Proteína Concentrada (Whey) e Isolada (Iso)?',
+      a: 'La proteína Concentrada mantiene un porcentaje mínimo y natural de grasas y lactosa, siendo ideal para la mayoría de objetivos. La Isolada pasa por un proceso de filtración más estricto para eliminar casi al 100% la grasa y la lactosa, lo que la hace perfecta para etapas de definición extrema o personas con digestión sensible.'
+    },
+    {
+      category: 'Suplementación',
+      q: '5. ¿Qué es un Pre-Entreno y cuándo debo tomarlo?',
+      a: 'Es una combinación de estimulantes (como cafeína) y vasodilatadores (como beta-alanina y citrulina) diseñada para maximizar el enfoque mental, la energía y el bombeo de sangre en el músculo. Se debe tomar entre 20 y 30 minutos antes de empezar tu rutina de entrenamiento.'
+    },
+    {
+      category: 'Suplementación',
+      q: '6. ¿Qué son los aminoácidos (BCAA / EAA) y son necesarios si ya tomo proteína?',
+      a: 'Los BCAA y EAA son los bloques constructores que forman la proteína. Si ya consumes suficiente proteína en tu dieta o batidos, no son estrictamente obligatorios, pero son un aliado excelente para mantener la hidratación y proteger la masa muscular durante entrenamientos en ayunas o sesiones cardiovasculares prolongadas.'
+    },
+    {
+      category: 'Suplementación',
+      q: '7. ¿Los suplementos tienen efectos secundarios en la salud?',
+      a: 'No, los suplementos de marcas certificadas son seguros para adultos saludables. Son extractos purificados de alimentos comunes (como el suero de la leche en la proteína). Siempre recomendamos respetar las dosis sugeridas en cada empaque.'
+    },
+    {
+      category: 'Suplementación',
+      q: '8. ¿Las mujeres pueden tomar los mismos suplementos que los hombres?',
+      a: '¡Totalmente! Las mujeres tienen los mismos requerimientos de recuperación muscular que los hombres. Tomar proteína, creatina o pre-entreno no alterará tus hormonas de forma negativa; al contrario, te ayudará a tonificar y desarrollar un físico fuerte y estético.'
+    },
+    {
+      category: 'Suplementación',
+      q: '9. ¿Es obligatorio tomar los suplementos con agua o puedo usar leche/jugos?',
+      a: 'Puedes mezclarlos a tu gusto. El agua garantiza una absorción más rápida y no añade calorías. Mezclarlos con leche mejora el sabor y la cremosidad, pero añade las calorías y macronutrientes de la leche (ideal si buscas aumentar peso).'
+    },
+    {
+      category: 'Suplementación',
+      q: '10. ¿A partir de qué edad se pueden consumir suplementos deportivos?',
+      a: 'El consumo de suplementos base como la proteína de suero o la creatina se considera seguro a partir de los 16-18 años, momento en el que el cuerpo ya realiza entrenamientos con cargas estructuradas de forma regular.'
+    },
+    {
+      category: 'Indumentaria & Estilo',
+      q: '11. ¿Qué significa que una prenda sea estilo “Oversize”?',
+      a: 'El estilo Oversize es un corte diseñado intencionalmente para quedar holgado, ancho y caído en los hombros, inspirado en la cultura urbana del bodybuilding. No necesitas pedir una talla más grande; pide tu talla normal y la prenda ya tendrá ese ajuste amplio, cómodo y estético.'
+    },
+    {
+      category: 'Indumentaria & Estilo',
+      q: '12. ¿Cómo sé cuál es mi talla exacta en la indumentaria de la marca?',
+      a: 'En la sección de cada prenda encontrarás nuestra Tabla de Medidas detallada en centímetros (ancho y largo). Te recomendamos medir una camisa o short que ya uses y te quede cómodo para compararlo con nuestras dimensiones.'
+    },
+    {
+      category: 'Indumentaria & Estilo',
+      q: '13. ¿Qué tipo de tela utilizan para las prendas de gimnasio?',
+      a: 'Seleccionamos telas de calidad premium con mezclas de algodón pesado para las prendas lifestyle (oversizes y hoodies) que mantienen la forma y frescura, y fibras elásticas de alta tecnología para los shorts y prendas de rendimiento que permiten un rango completo de movimiento sin deformarse.'
+    },
+    {
+      category: 'Indumentaria & Estilo',
+      q: '14. ¿Cómo debo lavar la ropa para que no pierda el color ni se encoja?',
+      a: 'Para garantizar la máxima vida útil de tus prendas, lávalas al revés con agua fría, evita el uso de blanqueadores agresivos y no utilices secadora a temperaturas altas. Deja secar la prenda a la sombra.'
+    },
+    {
+      category: 'Envíos, Pagos y Garantías',
+      q: '15. ¿Realizan envíos a toda Venezuela y qué agencias utilizan?',
+      a: 'Sí, realizamos envíos cobro en destino a nivel nacional a través de las empresas líderes del país: Zoom, MRW, Tealca y Liberty Express, completamente asegurados para tu tranquilidad.'
+    },
+    {
+      category: 'Envíos, Pagos y Garantías',
+      q: '16. ¿Cómo es el proceso de entrega si me encuentro en Mérida?',
+      a: 'Si estás en Mérida, contamos con servicio de delivery express directo hasta la puerta de tu casa o gimnasio. Al realizar tu pedido, coordinamos la hora exacta de entrega según tu disponibilidad.'
+    },
+    {
+      category: 'Envíos, Pagos y Garantías',
+      q: '17. ¿Cuáles son los métodos de pago disponibles?',
+      a: 'Para tu comodidad, aceptamos múltiples canales de pago seguros: Pago Móvil, transferencias bancarias nacionales, divisas en efectivo (para entregas en Mérida), Binance Pay (USDT) y Zelle.'
+    },
+    {
+      category: 'Envíos, Pagos y Garantías',
+      q: '18. ¿Cómo puedo hacerle seguimiento a mi envío nacional?',
+      a: 'Una vez que tu paquete es entregado a la casa de envío (Zoom/MRW), nuestro equipo te enviará de inmediato por WhatsApp el comprobante digital con el número de guía de rastreo para que monitoreees el estatus en tiempo real desde su página web.'
+    },
+    {
+      category: 'Envíos, Pagos y Garantías',
+      q: '19. ¿Tienen tienda física o son exclusivamente una plataforma en línea?',
+      a: 'Operamos bajo un modelo digital premium optimizado con almacenes de distribución centralizados. Esto nos permite reducir costos operativos y garantizarte los precios más competitivos del mercado y entregas ultra rápidas sin que tengas que salir de casa.'
+    },
+    {
+      category: 'Envíos, Pagos y Garantías',
+      q: '20. ¿Qué hago si mi producto llega dañado o hay un error en mi pedido de ropa/suplementos?',
+      a: 'Tu satisfacción es nuestra prioridad absoluta. Si hay algún error en las tallas enviadas o el empaque de tu suplemento sufre algún daño físico en el traslado nacional, comunícate de inmediato con nuestro soporte técnico para gestionar el caso.'
     }
   ];
+
+  const filteredFaqs = faqData.filter(f => f.category === activeFaqCategory);
 
   return (
     <main ref={mainRef} className={styles.main}>
@@ -204,10 +304,84 @@ export default function HomeClient({
         </div>
       </div>
 
-      {/* 1. Interactive Premium Hero Section (GSAP powered real products) */}
-      <PremiumHero featuredProducts={featuredProducts} />
+      {/* 1. Slider 1: Hero Principal (Carrusel Mixto Full-Width) */}
+      <section className={styles.heroSlider}>
+        {/* Slide 1: Suplementos */}
+        <div className={`${styles.heroSlide} ${currentHeroSlide === 0 ? styles.heroSlideActive : ''}`}>
+          <Image 
+            src="/brand-photos/Suplementos/IMG_5676.png" 
+            alt="Suplementos Premium" 
+            fill 
+            className={styles.heroSlideImage}
+            priority
+          />
+          <div className={styles.heroSlideContent}>
+            <h2>SUPLEMENTACIÓN <span>CIENTÍFICA</span></h2>
+            <p>Construye tu mejor versión con compuestos ultra puros validados por laboratorios de élite.</p>
+            <Link href="/suplementos" className={styles.heroSlideBtn}>
+              COMPRAR SUPLEMENTOS
+            </Link>
+          </div>
+        </div>
 
-      {/* 2. Value Pillars / Core Benefits Section (New Structural Enhancement) */}
+        {/* Slide 2: Ropa / Merch */}
+        <div className={`${styles.heroSlide} ${currentHeroSlide === 1 ? styles.heroSlideActive : ''}`}>
+          <Image 
+            src="/brand-photos/Ropa con modelo/IMG_7282.png" 
+            alt="Entrena con Estilo" 
+            fill 
+            className={styles.heroSlideImage}
+          />
+          <div className={styles.heroSlideContent}>
+            <h2>ENTRENA CON <span>ESTILO</span></h2>
+            <p>DENTRO Y FUERA DEL GIMNASIO. Indumentaria urbana oversized y de alto rendimiento.</p>
+            <Link href="/ropa" className={styles.heroSlideBtn}>
+              COMPRAR MERCH
+            </Link>
+          </div>
+        </div>
+
+        {/* Slide 3: Comunidad / Team */}
+        <div className={`${styles.heroSlide} ${currentHeroSlide === 2 ? styles.heroSlideActive : ''}`}>
+          <Image 
+            src="/brand-photos/Suplementos + ropa/IMG_3482.heif" 
+            alt="Team SupplyMax" 
+            fill 
+            className={styles.heroSlideImage}
+          />
+          <div className={styles.heroSlideContent}>
+            <h2>TEAM <span>SUPPLYMAX</span></h2>
+            <p>CONSTRUIDO POR ATLETAS, PARA ATLETAS. Únete al movimiento de alto rendimiento.</p>
+            <Link href="/join-team" className={styles.heroSlideBtn}>
+              UNIRME AL TEAM
+            </Link>
+          </div>
+        </div>
+
+        {/* Slide dots indicators */}
+        <div className={styles.heroSlideDots}>
+          {[0, 1, 2].map((idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentHeroSlide(idx)}
+              className={`${styles.heroSlideDot} ${currentHeroSlide === idx ? styles.heroSlideDotActive : ''}`}
+              aria-label={`Ir al slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* 1.5 COMPONENTE: BOTONES DE ACCESO RÁPIDO */}
+      <section className={styles.quickAccess}>
+        <Link href="/suplementos" className={styles.quickBtn}>
+          CATÁLOGO SUPLEMENTOS
+        </Link>
+        <Link href="/ropa" className={styles.quickBtn}>
+          CATÁLOGO ROPA
+        </Link>
+      </section>
+
+      {/* 2. Value Pillars / Core Benefits Section */}
       <section className={styles.pillarsSection}>
         <div className={styles.pillarsGrid}>
           <div className={styles.pillarCard}>
@@ -253,11 +427,11 @@ export default function HomeClient({
         </div>
       </section>
 
-      {/* 3. Supplements Featured Products Grid */}
+      {/* 2. SECCIÓN: PRODUCTOS DESTACADOS */}
       <section className={styles.featured}>
         <div className={styles.sectionHeader}>
           <p>EL COMBUSTIBLE DE LOS CAMPEONES</p>
-          <h2>Suplementos <span>Destacados</span></h2>
+          <h2>Productos <span>Destacados</span></h2>
         </div>
 
         {/* Dynamic Interactive Category Tabs */}
@@ -292,33 +466,169 @@ export default function HomeClient({
         />
       </section>
 
-      {/* 4. Supply Max Anchored Category Zones */}
-      <section className={styles.zones}>
-        <div className={styles.zoneGrid}>
-          <Link href="/catalog?category=Creatinas" className={styles.zoneCard}>
-            <div className={styles.zoneOverlay}></div>
-            <Image src="/banners/creatina-zone.jpg" alt="Zona Creatina" fill className={styles.zoneImg} />
-            <div className={styles.zoneContent}>
-              <h3>ZONA <span>CREATINA</span></h3>
-              <button>Ver todas</button>
+      {/* 3. SECCIÓN: CATEGORÍAS EN TARJETAS GIGANTES */}
+      <section className={styles.giantCategoryGrid}>
+        {/* Tarjeta Izquierda (SUPLEMENTOS) */}
+        <Link href="/suplementos" className={styles.giantCategoryCard}>
+          <div className={styles.giantCategoryOverlay}></div>
+          <Image 
+            src="/brand-photos/Suplementos/IMG_5676.png" 
+            alt="Catálogo Suplementos" 
+            fill 
+            className={styles.giantCategoryImg} 
+          />
+          <div className={styles.giantCategoryContent}>
+            <h3>CATÁLOGO <span>SUPLEMENTOS</span></h3>
+            <button>Ingresar</button>
+          </div>
+        </Link>
+
+        {/* Tarjeta Derecha (ROPA) */}
+        <Link href="/ropa" className={styles.giantCategoryCard}>
+          <div className={styles.giantCategoryOverlay}></div>
+          <Image 
+            src="/brand-photos/Ropa con modelo/IMG_7287.png" 
+            alt="Catálogo Ropa" 
+            fill 
+            className={styles.giantCategoryImg} 
+          />
+          <div className={styles.giantCategoryContent}>
+            <h3>CATÁLOGO <span>ROPA / MERCH</span></h3>
+            <button>Ingresar</button>
+          </div>
+        </Link>
+      </section>
+
+      {/* 4. BANNER / FEED ENFOCADO: EL BOLSO SUPPLYMAX */}
+      <section className={styles.bagBannerSection}>
+        <Link href="/ropa#bolso" className={styles.bagBanner}>
+          <Image 
+            src="/brand-photos/Suplementos + ropa/Photoroom_20260328_114310.jpg" 
+            alt="Bolso SupplyMax" 
+            fill 
+            className={styles.bagBannerImg} 
+          />
+          <div className={styles.bagBannerContent}>
+            <span className={styles.bagBannerBadge}>DESTACADO ACCESORIO</span>
+            <h3 className={styles.bagBannerTitle}>
+              EL BOLSO <span>SUPPLYMAX</span>
+            </h3>
+            <p className={styles.bagBannerDesc}>
+              El aliado perfecto para tus rutinas. Fabricado con materiales impermeables de alta resistencia, 
+              compartimento ventilado exclusivo para calzado húmedo y bolsillos inteligentes para tus batidos y straps.
+            </p>
+            <button className={styles.bagBannerBtn}>
+              ADQUIRIR BOLSO
+            </button>
+          </div>
+        </Link>
+      </section>
+
+      {/* 5. SECCIÓN: RESPALDO DE ENVÍOS NACIONALES + SLIDER COMPLEMENTARIO FINAL */}
+      <section className={styles.deliveriesSection}>
+        <div className={styles.sectionHeader}>
+          <p>COMPRA SEGURA Y COMPROBADA</p>
+          <h2>Envíos & <span>Entregas Garantizadas</span></h2>
+        </div>
+        
+        <div className={styles.deliveriesGrid}>
+          {/* Card 1: Real shipment photo slider (Square horizontal carrusel) */}
+          <div className={`${styles.deliveryCard} ${styles.deliveryImageCard}`}>
+            <div className={styles.deliverySlider}>
+              <div className={`${styles.deliverySliderSlide} ${currentShipmentSlide === 0 ? styles.deliverySliderSlideActive : ''}`}>
+                <Image 
+                  src="/brand-photos/Envíos nacionales/57573c77-184b-4641-9d35-9ce97c8f3eb2.jpg"
+                  alt="Empaque real de pedido de suplementos"
+                  fill
+                  className={styles.deliveryImg}
+                />
+                <div className={styles.deliveryImageOverlay}>
+                  <span className={styles.deliveryImageTag}>Listo en Oficina</span>
+                  <h4>Mérida central</h4>
+                </div>
+              </div>
+              <div className={`${styles.deliverySliderSlide} ${currentShipmentSlide === 1 ? styles.deliverySliderSlideActive : ''}`}>
+                <Image 
+                  src="/brand-photos/Envíos nacionales/73F6A189-5ABD-47E7-90A4-695ED13BF547.jpg"
+                  alt="Despacho nacional real"
+                  fill
+                  className={styles.deliveryImg}
+                />
+                <div className={styles.deliveryImageOverlay}>
+                  <span className={styles.deliveryImageTag}>Envío Nacional</span>
+                  <h4>Agencia Aliada Zoom/MRW</h4>
+                </div>
+              </div>
+              
+              <div className={styles.deliverySliderDots}>
+                {[0, 1].map((idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentShipmentSlide(idx)}
+                    className={`${styles.deliverySliderDot} ${currentShipmentSlide === idx ? styles.deliverySliderDotActive : ''}`}
+                    aria-label={`Ir al slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
             </div>
-          </Link>
-          <Link href="/catalog?category=Proteínas" className={styles.zoneCard}>
-            <div className={styles.zoneOverlay}></div>
-            <Image src="/banners/proteina-zone.jpg" alt="Zona Proteína" fill className={styles.zoneImg} />
-            <div className={styles.zoneContent}>
-              <h3>ZONA <span>PROTEÍNA</span></h3>
-              <button>Ver todas</button>
+          </div>
+
+          {/* Card 2: Shipments Info Panel */}
+          <div className={`${styles.deliveryCard} ${styles.deliveryInfoCard}`}>
+            <div className={styles.deliveryBadgeRow}>
+              <span className={styles.courierBadge}>Zoom</span>
+              <span className={styles.courierBadge}>Tealca</span>
+              <span className={styles.courierBadge}>MRW</span>
             </div>
-          </Link>
-          <Link href="/catalog?category=Pre-Entrenos" className={styles.zoneCard}>
-            <div className={styles.zoneOverlay}></div>
-            <Image src="/banners/pre-zone.jpg" alt="Zona Pre Entrenos" fill className={styles.zoneImg} />
-            <div className={styles.zoneContent}>
-              <h3>ZONA <span>PRE-ENTRENO</span></h3>
-              <button>Ver todas</button>
+            <h3>Envíos Rápidos a Toda Venezuela</h3>
+            <p>
+              Garantizamos el traslado seguro de tu combustible. Procesamos y embalamos cada pedido con 
+              los mejores estándares de protección contra el calor y los golpes.
+            </p>
+            
+            <div className={styles.deliveryFeaturesList}>
+              <div className={styles.deliveryFeatureItem}>
+                <div className={styles.featureIcon}>⚡</div>
+                <div>
+                  <strong>Envíos gratis a todo el país:</strong> Sin costos adicionales en compras seleccionadas.
+                </div>
+              </div>
+              <div className={styles.deliveryFeatureItem}>
+                <div className={styles.featureIcon}>📦</div>
+                <div>
+                  <strong>Despacho inmediato desde Mérida:</strong> Sede central de distribución agilizada.
+                </div>
+              </div>
+              <div className={styles.deliveryFeatureItem}>
+                <div className={styles.featureIcon}>🛡️</div>
+                <div>
+                  <strong>Pagos seguros confiables:</strong> Múltiples plataformas rápidas (Pago Móvil, Zelle, Binance).
+                </div>
+              </div>
             </div>
-          </Link>
+
+            <div className={styles.deliveryCtaBox}>
+              <Link href="/suplementos" className={styles.deliveryCtaBtn}>
+                Ver Catálogo de Suplementos
+              </Link>
+            </div>
+          </div>
+
+          {/* Card 3: Real shipment static photo */}
+          <div className={`${styles.deliveryCard} ${styles.deliveryImageCard}`}>
+            <div className={styles.deliveryImageContainer}>
+              <Image 
+                src="/brand-photos/Envíos nacionales/73F6A189-5ABD-47E7-90A4-695ED13BF547.jpg"
+                alt="Despacho real de pedido"
+                fill
+                className={styles.deliveryImg}
+              />
+              <div className={styles.deliveryImageOverlay}>
+                <span className={styles.deliveryImageTag}>Seguro de Envío</span>
+                <h4>Entregas 100% Garantizadas</h4>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -331,7 +641,7 @@ export default function HomeClient({
         <ProductGrid products={apparelProducts} formatPrice={formatPrice} addToCart={addToCart} />
       </section>
 
-      {/* 6. Recruitment Dynamic Conversional Banner (New Structural Enhancement) */}
+      {/* 6. Recruitment Dynamic Conversional Banner */}
       <section className={styles.recruitment}>
         <div className={styles.recruitmentBanner}>
           <span className={styles.recruitmentBadge}>PROGRAMA DE SINDICATO</span>
@@ -395,100 +705,28 @@ export default function HomeClient({
         </div>
       </section>
 
-      {/* 8.5. Envíos Nacionales / Entregas Reales Gallery (New Structural Enhancement) */}
-      <section className={styles.deliveriesSection}>
-        <div className={styles.sectionHeader}>
-          <p>COMPRA SEGURA Y COMPROBADA</p>
-          <h2>Entregas Reales & <span>Envíos Garantizados</span></h2>
-        </div>
-        
-        <div className={styles.deliveriesGrid}>
-          {/* Card 1: Real shipment photo 1 */}
-          <div className={`${styles.deliveryCard} ${styles.deliveryImageCard}`}>
-            <div className={styles.deliveryImageContainer}>
-              <Image 
-                src="/brand-photos/Envíos nacionales/57573c77-184b-4641-9d35-9ce97c8f3eb2.jpg"
-                alt="Empaque real de pedido de suplementos"
-                width={400}
-                height={500}
-                className={styles.deliveryImg}
-              />
-              <div className={styles.deliveryImageOverlay}>
-                <span className={styles.deliveryImageTag}>Mérida, VE</span>
-                <h4>Listo para Despacho Express</h4>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 2: Shipments Info Panel */}
-          <div className={`${styles.deliveryCard} ${styles.deliveryInfoCard}`}>
-            <div className={styles.deliveryBadgeRow}>
-              <span className={styles.courierBadge}>Zoom</span>
-              <span className={styles.courierBadge}>Tealca</span>
-              <span className={styles.courierBadge}>MRW</span>
-            </div>
-            <h3>Despachos Nacionales desde Mérida</h3>
-            <p>
-              Enviamos tu pedido el mismo día de la confirmación del pago. Todos los paquetes 
-              son embalados bajo estrictas normas de seguridad y protección para asegurar que 
-              tus proteínas y suplementos lleguen perfectos.
-            </p>
-            
-            <div className={styles.deliveryFeaturesList}>
-              <div className={styles.deliveryFeatureItem}>
-                <div className={styles.featureIcon}>⚡</div>
-                <div>
-                  <strong>Despacho Express:</strong> En Mérida en menos de 24-48 horas hábiles.
-                </div>
-              </div>
-              <div className={styles.deliveryFeatureItem}>
-                <div className={styles.featureIcon}>📦</div>
-                <div>
-                  <strong>Embalaje Reforzado:</strong> Mayor seguridad contra golpes y temperatura.
-                </div>
-              </div>
-              <div className={styles.deliveryFeatureItem}>
-                <div className={styles.featureIcon}>🛡️</div>
-                <div>
-                  <strong>Código de Tracking:</strong> Enviado inmediatamente para seguimiento online.
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.deliveryCtaBox}>
-              <Link href="/catalog" className={styles.deliveryCtaBtn}>
-                Comprar Ahora & Recibir
-              </Link>
-            </div>
-          </div>
-
-          {/* Card 3: Real shipment photo 2 */}
-          <div className={`${styles.deliveryCard} ${styles.deliveryImageCard}`}>
-            <div className={styles.deliveryImageContainer}>
-              <Image 
-                src="/brand-photos/Envíos nacionales/73F6A189-5ABD-47E7-90A4-695ED13BF547.jpg"
-                alt="Despacho real de pedido"
-                width={400}
-                height={500}
-                className={styles.deliveryImg}
-              />
-              <div className={styles.deliveryImageOverlay}>
-                <span className={styles.deliveryImageTag}>Nacional</span>
-                <h4>Entregas 100% Aseguradas</h4>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 9. Interactive FAQ Accordion Section (New Structural Enhancement) */}
+      {/* 9. Interactive FAQ Accordion Section (Acordeón con pestañas de categorías) */}
       <section className={styles.faqSection}>
         <div className={styles.sectionHeader}>
           <p>RESOLVEMOS TUS DUDAS</p>
           <h2>Preguntas <span>Frecuentes</span></h2>
         </div>
+
+        {/* FAQ Category Filter Tabs */}
+        <div className={styles.faqTabsContainer}>
+          {['Suplementación', 'Indumentaria & Estilo', 'Envíos, Pagos y Garantías'].map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveFaqCategory(cat)}
+              className={`${styles.faqTabButton} ${activeFaqCategory === cat ? styles.faqTabButtonActive : ''}`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
         <div className={styles.faqContainer}>
-          {faqData.map((faq, index) => {
+          {filteredFaqs.map((faq, index) => {
             const isActive = activeFaq === index;
             return (
               <div 
@@ -521,7 +759,7 @@ function ProductGrid({ products, formatPrice, addToCart }: any) {
     <div className={styles.productGrid}>
       {products.length > 0 ? products.map((product: any) => (
         <div key={product.id} className={styles.productCard}>
-          <Link href={`/catalog/${product.id}`} className={styles.cardLink}>
+          <Link href={`/producto/${product.id}`} className={styles.cardLink}>
             <div className={styles.productImageArea}>
                {product.goal && <div className={styles.cardBadge}>{product.goal}</div>}
                <div className={styles.imgContainer}>

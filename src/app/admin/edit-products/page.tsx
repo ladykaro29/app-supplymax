@@ -57,6 +57,17 @@ export default function EditProductsPage() {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
+  // Filter products based on search term and category pills
+  const filteredProducts = useMemo(() => {
+    return products.filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            p.category.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesCategory = activeCategory === 'Todos' || p.category === activeCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [products, searchTerm, activeCategory]);
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -110,17 +121,6 @@ export default function EditProductsPage() {
       </div>
     );
   }
-
-  // Filter products based on search term and category pills
-  const filteredProducts = useMemo(() => {
-    return products.filter(p => {
-      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            p.category.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesCategory = activeCategory === 'Todos' || p.category === activeCategory;
-      return matchesSearch && matchesCategory;
-    });
-  }, [products, searchTerm, activeCategory]);
 
   const handleCreateNew = () => {
     setEditingProduct({ ...BLANK_PRODUCT });

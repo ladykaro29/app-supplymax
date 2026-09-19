@@ -127,7 +127,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCurrency((prev) => (prev === 'USD' ? 'VES' : 'USD'));
   };
 
-  const fetchOrders = async (userId: string) => {
+  async function fetchOrders(userId: string) {
     try {
       const res = await fetch(`/api/orders?userId=${userId}`);
       if (res.ok) {
@@ -138,7 +138,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error('Error fetching orders:', err);
     }
-  };
+  }
 
   const login = (userData: any) => {
     // Normalizing the JSON object received from "server"
