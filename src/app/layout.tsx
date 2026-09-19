@@ -37,6 +37,16 @@ export const metadata: Metadata = {
     description: "Next-generation sports supplements and fitness apparel.",
     images: ["/protein.png"],
   },
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
