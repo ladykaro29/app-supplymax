@@ -404,8 +404,8 @@ export default function EditProductsPage() {
               )}
             </div>
             
-            <button className={styles.createNewBtn} onClick={handleCreateNew}>
-              <span className={styles.plusIcon}>+</span> Registrar Producto
+            <button className={styles.addBtn} onClick={handleCreateNew} id="btn-add-product">
+              <span className={styles.plusIcon}>+</span> Agregar Producto
             </button>
           </div>
         </header>
@@ -444,16 +444,16 @@ export default function EditProductsPage() {
           <div className={styles.statBox}>
             <span className={styles.statLabel}>Agotados</span>
             <span className={`${styles.statVal} ${styles.statRed}`}>
-              {products.filter(p => p.stock === 0).length}
+              {products.filter(p => p.stock <= 0).length}
             </span>
           </div>
         </div>
 
-        {/* Products Grid */}
+        {/* Product Catalog Grid */}
         {loading ? (
-          <div className={styles.loadingState}>
+          <div className={styles.loaderWrap}>
             <div className={styles.spinner}></div>
-            <p>Conectando con base de datos...</p>
+            <p>Sincronizando inventario...</p>
           </div>
         ) : error ? (
           <div className={styles.errorState}>
@@ -463,6 +463,9 @@ export default function EditProductsPage() {
         ) : filteredProducts.length === 0 ? (
           <div className={styles.emptyState}>
             <p>No se encontraron productos en esta categoría o con el término buscado.</p>
+            <button className={styles.addBtn} onClick={handleCreateNew} style={{ marginTop: '1.2rem', marginInline: 'auto' }}>
+              <span className={styles.plusIcon}>+</span> Agregar Primer Producto
+            </button>
           </div>
         ) : (
           <div className={styles.grid}>

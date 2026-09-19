@@ -30,7 +30,7 @@ export default function HomeClient({
   // Redirigir administradores al panel ejecutivo
   useEffect(() => {
     if (!authLoading && user && user.role_id === 'Admin') {
-      router.push('/dashboard/admin');
+      router.push('/admin/edit-products');
     }
   }, [user, authLoading, router]);
   

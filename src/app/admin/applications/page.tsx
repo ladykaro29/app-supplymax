@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppContext } from '@/context/AppContext';
-import Header from '@/components/Header/Header';
 import ApplicationsAdminClient from './ApplicationsAdminClient';
 
 export default function ApplicationsAdminPage() {

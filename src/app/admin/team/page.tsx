@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Header from '@/components/Header/Header';
 import { useAppContext } from '@/context/AppContext';
 import styles from './Team.module.css';
 
@@ -42,7 +41,6 @@ export default function TeamPage() {
   if (!user || user.role_id !== 'Admin') {
     return (
       <div className={styles.unauthorized}>
-        <Header />
         <h1 style={{ color: 'white' }}>Acceso Restringido</h1>
         <p style={{ color: 'rgba(255,255,255,0.6)' }}>Solo el administrador principal puede gestionar el equipo de trabajo.</p>
       </div>

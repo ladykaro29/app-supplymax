@@ -39,7 +39,7 @@ export default function LoginPage() {
       
       // Redirect based on role
       if (data.role_id === 'Admin') {
-        router.push('/dashboard/admin');
+        router.push('/admin/edit-products');
       } else {
         router.push('/profile');
       }

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Header from '@/components/Header/Header';
 import { useAppContext } from '@/context/AppContext';
 import styles from './ApplicationsAdmin.module.css';
 import Link from 'next/link';
@@ -80,7 +79,6 @@ export default function ApplicationsAdminClient() {
   if (!user || !allowedRoles.includes(user.role_id)) {
     return (
       <div className={styles.unauthorized}>
-        <Header />
         <div className={styles.errorCard}>
           <div className={styles.errorIcon}>⚠️</div>
           <h1>Acceso Restringido</h1>
@@ -93,8 +91,6 @@ export default function ApplicationsAdminClient() {
 
   return (
     <div className={styles.main}>
-      <Header />
-      
       <div className={styles.container}>
         {/* BANDEJA HEADER */}
         <header className={styles.header}>
