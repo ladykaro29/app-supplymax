@@ -149,8 +149,8 @@ export default function EditProductsPage() {
     }
   }, [isMounted]);
 
-  // Allowed Roles
-  const allowedRoles = ['Admin', 'Subgerente', 'Administrador de inventarios'];
+  // Allowed Roles (case-insensitive check)
+  const allowedRoles = ['admin', 'administrador', 'subgerente', 'administrador de inventarios'];
   
   if (authLoading || !isMounted) {
     return (
@@ -163,7 +163,8 @@ export default function EditProductsPage() {
     );
   }
 
-  if (!user || !allowedRoles.includes(user.role_id)) {
+  const userRole = (user?.role_id || '').toLowerCase().trim();
+  if (!user || !allowedRoles.includes(userRole)) {
     return (
       <div className={styles.unauthorized}>
         <div className={styles.errorCard}>

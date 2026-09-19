@@ -96,8 +96,8 @@ export default function AffiliatesAndCoachesPage() {
     return { coaches, influencers, delivery };
   }, [staffList]);
 
-  // Authorization Check
-  const allowedRoles = ['Admin', 'Subgerente'];
+  // Authorization Check (case-insensitive)
+  const allowedRoles = ['admin', 'administrador', 'subgerente'];
 
   // Loading gatekeeper
   if (authLoading || loading || !isMounted) {
@@ -113,7 +113,8 @@ export default function AffiliatesAndCoachesPage() {
   }
 
   // Access check
-  if (!user || !allowedRoles.includes(user.role_id)) {
+  const userRole = (user?.role_id || '').toLowerCase().trim();
+  if (!user || !allowedRoles.includes(userRole)) {
     return (
       <div className={styles.unauthorized}>
         <div className={styles.errorCard}>

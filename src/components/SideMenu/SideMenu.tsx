@@ -31,7 +31,7 @@ export default function SideMenu() {
         </div>
 
         <nav className={styles.nav}>
-          {user?.role_id === 'Admin' ? (
+          {(user?.role_id || '').toLowerCase() === 'admin' ? (
             <>
               {/* ADMIN OPTIONS */}
               <Link href="/admin/edit-products" target="_blank" className={styles.navItem} onClick={() => setMenuOpen(false)}>

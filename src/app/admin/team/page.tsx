@@ -38,7 +38,8 @@ export default function TeamPage() {
   }
 
   // Only Admin can manage team
-  if (!user || user.role_id !== 'Admin') {
+  const userRole = (user?.role_id || '').toLowerCase().trim();
+  if (!user || !['admin', 'administrador'].includes(userRole)) {
     return (
       <div className={styles.unauthorized}>
         <h1 style={{ color: 'white' }}>Acceso Restringido</h1>

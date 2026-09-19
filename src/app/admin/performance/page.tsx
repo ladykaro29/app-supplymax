@@ -61,8 +61,8 @@ export default function PerformancePage() {
     }
   }, [isMounted]);
 
-  // Authorization Check
-  const allowedRoles = ['Admin', 'Subgerente'];
+  // Authorization Check (case-insensitive)
+  const allowedRoles = ['admin', 'administrador', 'subgerente'];
 
   // ----------------------------------------------------
   // DYNAMIC PERFORMANCE CALCULATIONS
@@ -231,7 +231,8 @@ export default function PerformancePage() {
   }
 
   // Access Control check
-  if (!user || !allowedRoles.includes(user.role_id)) {
+  const userRole = (user?.role_id || '').toLowerCase().trim();
+  if (!user || !allowedRoles.includes(userRole)) {
     return (
       <div className={styles.unauthorized}>
         <div className={styles.errorCard}>
