@@ -40,6 +40,11 @@ export async function POST(request: Request) {
       isOffer,
       discount,
       stock,
+      supplierName,
+      purchaseType,
+      creditDueDate,
+      creditDebt,
+      creditPaid,
     } = body;
 
     if (!name || !category || price === undefined || price === null) {
@@ -75,6 +80,11 @@ export async function POST(request: Request) {
         isOffer: !!isOffer,
         discount: discount !== undefined && discount !== null ? parseFloat(discount) : null,
         stock: stock !== undefined && stock !== null ? parseInt(stock) : 10,
+        supplierName: supplierName ? supplierName.trim() : null,
+        purchaseType: purchaseType === 'CREDITO' ? 'CREDITO' : 'CONTADO',
+        creditDueDate: creditDueDate ? creditDueDate.trim() : null,
+        creditDebt: creditDebt !== undefined && creditDebt !== null ? parseFloat(creditDebt) : null,
+        creditPaid: !!creditPaid,
       }
     });
 
@@ -110,6 +120,11 @@ export async function PUT(request: Request) {
       isOffer,
       discount,
       stock,
+      supplierName,
+      purchaseType,
+      creditDueDate,
+      creditDebt,
+      creditPaid,
     } = body;
 
     if (!id) {
@@ -153,6 +168,11 @@ export async function PUT(request: Request) {
         isOffer: !!isOffer,
         discount: discount !== undefined && discount !== null ? parseFloat(discount) : null,
         stock: stock !== undefined && stock !== null ? parseInt(stock) : 10,
+        supplierName: supplierName !== undefined ? (supplierName ? supplierName.trim() : null) : undefined,
+        purchaseType: purchaseType !== undefined ? (purchaseType === 'CREDITO' ? 'CREDITO' : 'CONTADO') : undefined,
+        creditDueDate: creditDueDate !== undefined ? (creditDueDate ? creditDueDate.trim() : null) : undefined,
+        creditDebt: creditDebt !== undefined ? (creditDebt !== null ? parseFloat(creditDebt) : null) : undefined,
+        creditPaid: creditPaid !== undefined ? !!creditPaid : undefined,
       }
     });
 

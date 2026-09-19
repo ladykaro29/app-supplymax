@@ -22,6 +22,11 @@ interface Product {
   discount?: number | null;
   durationInDays?: string | null;
   stock: number;
+  supplierName?: string | null;
+  purchaseType?: 'CONTADO' | 'CREDITO' | null;
+  creditDueDate?: string | null;
+  creditDebt?: number | null;
+  creditPaid?: boolean | null;
 }
 
 const BLANK_PRODUCT: Product = {
@@ -41,6 +46,11 @@ const BLANK_PRODUCT: Product = {
   isOffer: false,
   discount: 0,
   stock: 10,
+  supplierName: '',
+  purchaseType: 'CONTADO',
+  creditDueDate: '',
+  creditDebt: null,
+  creditPaid: false,
 };
 
 const CATEGORIES = ['Todos', 'Proteínas', 'Creatinas', 'Pre-Entrenos', 'Aminoácidos/BCAA', 'Quemadores/Otros', 'Ropa'];
@@ -376,6 +386,50 @@ export default function EditProductsPage() {
   const marginPctVal = priceVal > 0 ? Math.round((unitProfitVal / priceVal) * 100) : 0;
   const totalProjectedProfitVal = unitProfitVal * stockVal;
 
+  // Credit & Break-even calculations
+  const isCredit = editingProduct?.purchaseType === 'CREDITO';
+  const effectiveDebt = isCredit 
+    ? (editingProduct?.creditDebt !== null && editingProduct?.creditDebt !== undefined 
+        ? Number(editingProduct.creditDebt) 
+        : costVal * stockVal)
+    : 0;
+  
+  // Break-even units: how many units must be sold to cover provider debt
+  const breakEvenUnits = priceVal > 0 && effectiveDebt > 0 
+    ? Math.min(stockVal, Math.ceil(effectiveDebt / priceVal)) 
+    : 0;
+  
+  // Remaining units that represent 100% free net profit
+  const freeProfitUnits = Math.max(0, stockVal - breakEvenUnits);
+  const projectedFreeProfitUSD = Math.max(0, (stockVal * priceVal) - effectiveDebt);
+
+  // Helper to add days to today and return YYYY-MM-DD
+  const setDueDaysFromToday = (days: number) => {
+    if (!editingProduct) return;
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    setEditingProduct({
+      ...editingProduct,
+      creditDueDate: `${yyyy}-${mm}-${dd}`
+    });
+  };
+
+  // Helper for credit days remaining
+  const getCreditDaysDiff = (dueDateStr?: string | null) => {
+    if (!dueDateStr) return null;
+    const parts = dueDateStr.split('-');
+    if (parts.length !== 3) return null;
+    const due = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    due.setHours(0, 0, 0, 0);
+    const diffTime = due.getTime() - today.getTime();
+    return Math.round(diffTime / (1000 * 60 * 60 * 24));
+  };
+
   return (
     <div className={styles.container}>
       <main className={styles.main}>
@@ -548,6 +602,41 @@ export default function EditProductsPage() {
                         Ganancia: +${profit.toFixed(2)}
                       </span>
                     </div>
+
+                    {/* Supplier & Credit Acquisition Tag */}
+                    {product.purchaseType === 'CREDITO' && (
+                      <div className={styles.cardCreditBox}>
+                        {product.creditPaid ? (
+                          <span className={styles.creditStatusPaid}>
+                            ✅ Factura Proveedor Liquidada
+                          </span>
+                        ) : (
+                          (() => {
+                            const daysDiff = getCreditDaysDiff(product.creditDueDate);
+                            const isOverdue = daysDiff !== null && daysDiff < 0;
+                            const isWarning = daysDiff !== null && daysDiff >= 0 && daysDiff <= 7;
+                            return (
+                              <div className={styles.creditStatusPending}>
+                                <span className={isOverdue ? styles.badgeOverdue : isWarning ? styles.badgeWarning : styles.badgeNormal}>
+                                  {isOverdue 
+                                    ? `🚨 Factura Vencida (${Math.abs(daysDiff!)}d)` 
+                                    : daysDiff === 0 
+                                      ? `🚨 Vence Hoy` 
+                                      : daysDiff !== null 
+                                        ? `⏳ Pagar en ${daysDiff}d` 
+                                        : '🟣 A Crédito'}
+                                </span>
+                                {product.supplierName && (
+                                  <span className={styles.creditSupplierName} title={`Proveedor: ${product.supplierName}`}>
+                                    🏢 {product.supplierName}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })()
+                        )}
+                      </div>
+                    )}
 
                     {/* Quick Stock Controls */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
@@ -756,6 +845,159 @@ export default function EditProductsPage() {
                       step="0.01"
                       min="0"
                     />
+                  </div>
+                )}
+              </div>
+
+              {/* ======================================================== */}
+              {/* MODALIDAD DE ADQUISICIÓN: CONTADO VS CRÉDITO PROVEEDOR   */}
+              {/* ======================================================== */}
+              <div className={styles.creditManagerCard}>
+                <div className={styles.creditCardHeader}>
+                  <span className={styles.creditTitle}>
+                    🏢 Modalidad de Adquisición & Proveedor
+                  </span>
+                  
+                  {/* Selector de Modalidad */}
+                  <div className={styles.purchaseTypeToggle}>
+                    <button
+                      type="button"
+                      className={`${styles.typeToggleBtn} ${!isCredit ? styles.typeToggleActiveCash : ''}`}
+                      onClick={() => setEditingProduct({ ...editingProduct, purchaseType: 'CONTADO' })}
+                    >
+                      🟢 Contado (Pagado)
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.typeToggleBtn} ${isCredit ? styles.typeToggleActiveCredit : ''}`}
+                      onClick={() => {
+                        const defaultDebt = effectiveDebt > 0 ? effectiveDebt : costVal * stockVal;
+                        setEditingProduct({ 
+                          ...editingProduct, 
+                          purchaseType: 'CREDITO',
+                          creditDebt: defaultDebt > 0 ? defaultDebt : null,
+                        });
+                      }}
+                    >
+                      🟣 A Crédito (Por Pagar)
+                    </button>
+                  </div>
+                </div>
+
+                {isCredit && (
+                  <div className={styles.creditFormBody}>
+                    <div className={styles.priceGrid}>
+                      <div className={styles.formGroup}>
+                        <label>Proveedor o Distribuidor Comercial</label>
+                        <input 
+                          type="text" 
+                          className={styles.formInput} 
+                          placeholder="Ej: Distribuidor ProSupps Mérida"
+                          value={editingProduct.supplierName || ''}
+                          onChange={(e) => setEditingProduct({ ...editingProduct, supplierName: e.target.value })}
+                        />
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <label>Fecha Límite de Pago de Factura</label>
+                          <div className={styles.dueQuickPresets}>
+                            <button type="button" onClick={() => setDueDaysFromToday(15)} className={styles.presetDayBtn}>+15d</button>
+                            <button type="button" onClick={() => setDueDaysFromToday(30)} className={styles.presetDayBtn}>+30d</button>
+                            <button type="button" onClick={() => setDueDaysFromToday(45)} className={styles.presetDayBtn}>+45d</button>
+                          </div>
+                        </div>
+                        <input 
+                          type="date" 
+                          className={styles.formInput} 
+                          value={editingProduct.creditDueDate || ''}
+                          onChange={(e) => setEditingProduct({ ...editingProduct, creditDueDate: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className={styles.priceGrid} style={{ marginTop: '10px' }}>
+                      <div className={styles.formGroup}>
+                        <label>Deuda Total con el Proveedor ($ USD)</label>
+                        <input 
+                          type="number" 
+                          className={styles.formInput} 
+                          step="0.01"
+                          min="0"
+                          placeholder={`Por defecto: $${(costVal * stockVal).toFixed(2)}`}
+                          value={editingProduct.creditDebt !== null && editingProduct.creditDebt !== undefined ? editingProduct.creditDebt : ''}
+                          onChange={(e) => setEditingProduct({ ...editingProduct, creditDebt: parseFloat(e.target.value) || 0 })}
+                        />
+                        <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: '4px', display: 'block' }}>
+                          Base sugerida: Costo (${costVal.toFixed(2)}) × Stock ({stockVal}) = ${(costVal * stockVal).toFixed(2)} USD
+                        </span>
+                      </div>
+
+                      <div className={styles.formGroup} style={{ justifyContent: 'center' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginTop: '1.2rem' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={!!editingProduct.creditPaid} 
+                            onChange={(e) => setEditingProduct({ ...editingProduct, creditPaid: e.target.checked })}
+                            style={{ width: '18px', height: '18px', accentColor: '#00F0FF' }}
+                          />
+                          <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: editingProduct.creditPaid ? '#25D366' : 'white' }}>
+                            {editingProduct.creditPaid ? '✅ Factura Cancelada al 100%' : '⏳ Factura Pendiente por Pagar'}
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* TARJETA DE ANÁLISIS DE PUNTO DE EQUILIBRIO (BREAK-EVEN) */}
+                    <div className={styles.breakEvenCard}>
+                      <div className={styles.breakEvenHeader}>
+                        <span className={styles.breakEvenTitle}>🎯 Análisis de Retorno & Punto de Equilibrio</span>
+                        {(() => {
+                          const days = getCreditDaysDiff(editingProduct.creditDueDate);
+                          if (days === null) return null;
+                          if (days < 0) return <span className={styles.badgeAlertRed}>🚨 Factura Vencida hace {Math.abs(days)} días</span>;
+                          if (days === 0) return <span className={styles.badgeAlertRed}>🚨 Vence HOY</span>;
+                          if (days <= 7) return <span className={styles.badgeAlertYellow}>⚠️ Vence en {days} días (¡Prioridad Rotación!)</span>;
+                          return <span className={styles.badgeAlertGreen}>🟢 {days} días restantes de crédito</span>;
+                        })()}
+                      </div>
+
+                      <div className={styles.breakEvenGrid}>
+                        <div className={styles.breakEvenBox}>
+                          <span className={styles.beLabel}>1. Unidades para Pagar Deuda</span>
+                          <span className={`${styles.beVal} ${styles.beValDebt}`}>
+                            {breakEvenUnits} unid.
+                          </span>
+                          <span className={styles.beSub}>
+                            Recaudan ${((breakEvenUnits * priceVal) || 0).toFixed(2)} USD (cubren deuda de ${effectiveDebt.toFixed(2)})
+                          </span>
+                        </div>
+
+                        <div className={styles.breakEvenBox}>
+                          <span className={styles.beLabel}>2. Unidades de Ganancia Neta</span>
+                          <span className={`${styles.beVal} ${styles.beValProfit}`}>
+                            {freeProfitUnits} unid.
+                          </span>
+                          <span className={styles.beSub}>
+                            +{formatPrice(projectedFreeProfitUSD)} USD libres para tu cuenta
+                          </span>
+                        </div>
+
+                        <div className={styles.breakEvenBox}>
+                          <span className={styles.beLabel}>3. Fondo Requerido Proveedor</span>
+                          <span className={`${styles.beVal} ${styles.beValCyan}`}>
+                            ${effectiveDebt.toFixed(2)} USD
+                          </span>
+                          <span className={styles.beSub}>
+                            ≈ {formatPrice(effectiveDebt)} intocables para el proveedor
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className={styles.breakEvenAdvice}>
+                        💡 <strong>Regla Financiera:</strong> Los primeros <strong>${effectiveDebt.toFixed(2)} USD</strong> cobrados por las primeras <strong>{breakEvenUnits} unidades</strong> vendidas deben apartarse exclusivamente para pagar la factura del proveedor antes del {editingProduct.creditDueDate || 'vencimiento'}. A partir de la <strong>unidad {breakEvenUnits + 1}</strong>, todo el dinero cobrado es ganancia líquida pura.
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

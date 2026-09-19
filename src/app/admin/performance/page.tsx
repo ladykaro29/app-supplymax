@@ -166,6 +166,57 @@ export default function PerformancePage() {
     return { totalRev, totalProf, totalUnits };
   }, [productPerformance]);
 
+  // Credit & Accounts Payable Metrics (Deuda de Proveedores & Flujo de Caja)
+  const creditMetrics = useMemo(() => {
+    const creditProducts = products.filter(p => p.purchaseType === 'CREDITO' && !p.creditPaid);
+    
+    let totalDebtUSD = 0;
+    let totalCreditStock = 0;
+    let overdueCount = 0;
+    let urgentCount = 0; // <= 7 days
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const items = creditProducts.map(p => {
+      const cost = Number(p.purchasePrice) || 0;
+      const stock = Number(p.stock) || 0;
+      const debt = p.creditDebt !== null && p.creditDebt !== undefined 
+        ? Number(p.creditDebt) 
+        : cost * stock;
+      
+      totalDebtUSD += debt;
+      totalCreditStock += stock;
+
+      let daysRemaining: number | null = null;
+      if (p.creditDueDate) {
+        const parts = p.creditDueDate.split('-');
+        if (parts.length === 3) {
+          const due = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+          due.setHours(0, 0, 0, 0);
+          daysRemaining = Math.round((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+          if (daysRemaining < 0) overdueCount++;
+          else if (daysRemaining <= 7) urgentCount++;
+        }
+      }
+
+      return {
+        ...p,
+        calculatedDebt: debt,
+        daysRemaining
+      };
+    }).sort((a, b) => (a.daysRemaining ?? 999) - (b.daysRemaining ?? 999));
+
+    return {
+      totalDebtUSD,
+      totalCreditStock,
+      overdueCount,
+      urgentCount,
+      activeLotsCount: creditProducts.length,
+      items
+    };
+  }, [products]);
+
   // Loading Screen (Premium UI Pulse)
   if (authLoading || loading || !isMounted) {
     return (
@@ -310,6 +361,124 @@ export default function PerformancePage() {
             )}
           </div>
         </div>
+
+        {/* ACCOUNTS PAYABLE & SUPPLIER CREDIT HEALTH */}
+        <section className={styles.creditHealthSection}>
+          <div className={styles.sectionTitle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '1.5rem' }}>🏢</span>
+              <div>
+                <h2 style={{ margin: 0 }}>Cuentas por Pagar & Crédito de Proveedores</h2>
+                <p style={{ margin: 0, fontSize: '0.82rem', color: 'rgba(255,255,255,0.5)' }}>
+                  Control de liquidez: Reserva obligatoria para facturas de proveedores vs. Ganancia libre
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {creditMetrics.overdueCount > 0 && (
+                <span className={styles.urgentAlertBadge}>
+                  🚨 {creditMetrics.overdueCount} Facturas Vencidas
+                </span>
+              )}
+              {creditMetrics.urgentCount > 0 && (
+                <span className={styles.warningAlertBadge}>
+                  ⚠️ {creditMetrics.urgentCount} Vencen &le; 7 días
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className={styles.creditSummaryGrid}>
+            <div className={styles.creditSummaryCard}>
+              <span className={styles.csLabel}>Deuda Total Activa (Proveedores)</span>
+              <div className={styles.csValueOrange}>
+                ${creditMetrics.totalDebtUSD.toFixed(2)} USD
+              </div>
+              <span className={styles.csSub}>
+                ≈ {formatPrice(creditMetrics.totalDebtUSD)} a liquidar
+              </span>
+            </div>
+
+            <div className={styles.creditSummaryCard}>
+              <span className={styles.csLabel}>Mercancía a Crédito en Almacén</span>
+              <div className={styles.csValueCyan}>
+                {creditMetrics.totalCreditStock} unidades
+              </div>
+              <span className={styles.csSub}>
+                Distribuido en {creditMetrics.activeLotsCount} lotes comerciales
+              </span>
+            </div>
+
+            <div className={styles.creditSummaryCard}>
+              <span className={styles.csLabel}>Regla de Oro de Flujo</span>
+              <div className={styles.csValueGreen}>
+                Fondo Separado
+              </div>
+              <span className={styles.csSub}>
+                Apartar el costo de cada venta para pago a tiempo
+              </span>
+            </div>
+          </div>
+
+          {creditMetrics.items.length > 0 ? (
+            <div className={styles.tableWrapper} style={{ marginTop: '1rem' }}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Producto a Crédito</th>
+                    <th>Proveedor</th>
+                    <th>Stock Lote</th>
+                    <th>Deuda Pendiente</th>
+                    <th>Vencimiento de Factura</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {creditMetrics.items.map(item => (
+                    <tr key={item.id}>
+                      <td>
+                        <strong>{item.name}</strong>
+                      </td>
+                      <td>{item.supplierName || 'Proveedor no especificado'}</td>
+                      <td>{item.stock} uds.</td>
+                      <td style={{ color: '#fb923c', fontWeight: 'bold' }}>
+                        ${item.calculatedDebt.toFixed(2)} USD
+                      </td>
+                      <td>
+                        {item.daysRemaining !== null ? (
+                          item.daysRemaining < 0 ? (
+                            <span className={styles.badgeAlertRed}>Vencida hace {Math.abs(item.daysRemaining)}d</span>
+                          ) : item.daysRemaining === 0 ? (
+                            <span className={styles.badgeAlertRed}>Vence HOY</span>
+                          ) : item.daysRemaining <= 7 ? (
+                            <span className={styles.badgeAlertYellow}>Vence en {item.daysRemaining}d</span>
+                          ) : (
+                            <span className={styles.badgeAlertGreen}>{item.daysRemaining}d restantes</span>
+                          )
+                        ) : (
+                          <span style={{ opacity: 0.5 }}>Sin fecha fijada</span>
+                        )}
+                        <span style={{ display: 'block', fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>
+                          {item.creditDueDate || ''}
+                        </span>
+                      </td>
+                      <td>
+                        <Link href="/admin/edit-products" className={styles.manageLotLink}>
+                          Gestionar Lote &rarr;
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className={styles.emptyCreditMsg}>
+              ✨ No tienes facturas a crédito pendientes por pagar. Todo tu inventario actual está libre de deudas.
+            </div>
+          )}
+        </section>
 
         {/* DETAILED REAL CATALOG METRICS TABLE */}
         <section className={styles.section}>

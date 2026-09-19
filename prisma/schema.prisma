@@ -47,6 +47,11 @@ model Product {
   isOffer        Boolean     @default(false)
   discount       Float?
   stock          Int         @default(10)
+  supplierName   String?
+  purchaseType   String?     @default("CONTADO") // CONTADO | CREDITO
+  creditDueDate  String?     // YYYY-MM-DD
+  creditDebt     Float?      // Monto total adeudado al proveedor
+  creditPaid     Boolean?    @default(false)
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   orderItems     OrderItem[]
