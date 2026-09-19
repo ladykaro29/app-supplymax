@@ -619,6 +619,102 @@
   border-color: var(--color-accent);
 }
 
+/* Image Upload Container & Actions */
+.imageUploadCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.imageUploadMainRow {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.imagePreviewThumbnail {
+  width: 76px;
+  height: 76px;
+  min-width: 76px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.imagePreviewThumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.imagePreviewPlaceholder {
+  font-size: 1.8rem;
+  opacity: 0.4;
+}
+
+.uploadActionWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.uploadFileBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(168, 85, 247, 0.15));
+  border: 1px solid #00F0FF;
+  color: #FFFFFF;
+  padding: 0.7rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.3px;
+  width: 100%;
+}
+
+.uploadFileBtn:hover {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.3), rgba(168, 85, 247, 0.3));
+  border-color: #00F0FF;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.uploadFileBtnLoading {
+  opacity: 0.6;
+  cursor: wait;
+  pointer-events: none;
+}
+
+.uploadStatusMsg {
+  font-size: 0.78rem;
+  color: #25D366;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.uploadErrorMsg {
+  font-size: 0.78rem;
+  color: #FF3B30;
+  font-weight: 600;
+}
+
 .flavorChecklistTitle {
   font-size: 0.75rem;
   font-weight: 700;

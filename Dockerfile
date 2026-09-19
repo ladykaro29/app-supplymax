@@ -69,9 +69,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_module
 COPY --from=builder --chown=nextjs:nodejs /app/scripts/start.sh ./scripts/start.sh
 RUN chmod +x ./scripts/start.sh
 
-# Ensure the nextjs user can write to the prisma dir (SQLite needs write for WAL/journal)
+# Ensure the nextjs user can write to the prisma dir and public uploads
 USER root
-RUN chown -R nextjs:nodejs /app/prisma
+RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/prisma /app/public
 USER nextjs
 
 EXPOSE 3000

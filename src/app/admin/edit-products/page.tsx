@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import styles from './EditProducts.module.css';
 
@@ -113,23 +113,11 @@ export default function EditProductsPage() {
     });
   }, [products, searchTerm, activeCategory]);
 
-  // Flavor Variation Tag Helpers (must be at top level before early returns)
-  const currentFlavorsList = useMemo(() => {
-    if (!editingProduct || !editingProduct.flavor) return [];
-    return String(editingProduct.flavor)
-      .split(',')
-      .map(f => f.trim())
-      .filter(Boolean);
-  }, [editingProduct?.flavor]);
-
-  // Weight / Presentation Variation Tag Helpers (must be at top level before early returns)
-  const currentWeightsList = useMemo(() => {
-    if (!editingProduct || !editingProduct.weight) return [];
-    return String(editingProduct.weight)
-      .split(',')
-      .map(w => w.trim())
-      .filter(Boolean);
-  }, [editingProduct?.weight]);
+  // Image upload state
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [uploadSuccess, setUploadSuccess] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -351,6 +339,71 @@ export default function EditProductsPage() {
       price,
     });
   };
+
+  // Image File Upload Handler
+  const handleImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editingProduct) return;
+
+    setUploadingImage(true);
+    setUploadError('');
+    setUploadSuccess('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al subir la imagen.');
+      }
+
+      setEditingProduct(prev => prev ? ({
+        ...prev,
+        image: data.url,
+      }) : null);
+      setUploadSuccess('¡Imagen cargada exitosamente!');
+      setTimeout(() => setUploadSuccess(''), 4000);
+    } catch (err: any) {
+      console.warn('Upload API fallback to data URL:', err);
+      try {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (reader.result && typeof reader.result === 'string') {
+            setEditingProduct(prev => prev ? ({
+              ...prev,
+              image: reader.result as string,
+            }) : null);
+            setUploadSuccess('Imagen cargada localmente.');
+            setTimeout(() => setUploadSuccess(''), 4000);
+          }
+        };
+        reader.readAsDataURL(file);
+      } catch (fallbackErr) {
+        setUploadError(err.message || 'Error al procesar la imagen.');
+      }
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Plain string parsers for active product (no React hooks)
+  const currentFlavorsList = editingProduct?.flavor
+    ? String(editingProduct.flavor).split(',').map(f => f.trim()).filter(Boolean)
+    : [];
+
+  const currentWeightsList = editingProduct?.weight
+    ? String(editingProduct.weight).split(',').map(w => w.trim()).filter(Boolean)
+    : [];
 
   const handleAddFlavor = (flavorToAdd: string) => {
     if (!editingProduct || !flavorToAdd.trim()) return;
@@ -1203,27 +1256,92 @@ export default function EditProductsPage() {
                 </div>
               )}
 
-              {/* Image Route and Presets */}
+              {/* Image Upload, Preview & Route */}
               <div className={styles.formGroup}>
-                <label>URL o Ruta de la Imagen</label>
-                <input 
-                  type="text" 
-                  className={styles.formInput} 
-                  value={editingProduct.image}
-                  onChange={(e) => setEditingProduct({...editingProduct, image: e.target.value})}
-                  placeholder="Ej: /brand-photos/Suplementos/IMG-20260513-WA0017.jpg"
-                />
-                <div className={styles.imagePresets}>
-                  {['/protein.png', '/creatine.png', '/amino.png', '/hoodie.png'].map(img => (
-                    <button 
-                      key={img} 
-                      type="button" 
-                      onClick={() => setEditingProduct({...editingProduct, image: img})}
-                      className={`${styles.presetBtn} ${editingProduct.image === img ? styles.presetActive : ''}`}
-                    >
-                      {img}
-                    </button>
-                  ))}
+                <label>Imagen del Producto *</label>
+                
+                <div className={styles.imageUploadCard}>
+                  <div className={styles.imageUploadMainRow}>
+                    {/* Visual Thumbnail Preview */}
+                    <div className={styles.imagePreviewThumbnail}>
+                      {editingProduct.image ? (
+                        <img 
+                          src={editingProduct.image} 
+                          alt="Vista previa del producto"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/protein.png';
+                          }} 
+                        />
+                      ) : (
+                        <span className={styles.imagePreviewPlaceholder}>📷</span>
+                      )}
+                    </div>
+
+                    {/* Upload Button & Status */}
+                    <div className={styles.uploadActionWrapper}>
+                      <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        onChange={handleImageFileUpload} 
+                        accept="image/png, image/jpeg, image/jpg, image/webp, image/gif, image/avif" 
+                        style={{ display: 'none' }} 
+                      />
+                      <button 
+                        type="button" 
+                        className={`${styles.uploadFileBtn} ${uploadingImage ? styles.uploadFileBtnLoading : ''}`}
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingImage}
+                      >
+                        {uploadingImage ? '⏳ Subiendo imagen...' : '📁 Subir Imagen desde el Dispositivo'}
+                      </button>
+
+                      {uploadSuccess && (
+                        <span className={styles.uploadStatusMsg}>
+                          ✓ {uploadSuccess}
+                        </span>
+                      )}
+
+                      {uploadError && (
+                        <span className={styles.uploadErrorMsg}>
+                          ⚠️ {uploadError}
+                        </span>
+                      )}
+
+                      <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)' }}>
+                        Formatos soportados: PNG, JPG, WEBP, GIF (máx. 15MB)
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Manual URL Input */}
+                  <div style={{ marginTop: '0.4rem' }}>
+                    <label style={{ fontSize: '0.72rem', marginBottom: '4px', display: 'block', color: 'rgba(255,255,255,0.6)' }}>
+                      O introduce una URL / Ruta manual del servidor:
+                    </label>
+                    <input 
+                      type="text" 
+                      className={styles.formInput} 
+                      value={editingProduct.image}
+                      onChange={(e) => setEditingProduct({...editingProduct, image: e.target.value})}
+                      placeholder="Ej: /brand-photos/Suplementos/IMG-20260513-WA0017.jpg"
+                      style={{ fontSize: '0.82rem', padding: '0.5rem 0.75rem' }}
+                    />
+                  </div>
+
+                  {/* Default Quick Presets */}
+                  <div className={styles.imagePresets}>
+                    <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', alignSelf: 'center' }}>Preajustes:</span>
+                    {['/protein.png', '/creatine.png', '/amino.png', '/hoodie.png'].map(img => (
+                      <button 
+                        key={img} 
+                        type="button" 
+                        onClick={() => setEditingProduct({...editingProduct, image: img})}
+                        className={`${styles.presetBtn} ${editingProduct.image === img ? styles.presetActive : ''}`}
+                      >
+                        {img}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
