@@ -113,6 +113,24 @@ export default function EditProductsPage() {
     });
   }, [products, searchTerm, activeCategory]);
 
+  // Flavor Variation Tag Helpers (must be at top level before early returns)
+  const currentFlavorsList = useMemo(() => {
+    if (!editingProduct || !editingProduct.flavor) return [];
+    return String(editingProduct.flavor)
+      .split(',')
+      .map(f => f.trim())
+      .filter(Boolean);
+  }, [editingProduct?.flavor]);
+
+  // Weight / Presentation Variation Tag Helpers (must be at top level before early returns)
+  const currentWeightsList = useMemo(() => {
+    if (!editingProduct || !editingProduct.weight) return [];
+    return String(editingProduct.weight)
+      .split(',')
+      .map(w => w.trim())
+      .filter(Boolean);
+  }, [editingProduct?.weight]);
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -171,6 +189,9 @@ export default function EditProductsPage() {
           <div className={styles.errorIcon}>⚠️</div>
           <h1>Acceso Restringido</h1>
           <p>Solo personal del staff con permisos de inventario puede acceder a este panel.</p>
+          <a href="/login" className={styles.retryBtn} style={{ display: 'inline-block', marginTop: '1rem', textDecoration: 'none' }}>
+            Iniciar Sesión como Administrador
+          </a>
         </div>
       </div>
     );
@@ -331,15 +352,6 @@ export default function EditProductsPage() {
     });
   };
 
-  // Flavor Variation Tag Helpers
-  const currentFlavorsList = useMemo(() => {
-    if (!editingProduct || !editingProduct.flavor) return [];
-    return String(editingProduct.flavor)
-      .split(',')
-      .map(f => f.trim())
-      .filter(Boolean);
-  }, [editingProduct?.flavor]);
-
   const handleAddFlavor = (flavorToAdd: string) => {
     if (!editingProduct || !flavorToAdd.trim()) return;
     const cleaned = flavorToAdd.trim();
@@ -354,15 +366,6 @@ export default function EditProductsPage() {
     const updated = currentFlavorsList.filter(f => f !== flavorToRemove).join(', ');
     setEditingProduct({ ...editingProduct, flavor: updated });
   };
-
-  // Weight / Presentation Variation Tag Helpers
-  const currentWeightsList = useMemo(() => {
-    if (!editingProduct || !editingProduct.weight) return [];
-    return String(editingProduct.weight)
-      .split(',')
-      .map(w => w.trim())
-      .filter(Boolean);
-  }, [editingProduct?.weight]);
 
   const handleAddWeight = (weightToAdd: string) => {
     if (!editingProduct || !weightToAdd.trim()) return;
