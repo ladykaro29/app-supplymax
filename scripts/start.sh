@@ -36,10 +36,12 @@ node $PRISMA_CLI db push --schema=$SCHEMA_PATH --accept-data-loss
 
 # Run the compiled seed script
 echo "Running seed script..."
-if [ -f prisma/seed.js ]; then
+if [ -f ./scripts/seed.js ]; then
+  node ./scripts/seed.js
+elif [ -f prisma/seed.js ]; then
   node prisma/seed.js
 else
-  echo "WARNING: prisma/seed.js not found!"
+  echo "WARNING: seed script not found!"
 fi
 
 # Defensive admin ensure — runs INDEPENDENTLY of seed.js so it survives
