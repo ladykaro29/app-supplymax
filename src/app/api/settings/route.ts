@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     const settings = await prisma.setting.findMany();
@@ -8,8 +11,18 @@ export async function GET() {
       acc[curr.key] = curr.value;
       return acc;
     }, {});
+
+    if (!config.exchange_rate) {
+      config.exchange_rate = '60.00';
+    }
     
-    return NextResponse.json(config);
+    return NextResponse.json(config, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      }
+    });
   } catch (error) {
     return NextResponse.json({ error: 'Error fetching settings' }, { status: 500 });
   }

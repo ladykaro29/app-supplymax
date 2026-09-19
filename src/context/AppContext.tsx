@@ -87,8 +87,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const savedCart = localStorage.getItem('supplymax_cart');
     const savedOrders = localStorage.getItem('supplymax_orders');
     const savedUser = localStorage.getItem('supplymax_user');
+    const savedRate = localStorage.getItem('supplymax_exchange_rate');
+
     if (savedCart) setCart(JSON.parse(savedCart));
     if (savedOrders) setOrders(JSON.parse(savedOrders));
+    if (savedRate) {
+      const parsedRate = parseFloat(savedRate);
+      if (!isNaN(parsedRate) && parsedRate > 0) {
+        setExchangeRateInternal(parsedRate);
+      }
+    }
     if (savedUser) {
       const parsed = JSON.parse(savedUser);
       setUser(parsed);
@@ -98,12 +106,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setExchangeRate = async (rate: number) => {
-    setExchangeRateInternal(rate);
+    const numRate = parseFloat(String(rate));
+    if (isNaN(numRate) || numRate <= 0) return;
+
+    setExchangeRateInternal(numRate);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('supplymax_exchange_rate', numRate.toString());
+    }
+
     try {
       await fetch('/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'exchange_rate', value: rate.toString() })
+        body: JSON.stringify({ key: 'exchange_rate', value: numRate.toString() }),
+        cache: 'no-store'
       });
     } catch (err) {
       console.error('Error saving exchange rate to database:', err);
@@ -212,12 +228,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch('/api/settings');
+        const res = await fetch('/api/settings', { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           setSettings(data);
           if (data.exchange_rate) {
-            setExchangeRateInternal(Number(data.exchange_rate));
+            const parsed = parseFloat(data.exchange_rate);
+            if (!isNaN(parsed) && parsed > 0) {
+              setExchangeRateInternal(parsed);
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('supplymax_exchange_rate', parsed.toString());
+              }
+            }
           }
         }
       } catch (err) {

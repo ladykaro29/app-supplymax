@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -8,8 +8,30 @@ import { useAppContext } from '@/context/AppContext';
 import styles from './AdminHeader.module.css';
 
 export default function AdminHeader() {
-  const { user, logout } = useAppContext();
+  const { user, logout, exchangeRate, setExchangeRate } = useAppContext();
   const pathname = usePathname();
+
+  // Exchange rate editing state
+  const [isEditingRate, setIsEditingRate] = useState(false);
+  const [rateInput, setRateInput] = useState(exchangeRate ? exchangeRate.toString() : '60');
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    if (exchangeRate) {
+      setRateInput(exchangeRate.toString());
+    }
+  }, [exchangeRate]);
+
+  const handleSaveRate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = parseFloat(rateInput);
+    if (!isNaN(parsed) && parsed > 0) {
+      await setExchangeRate(parsed);
+      setSaveSuccess(true);
+      setIsEditingRate(false);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    }
+  };
 
   const navItems = [
     { label: 'Inventario / Stock', href: '/admin/edit-products', icon: '📦' },
@@ -58,8 +80,40 @@ export default function AdminHeader() {
           })}
         </nav>
 
-        {/* Right Actions: Public Store Link & Session */}
+        {/* Right Actions: Daily Rate Widget, Public Store Link & Session */}
         <div className={styles.rightActions}>
+          {/* Daily Exchange Rate Widget */}
+          <div className={styles.rateWidget} title="Tasa oficial BCV / día para conversión a Bolívares (VES)">
+            <span className={styles.rateLabel}>💵 TASA DEL DÍA:</span>
+            {isEditingRate ? (
+              <form onSubmit={handleSaveRate} className={styles.rateForm}>
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  min="1"
+                  className={styles.rateInput}
+                  value={rateInput}
+                  onChange={(e) => setRateInput(e.target.value)}
+                  autoFocus
+                />
+                <button type="submit" className={styles.rateSaveBtn}>OK</button>
+                <button type="button" className={styles.rateCancelBtn} onClick={() => setIsEditingRate(false)}>✕</button>
+              </form>
+            ) : (
+              <>
+                <span className={styles.rateValue}>{exchangeRate ? exchangeRate.toFixed(2) : '60.00'} VES</span>
+                <button 
+                  type="button" 
+                  className={styles.rateEditBtn} 
+                  onClick={() => setIsEditingRate(true)}
+                  title="Editar Tasa del Día"
+                >
+                  ✏️
+                </button>
+                {saveSuccess && <span className={styles.rateSuccessToast}>✓ Guardada</span>}
+              </>
+            )}
+          </div>
           <Link 
             href="/" 
             target="_blank" 
