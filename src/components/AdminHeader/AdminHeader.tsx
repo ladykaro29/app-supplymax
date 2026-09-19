@@ -34,7 +34,8 @@ export default function AdminHeader() {
   };
 
   const navItems = [
-    { label: 'Inventario / Stock', href: '/admin/edit-products', icon: '📦' },
+    { label: 'Productos', href: '/admin/edit-products', icon: '📦' },
+    { label: 'Agregar Producto', href: '/admin/edit-products?new=true', icon: '➕' },
     { label: 'Finanzas & Métricas', href: '/admin/performance', icon: '📈' },
     { label: 'Coaches & Afiliados', href: '/admin/affiliates-and-coaches', icon: '👥' },
     { label: 'Postulaciones', href: '/admin/applications', icon: '📝' },

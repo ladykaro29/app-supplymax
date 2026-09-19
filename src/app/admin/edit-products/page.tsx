@@ -137,6 +137,15 @@ export default function EditProductsPage() {
   useEffect(() => {
     if (isMounted) {
       loadProducts();
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('new') === 'true' || window.location.hash === '#new') {
+          setSelectedMargin(50);
+          setCustomFlavor('');
+          setCustomWeight('');
+          setEditingProduct({ ...BLANK_PRODUCT });
+        }
+      }
     }
   }, [isMounted]);
 
@@ -436,9 +445,9 @@ export default function EditProductsPage() {
         {/* Header Title & Actions */}
         <header className={styles.header}>
           <div className={styles.headerTitleWrap}>
-            <span className={styles.sectionBadge}>Gestión de Stock & Rentabilidad</span>
-            <h1>Inventario de <span>Productos</span></h1>
-            <p>Control de costos de compra, cálculo de precios de venta, stock en tiempo real y variaciones</p>
+            <span className={styles.sectionBadge}>Catálogo & Control de Stock</span>
+            <h1><span>Productos</span></h1>
+            <p>Control de inventario, costos de compra, cálculo de precios de venta y variaciones</p>
           </div>
           
           <div className={styles.headerActions}>
@@ -459,7 +468,7 @@ export default function EditProductsPage() {
             </div>
             
             <button className={styles.addBtn} onClick={handleCreateNew} id="btn-add-product">
-              <span className={styles.plusIcon}>+</span> Agregar Producto
+              <span className={styles.plusIcon}>+</span> Agregar Productos
             </button>
           </div>
         </header>
