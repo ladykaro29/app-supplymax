@@ -547,24 +547,26 @@ export default function EditProductsPage() {
         <div className={styles.stockSummaryBar}>
           <div className={styles.statBox}>
             <span className={styles.statLabel}>Total en Catálogo</span>
-            <span className={styles.statVal}>{products.length} productos</span>
+            <span className={styles.statVal}>
+              {products.length} <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'rgba(255,255,255,0.6)' }}>productos</span>
+            </span>
           </div>
           <div className={styles.statBox}>
             <span className={styles.statLabel}>Disponibles</span>
             <span className={`${styles.statVal} ${styles.statGreen}`}>
-              {products.filter(p => p.stock > 5).length}
+              {products.filter(p => p.stock > 5).length} <span style={{ fontSize: '0.85rem', fontWeight: 500, opacity: 0.85 }}>unid.</span>
             </span>
           </div>
           <div className={styles.statBox}>
             <span className={styles.statLabel}>Stock Bajo</span>
             <span className={`${styles.statVal} ${styles.statYellow}`}>
-              {products.filter(p => p.stock > 0 && p.stock <= 5).length}
+              {products.filter(p => p.stock > 0 && p.stock <= 5).length} <span style={{ fontSize: '0.85rem', fontWeight: 500, opacity: 0.85 }}>unid.</span>
             </span>
           </div>
           <div className={styles.statBox}>
             <span className={styles.statLabel}>Agotados</span>
             <span className={`${styles.statVal} ${styles.statRed}`}>
-              {products.filter(p => p.stock <= 0).length}
+              {products.filter(p => p.stock <= 0).length} <span style={{ fontSize: '0.85rem', fontWeight: 500, opacity: 0.85 }}>unid.</span>
             </span>
           </div>
         </div>
@@ -582,10 +584,31 @@ export default function EditProductsPage() {
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className={styles.emptyState}>
-            <p>No se encontraron productos en esta categoría o con el término buscado.</p>
-            <button className={styles.addBtn} onClick={handleCreateNew} style={{ marginTop: '1.2rem', marginInline: 'auto' }}>
-              <span className={styles.plusIcon}>+</span> Agregar Primer Producto
-            </button>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.85 }}>📦</div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.5rem' }}>
+              No se encontraron productos
+            </h3>
+            <p>
+              {searchTerm 
+                ? `No hay coincidencias para "${searchTerm}". Intenta con otro término o categoría.` 
+                : 'Aún no hay productos registrados en esta categoría o tu inventario está sincronizándose.'}
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+              {searchTerm && (
+                <button 
+                  onClick={() => setSearchTerm('')} 
+                  className={styles.retryBtn}
+                >
+                  Limpiar Búsqueda
+                </button>
+              )}
+              <button 
+                className={styles.addBtn} 
+                onClick={handleCreateNew}
+              >
+                <span className={styles.plusIcon}>+</span> Registrar Nuevo Producto
+              </button>
+            </div>
           </div>
         ) : (
           <div className={styles.grid}>

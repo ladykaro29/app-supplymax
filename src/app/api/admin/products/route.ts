@@ -3,12 +3,180 @@ import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-// GET: Fetch all products from SQLite
+const INITIAL_PRODUCTS = [
+  {
+    name: "Pure Whey Impact 5lb",
+    category: "Proteínas",
+    goal: "MÁS VENDIDO",
+    price: 65.00,
+    purchasePrice: 42.00,
+    image: "/brand-photos/Suplementos/IMG-20260513-WA0013.jpg",
+    description: "Proteína de suero de alta calidad para máxima recuperación muscular.",
+    isFeatured: true,
+    portions: "70",
+    flavor: "Vainilla, Chocolate, Fresa",
+    weight: "2.2kg, 5 lbs",
+    durationInDays: "30",
+    stock: 18,
+    purchaseType: "CONTADO",
+  },
+  {
+    name: "Creatine Micronized 300g",
+    category: "Creatinas",
+    goal: "FUERZA MÁXIMA",
+    price: 35.00,
+    purchasePrice: 20.00,
+    image: "/brand-photos/Suplementos/IMG-20260513-WA0017.jpg",
+    description: "Creatina monohidratada pura para aumento de fuerza y potencia celular.",
+    isOffer: true,
+    discount: 5,
+    weight: "300g, 500g",
+    durationInDays: "60",
+    stock: 25,
+    purchaseType: "CONTADO",
+  },
+  {
+    name: "Creatina Creapure Elite 500g",
+    category: "Creatinas",
+    goal: "PREMIUM",
+    price: 49.99,
+    purchasePrice: 28.00,
+    image: "/brand-photos/Suplementos/IMG-20260513-WA0018.jpg",
+    description: "Creatina Creapure alemana patentada de máxima solubilidad y pureza científica.",
+    weight: "500g, 1 kg",
+    durationInDays: "100",
+    stock: 12,
+    purchaseType: "CREDITO",
+    supplierName: "Distribuidor Oficial Creapure",
+    creditDueDate: "2026-10-15",
+    creditDebt: 336.00,
+    creditPaid: false,
+  },
+  {
+    name: "Creatina HCL Concentrated 150g",
+    category: "Creatinas",
+    goal: "POTENCIA CELULAR",
+    price: 39.99,
+    purchasePrice: 22.00,
+    image: "/brand-photos/Suplementos/IMG-20260513-WA0019.jpg",
+    description: "Creatina clorhidrato concentrada de rápida absorción sin retención de líquido extracelular.",
+    weight: "150g, 300g",
+    durationInDays: "50",
+    stock: 10,
+    purchaseType: "CONTADO",
+  },
+  {
+    name: "Creatine Plus Energy 300g",
+    category: "Creatinas",
+    goal: "ENERGÍA EXTRA",
+    price: 37.99,
+    purchasePrice: 21.00,
+    image: "/brand-photos/Suplementos/IMG-20260513-WA0016.jpg",
+    description: "Creatina monohidratada adicionada con taurina y electrolitos para una contracción muscular potente.",
+    weight: "300g",
+    durationInDays: "60",
+    stock: 15,
+    purchaseType: "CONTADO",
+  },
+  {
+    name: "Elite Amino Recovery",
+    category: "Aminoácidos/BCAA",
+    goal: "RECUPERACIÓN",
+    price: 29.99,
+    purchasePrice: 15.00,
+    image: "/brand-photos/Suplementos/IMG-20260513-WA0020.jpg",
+    description: "BCAA premium para evitar el catabolismo y promover la hidratación muscular.",
+    flavor: "Blue Raspberry, Fruit Punch",
+    weight: "400g, 30 Servicios",
+    durationInDays: "45",
+    stock: 20,
+    purchaseType: "CONTADO",
+  },
+  {
+    name: "Pre-Workout Nitro",
+    category: "Pre-Entrenos",
+    goal: "ENERGÍA",
+    price: 45.00,
+    purchasePrice: 24.00,
+    image: "/brand-photos/Suplementos/IMG-20260513-WA0024.jpg",
+    description: "Explosión de energía para tus entrenamientos más pesados y enfoque mental extremo.",
+    portions: "30",
+    flavor: "Fruit Punch, Manzana Verde",
+    durationInDays: "30",
+    stock: 14,
+    purchaseType: "CONTADO",
+  },
+  {
+    name: "Camiseta Oversized Blanca SupplyMax",
+    category: "Ropa",
+    goal: "COLECCIÓN BLANCA",
+    price: 25.00,
+    purchasePrice: 11.00,
+    image: "/brand-photos/Ropa con modelo/IMG_7283.png",
+    description: "Camiseta oversized blanca de algodón premium pesado, corte lifestyle ultra estético.",
+    isFeatured: true,
+    sizes: "S,M,L,XL",
+    stock: 22,
+    purchaseType: "CONTADO",
+  },
+  {
+    name: "Camiseta Oversized Negra SupplyMax",
+    category: "Ropa",
+    goal: "COLECCIÓN NEGRA",
+    price: 25.00,
+    purchasePrice: 11.00,
+    image: "/brand-photos/Ropa con modelo/IMG_7282.png",
+    description: "Camiseta oversized negra de algodón pesado con logo de la marca, horma perfecta.",
+    isFeatured: true,
+    sizes: "S,M,L,XL",
+    stock: 30,
+    purchaseType: "CONTADO",
+  },
+  {
+    name: "Performance Joggers Negros",
+    category: "Ropa",
+    goal: "COLECCIÓN NEGRA",
+    price: 45.00,
+    purchasePrice: 20.00,
+    image: "/brand-photos/Ropa con modelo/IMG_7287.png",
+    description: "Pantalones deportivos ajustados de color negro con tecnología dry-fit y bolsillos con cierre.",
+    isFeatured: true,
+    sizes: "M,L,XL",
+    stock: 16,
+    purchaseType: "CONTADO",
+  },
+  {
+    name: "Bolso Deportivo SupplyMax",
+    category: "Ropa",
+    goal: "ACCESORIO",
+    price: 39.99,
+    purchasePrice: 19.00,
+    image: "/brand-photos/Suplementos + ropa/Photoroom_20260328_114310.jpg",
+    description: "Bolso de entrenamiento premium. Compartimento aislado para calzado húmedo, espacio para suplementos y costuras reforzadas ultra resistentes.",
+    sizes: "Único",
+    stock: 8,
+    purchaseType: "CONTADO",
+  }
+];
+
+// GET: Fetch all products from SQLite (with auto-initialization fallback)
 export async function GET() {
   try {
-    const products = await prisma.product.findMany({
+    let products = await prisma.product.findMany({
       orderBy: { id: 'asc' }
     });
+
+    // Auto-seed if database has 0 products
+    if (products.length === 0) {
+      console.log('[API PRODUCTS] Database is empty, populating initial catalog...');
+      for (const item of INITIAL_PRODUCTS) {
+        await prisma.product.create({ data: item });
+      }
+      products = await prisma.product.findMany({
+        orderBy: { id: 'asc' }
+      });
+    }
+
     return NextResponse.json(products);
   } catch (error: any) {
     console.error('[API PRODUCTS GET ERROR]:', error);
