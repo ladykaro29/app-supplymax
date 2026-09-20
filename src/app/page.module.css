@@ -1615,3 +1615,128 @@
   }
 }
 
+/* =========================================================
+   VALUE PILLARS / CORE BENEFITS SECTION
+========================================================= */
+.pillarsSection {
+  padding: 60px 5% 70px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.pillarsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.pillarCard {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.025) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+}
+
+.pillarCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.6), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.pillarCard:hover {
+  border-color: rgba(0, 240, 255, 0.35);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 240, 255, 0.08);
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+}
+
+.pillarCard:hover::before {
+  opacity: 1;
+}
+
+.pillarIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(168, 85, 247, 0.15));
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.pillarCard:hover .pillarIcon {
+  transform: scale(1.08) rotate(3deg);
+  border-color: #00F0FF;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.45);
+}
+
+.pillarSvg {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  max-width: 28px !important;
+  max-height: 28px !important;
+  color: #00F0FF !important;
+  stroke: #00F0FF !important;
+  display: block;
+}
+
+.pillarCard h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+  font-family: 'Outfit', 'Oswald', sans-serif;
+}
+
+.pillarCard p {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #a1a1aa;
+  font-weight: 400;
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .pillarsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .pillarsSection {
+    padding: 40px 4% 50px;
+  }
+  .pillarsGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .pillarCard {
+    padding: 24px 20px;
+  }
+}
+
