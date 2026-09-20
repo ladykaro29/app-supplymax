@@ -17,6 +17,9 @@ interface User {
   name: string;
   email: string;
   role_id: 'User' | 'Influencer' | 'Coach' | 'Admin';
+  phone?: string | null;
+  idNumber?: string | null;
+  newsletter?: boolean;
   level?: string;
   sub_level?: string; 
   status: UserStatus;
@@ -42,11 +45,22 @@ interface Order {
   status: 'Pendiente' | 'Verificado' | 'Preparando' | 'Enviado' | 'Entregado';
   items: CartItem[];
   total: number;
+  totalVes?: number;
+  bcvRate?: number;
+}
+
+export interface BcvRateInfo {
+  rate: number;
+  date: string;
+  formatted: string;
+  source?: string;
 }
 
 interface AppContextType {
   currency: Currency;
   exchangeRate: number;
+  bcvInfo: BcvRateInfo | null;
+  fetchBcvRate: (force?: boolean) => Promise<void>;
   user: User | null;
   cart: CartItem[];
   orders: Order[];
@@ -77,10 +91,30 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currency, setCurrency] = useState<Currency>('USD');
   const [exchangeRate, setExchangeRateInternal] = useState<number>(60);
+  const [bcvInfo, setBcvInfo] = useState<BcvRateInfo | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [authLoading, setAuthLoading] = useState(true);
+
+  const fetchBcvRate = async (force: boolean = false) => {
+    try {
+      const res = await fetch(`/api/bcv${force ? '?force=true' : ''}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.rate) {
+          setBcvInfo(data);
+          setExchangeRateInternal(data.rate);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('supplymax_exchange_rate', data.rate.toString());
+            localStorage.setItem('supplymax_bcv_info', JSON.stringify(data));
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching BCV rate:', err);
+    }
+  };
 
   // Local Storage Persistence
   useEffect(() => {
@@ -88,9 +122,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const savedOrders = localStorage.getItem('supplymax_orders');
     const savedUser = localStorage.getItem('supplymax_user');
     const savedRate = localStorage.getItem('supplymax_exchange_rate');
+    const savedBcv = localStorage.getItem('supplymax_bcv_info');
 
     if (savedCart) setCart(JSON.parse(savedCart));
     if (savedOrders) setOrders(JSON.parse(savedOrders));
+    if (savedBcv) {
+      try {
+        setBcvInfo(JSON.parse(savedBcv));
+      } catch (e) {}
+    }
     if (savedRate) {
       const parsedRate = parseFloat(savedRate);
       if (!isNaN(parsedRate) && parsedRate > 0) {
@@ -103,6 +143,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       fetchOrders(parsed.id);
     }
     setAuthLoading(false);
+
+    // Fetch official live BCV rate
+    fetchBcvRate();
   }, []);
 
   const setExchangeRate = async (rate: number) => {
@@ -163,6 +206,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       name: userData.name || 'Usuario Supply',
       email: userData.email || 'user@email.com',
       role_id: userData.role_id || 'User',
+      phone: userData.phone || null,
+      idNumber: userData.idNumber || null,
+      newsletter: userData.newsletter !== undefined ? userData.newsletter : true,
       level: userData.level,
       sub_level: userData.sub_level,
       status: userData.status || 'Active',
@@ -253,13 +299,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (cart.length === 0 || !user) return;
 
     try {
+      const orderUsdTotal = orderData?.total ?? cartTotal;
+      const orderVesTotal = orderUsdTotal * exchangeRate;
+
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user.id,
           items: cart,
-          total: cartTotal,
+          total: orderUsdTotal,
+          totalVes: orderVesTotal,
+          bcvRate: exchangeRate,
+          customerName: orderData?.customerName || user.name,
+          customerIdNumber: orderData?.customerIdNumber || user.idNumber,
+          customerPhone: orderData?.customerPhone || user.phone,
+          customerEmail: orderData?.customerEmail || user.email,
           ...orderData
         }),
       });
@@ -269,7 +324,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setOrders(prev => [newOrder, ...prev]);
         clearCart();
         
-        // Refresh user data if tokens were used or awarded
+        // Refresh user data if tokens were used or profile updated
         const userRes = await fetch(`/api/auth/profile?userId=${user.id}`);
         if (userRes.ok) login(await userRes.json());
         
@@ -316,6 +371,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       value={{ 
         currency, 
         exchangeRate, 
+        bcvInfo,
+        fetchBcvRate,
         user,
         cart,
         orders,

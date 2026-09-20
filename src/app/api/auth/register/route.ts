@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, phone, idNumber, newsletter } = await request.json();
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: 'Todos los campos son obligatorios' }, { status: 400 });
@@ -25,6 +25,9 @@ export async function POST(request: Request) {
         name,
         email,
         password,
+        phone: phone || null,
+        idNumber: idNumber || null,
+        newsletter: typeof newsletter === 'boolean' ? newsletter : true,
         role_id: 'User',
         status: 'Active',
       },

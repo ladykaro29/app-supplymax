@@ -22,6 +22,9 @@ model User {
   coach_tier     Int?      
   is_featured    Boolean?  @default(false)
   image          String?   // Avatar for partners/coaches
+  phone          String?   // WhatsApp / Contact phone
+  idNumber       String?   // Cédula / RIF (e.g. V-12345678)
+  newsletter     Boolean   @default(true) // Boletín informativo opt-in
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   addresses      Address[]
@@ -88,17 +91,23 @@ model Review {
 }
 
 model Order {
-  id           String      @id @default(cuid())
-  userId       String
-  total        Float
-  status       String      @default("PENDIENTE")
-  referralCode String?
-  agency       String?
-  paymentRef   String?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  user         User        @relation(fields: [userId], references: [id])
-  items        OrderItem[]
+  id              String      @id @default(cuid())
+  userId          String
+  total           Float
+  totalVes        Float?      // Monto total en Bolívares según tasa BCV
+  bcvRate         Float?      // Tasa oficial BCV aplicada a la orden
+  customerName    String?     // Nombre y apellido del comprador
+  customerIdNumber String?    // Cédula del comprador
+  customerPhone   String?     // Teléfono del comprador
+  customerEmail   String?     // Correo electrónico
+  status          String      @default("PENDIENTE")
+  referralCode    String?
+  agency          String?
+  paymentRef      String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  user            User        @relation(fields: [userId], references: [id])
+  items           OrderItem[]
 }
 
 model OrderItem {

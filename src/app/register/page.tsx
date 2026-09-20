@@ -14,9 +14,13 @@ export default function RegisterPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
+    idType: 'V',
+    idNumber: '',
+    phone: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    newsletter: true
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,18 +31,32 @@ export default function RegisterPage() {
       setError('Las contraseñas no coinciden');
       return;
     }
+
+    if (!formData.idNumber.trim()) {
+      setError('Por favor ingresa tu número de Cédula o RIF');
+      return;
+    }
+
+    if (!formData.phone.trim()) {
+      setError('Por favor ingresa tu número telefónico');
+      return;
+    }
     
     setError('');
     setLoading(true);
 
     try {
+      const fullIdNumber = `${formData.idType}-${formData.idNumber.trim()}`;
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
+          phone: formData.phone,
+          idNumber: fullIdNumber,
+          newsletter: formData.newsletter
         }),
       });
 
@@ -70,7 +88,7 @@ export default function RegisterPage() {
           
           <form className={styles.form} onSubmit={handleRegister}>
             <div className={styles.inputGroup}>
-              <label>Nombre Completo</label>
+              <label>Nombre y Apellido</label>
               <input 
                 type="text" 
                 placeholder="Ej. Juan Pérez" 
@@ -82,7 +100,43 @@ export default function RegisterPage() {
             </div>
 
             <div className={styles.inputGroup}>
-              <label>Email</label>
+              <label>Cédula de Identidad / RIF</label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <select
+                  className={styles.input}
+                  style={{ width: '80px', padding: '10px' }}
+                  value={formData.idType}
+                  onChange={(e) => setFormData({...formData, idType: e.target.value})}
+                >
+                  <option value="V">V-</option>
+                  <option value="E">E-</option>
+                  <option value="J">J-</option>
+                </select>
+                <input 
+                  type="text" 
+                  placeholder="Número de cédula (Ej. 12345678)" 
+                  className={styles.input} 
+                  required
+                  value={formData.idNumber}
+                  onChange={(e) => setFormData({...formData, idNumber: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label>Teléfono Móvil / WhatsApp</label>
+              <input 
+                type="tel" 
+                placeholder="Ej. 0414-1234567" 
+                className={styles.input} 
+                required
+                value={formData.phone}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label>Correo Electrónico</label>
               <input 
                 type="email" 
                 placeholder="tu@email.com" 
@@ -115,6 +169,19 @@ export default function RegisterPage() {
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
               />
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '5px', marginBottom: '15px' }}>
+              <input 
+                type="checkbox" 
+                id="newsletterCheck"
+                checked={formData.newsletter}
+                onChange={(e) => setFormData({...formData, newsletter: e.target.checked})}
+                style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
+              />
+              <label htmlFor="newsletterCheck" style={{ fontSize: '0.85rem', color: '#ccc', cursor: 'pointer' }}>
+                Deseo recibir promociones, novedades y boletín informativo de SupplyMax
+              </label>
             </div>
             
             <button type="submit" className={styles.submitBtn} disabled={loading}>

@@ -351,3 +351,243 @@
     position: static;
   }
 }
+
+/* Customer Identification & Registration */
+.authBox {
+  background: var(--color-bg-alt, #15181e);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.authTabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.authTab {
+  flex: 1;
+  padding: 14px 20px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted, #888);
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.authTab.activeAuthTab {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 2px solid var(--color-primary, #e2fd52);
+}
+
+.authContent {
+  padding: 24px;
+}
+
+.authHeaderMsg {
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #aaa);
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+}
+
+.authHeaderMsg strong {
+  color: #fff;
+}
+
+.authGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .authGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.idInputWrap {
+  display: flex;
+  gap: 8px;
+}
+
+.idTypeSelect {
+  width: 85px !important;
+  padding: 12px !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 8px !important;
+  color: white !important;
+  font-weight: 600;
+}
+
+.authActionBtn {
+  width: 100%;
+  padding: 14px;
+  background: var(--color-primary, #e2fd52);
+  color: #000;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: transform 0.15s ease, filter 0.2s ease;
+}
+
+.authActionBtn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.authActionBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.authError {
+  background: rgba(255, 77, 77, 0.12);
+  border: 1px solid rgba(255, 77, 77, 0.4);
+  color: #ff6b6b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+/* Verified Customer Banner */
+.verifiedUserCard {
+  background: linear-gradient(135deg, rgba(226, 253, 82, 0.08) 0%, rgba(20, 24, 30, 0.95) 100%);
+  border: 1px solid rgba(226, 253, 82, 0.3);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 2rem;
+}
+
+.verifiedHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.verifiedTitle {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  color: var(--color-primary, #e2fd52);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.5px;
+}
+
+.switchAccountBtn {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.switchAccountBtn:hover {
+  color: #fff;
+}
+
+.customerDetailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  font-size: 0.85rem;
+}
+
+.detailItem {
+  color: #ccc;
+}
+
+.detailItem strong {
+  display: block;
+  color: #fff;
+  font-size: 0.95rem;
+  margin-top: 2px;
+}
+
+.missingDataAlert {
+  margin-top: 14px;
+  padding: 12px;
+  background: rgba(255, 170, 0, 0.1);
+  border: 1px dashed rgba(255, 170, 0, 0.5);
+  border-radius: 8px;
+  color: #ffc107;
+  font-size: 0.85rem;
+}
+
+/* BCV Live Rate Banner */
+.bcvRateBanner {
+  background: linear-gradient(135deg, rgba(16, 24, 40, 0.95) 0%, rgba(20, 35, 60, 0.85) 100%);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.bcvBadgeInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bcvIcon {
+  font-size: 1.8rem;
+}
+
+.bcvText h4 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  color: #00e5ff;
+  margin: 0;
+}
+
+.bcvText p {
+  font-size: 0.75rem;
+  color: #8fa0b5;
+  margin: 2px 0 0 0;
+}
+
+.bcvRateDisplay {
+  text-align: right;
+}
+
+.bcvRateDisplay .rateAmount {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffea79;
+}
+
+.bcvRateDisplay .rateLabel {
+  font-size: 0.7rem;
+  color: #8fa0b5;
+  text-transform: uppercase;
+}
+

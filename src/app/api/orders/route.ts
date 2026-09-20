@@ -3,7 +3,20 @@ import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
-    const { userId, items, total, referralCode, agency, paymentRef } = await request.json();
+    const {
+      userId,
+      items,
+      total,
+      totalVes,
+      bcvRate,
+      customerName,
+      customerIdNumber,
+      customerPhone,
+      customerEmail,
+      referralCode,
+      agency,
+      paymentRef,
+    } = await request.json();
 
     if (!userId || !items || items.length === 0) {
       return NextResponse.json({ error: 'Datos de pedido incompletos' }, { status: 400 });
@@ -20,11 +33,6 @@ export async function POST(request: Request) {
 
       if (referrer) {
         referrerId = referrer.id;
-        // 5% discount for customer, 5% commission for affiliate
-        // We assume 'total' passed from frontend is already discounted or we recalculate
-        // The plan says: "sistema aplica un multiplicador de 0.95 al total"
-        // Let's ensure the backend enforces this if a valid code is present
-        // finalTotal = total * 0.95; // Only if total wasn't already discounted
       }
     }
 
@@ -35,6 +43,12 @@ export async function POST(request: Request) {
         data: {
           userId,
           total: finalTotal,
+          totalVes: totalVes ? parseFloat(String(totalVes)) : null,
+          bcvRate: bcvRate ? parseFloat(String(bcvRate)) : null,
+          customerName: customerName || null,
+          customerIdNumber: customerIdNumber || null,
+          customerPhone: customerPhone || null,
+          customerEmail: customerEmail || null,
           referralCode,
           agency,
           paymentRef,
@@ -63,6 +77,18 @@ export async function POST(request: Request) {
           where: { id: referrerId },
           data: { tokens: { increment: commission } }
         });
+      }
+
+      // 3. Update user profile with phone / idNumber if missing
+      if (customerPhone || customerIdNumber || customerName) {
+        await tx.user.update({
+          where: { id: userId },
+          data: {
+            ...(customerPhone ? { phone: customerPhone } : {}),
+            ...(customerIdNumber ? { idNumber: customerIdNumber } : {}),
+            ...(customerName ? { name: customerName } : {}),
+          },
+        }).catch(() => null);
       }
 
       return newOrder;

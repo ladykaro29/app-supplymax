@@ -7,9 +7,11 @@ import Link from 'next/link';
 import styles from './CartDrawer.module.css';
 
 export default function CartDrawer() {
-  const { cart, updateQuantity, removeFromCart, cartTotal, formatPrice, isCartOpen, setCartOpen } = useAppContext();
+  const { cart, updateQuantity, removeFromCart, cartTotal, formatPrice, isCartOpen, setCartOpen, exchangeRate, bcvInfo } = useAppContext();
 
   if (!isCartOpen) return null;
+
+  const vesTotal = cartTotal * exchangeRate;
 
   return (
     <div className={styles.overlay} onClick={() => setCartOpen(false)}>
@@ -54,8 +56,34 @@ export default function CartDrawer() {
           <footer className={styles.footer}>
             <div className={styles.totalRow}>
               <span>TOTAL ESTIMADO</span>
-              <span className={styles.totalAmount}>{formatPrice(cartTotal)}</span>
+              <div style={{ textAlign: 'right' }}>
+                <span className={styles.totalAmount}>${cartTotal.toFixed(2)}</span>
+                <div style={{ fontSize: '0.95rem', color: '#ffea79', fontWeight: 700, marginTop: '2px' }}>
+                  Bs. {vesTotal.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              </div>
             </div>
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '6px 10px',
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              color: '#aaa',
+              marginBottom: '14px'
+            }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                🏛️ Tasa BCV Oficial:
+              </span>
+              <strong style={{ color: '#fff' }}>
+                Bs. {exchangeRate.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / $
+              </strong>
+            </div>
+
             <Link href="/checkout" onClick={() => setCartOpen(false)}>
               <button className={styles.checkoutBtn}>FINALIZAR PEDIDO</button>
             </Link>
