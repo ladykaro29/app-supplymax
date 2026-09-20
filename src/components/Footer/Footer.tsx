@@ -45,8 +45,19 @@ export default function Footer() {
       </div>
       
       <div className={styles.bottomBar}>
-        <div className={styles.container}>
+        <div className={styles.bottomContainer}>
           <p>© 2026 Supply Max. Todos los derechos reservados.</p>
+          <p className={styles.developedBy}>
+            Desarrollado por{' '}
+            <a 
+              href="https://kickoffdevelopment.com/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={styles.devLink}
+            >
+              Kickoff Development
+            </a>
+          </p>
         </div>
       </div>
     </footer>
