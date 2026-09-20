@@ -169,94 +169,130 @@ export default function HomeClient({
     gsap.registerPlugin(ScrollTrigger);
 
     let ctx = gsap.context(() => {
-      // 1. Stagger Value Pillars
-      gsap.from(`.${styles.pillarCard}`, {
-        scrollTrigger: {
-          trigger: `.${styles.pillarsGrid}`,
-          start: 'top 85%',
-          toggleActions: 'play none none reverse',
-        },
-        opacity: 0,
-        y: 40,
-        stagger: 0.15,
-        duration: 0.8,
-        ease: 'power3.out',
-      });
+      // 1. Stagger Value Pillars - Smooth entrance, never hides on scroll
+      const pillarCards = document.querySelectorAll(`.${styles.pillarCard}`);
+      if (pillarCards.length > 0) {
+        gsap.fromTo(pillarCards, 
+          { opacity: 0, y: 25 },
+          {
+            opacity: 1,
+            y: 0,
+            stagger: 0.1,
+            duration: 0.7,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: `.${styles.pillarsGrid}`,
+              start: 'top 95%',
+              once: true,
+            },
+          }
+        );
+      }
 
       // 2. Section Headers
       const headers = document.querySelectorAll(`.${styles.sectionHeader}`);
-      headers.forEach((header) => {
-        gsap.from(header, {
-          scrollTrigger: {
-            trigger: header,
-            start: 'top 90%',
-            toggleActions: 'play none none reverse',
-          },
-          opacity: 0,
-          y: 35,
-          duration: 0.8,
-          ease: 'power2.out',
-        });
-      });
+      if (headers.length > 0) {
+        gsap.fromTo(headers,
+          { opacity: 0, y: 25 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: 'power2.out',
+            stagger: 0.1,
+            scrollTrigger: {
+              trigger: headers[0],
+              start: 'top 95%',
+              once: true,
+            },
+          }
+        );
+      }
 
       // 3. Giant Category Zone Cards
-      gsap.from(`.${styles.giantCategoryCard}`, {
-        scrollTrigger: {
-          trigger: `.${styles.giantCategoryGrid}`,
-          start: 'top 85%',
-          toggleActions: 'play none none reverse',
-        },
-        opacity: 0,
-        y: 45,
-        stagger: 0.18,
-        duration: 0.9,
-        ease: 'power3.out',
-      });
+      const giantCards = document.querySelectorAll(`.${styles.giantCategoryCard}`);
+      if (giantCards.length > 0) {
+        gsap.fromTo(giantCards,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            stagger: 0.12,
+            duration: 0.8,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: `.${styles.giantCategoryGrid}`,
+              start: 'top 95%',
+              once: true,
+            },
+          }
+        );
+      }
 
       // 4. Recruitment Banner Box
-      gsap.from(`.${styles.recruitmentBanner}`, {
-        scrollTrigger: {
-          trigger: `.${styles.recruitment}`,
-          start: 'top 85%',
-          toggleActions: 'play none none reverse',
-        },
-        opacity: 0,
-        scale: 0.96,
-        y: 40,
-        duration: 0.8,
-        ease: 'power3.out',
-      });
+      const recruitBanner = document.querySelector(`.${styles.recruitmentBanner}`);
+      if (recruitBanner) {
+        gsap.fromTo(recruitBanner,
+          { opacity: 0, scale: 0.98, y: 25 },
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: `.${styles.recruitment}`,
+              start: 'top 95%',
+              once: true,
+            },
+          }
+        );
+      }
 
       // 5. Testimonial Cards
       const testimonialCards = document.querySelectorAll(`.${styles.testimonialCard}`);
       if (testimonialCards.length > 0) {
-        gsap.from(testimonialCards, {
-          scrollTrigger: {
-            trigger: `.${styles.testimonialGrid}`,
-            start: 'top 85%',
-            toggleActions: 'play none none reverse',
-          },
-          opacity: 0,
-          y: 30,
-          stagger: 0.12,
-          duration: 0.7,
-          ease: 'power2.out',
-        });
+        gsap.fromTo(testimonialCards,
+          { opacity: 0, y: 25 },
+          {
+            opacity: 1,
+            y: 0,
+            stagger: 0.1,
+            duration: 0.6,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: `.${styles.testimonialGrid}`,
+              start: 'top 95%',
+              once: true,
+            },
+          }
+        );
       }
 
       // 6. FAQ Items
-      gsap.from(`.${styles.faqItem}`, {
-        scrollTrigger: {
-          trigger: `.${styles.faqContainer}`,
-          start: 'top 85%',
-          toggleActions: 'play none none reverse',
-        },
-        opacity: 0,
-        y: 20,
-        stagger: 0.1,
-        duration: 0.6,
-        ease: 'power2.out',
-      });
+      const faqItems = document.querySelectorAll(`.${styles.faqItem}`);
+      if (faqItems.length > 0) {
+        gsap.fromTo(faqItems,
+          { opacity: 0, y: 15 },
+          {
+            opacity: 1,
+            y: 0,
+            stagger: 0.08,
+            duration: 0.5,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: `.${styles.faqContainer}`,
+              start: 'top 95%',
+              once: true,
+            },
+          }
+        );
+      }
+
+      // Recalculate triggers after images and fonts settle
+      setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 500);
     }, mainRef);
 
     return () => ctx.revert();
