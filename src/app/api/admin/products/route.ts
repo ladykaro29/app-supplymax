@@ -265,32 +265,45 @@ export async function POST(request: Request) {
 
     const processedGoal = goal && typeof goal === 'string' ? goal.trim() : (goal ? String(goal).trim() : '');
 
-    const newProduct = await prisma.product.create({
-      data: {
-        name: name.trim(),
-        category: category.trim(),
-        goal: processedGoal,
-        price: parseFloat(price),
-        purchasePrice: purchasePrice !== undefined && purchasePrice !== null ? parseFloat(purchasePrice) : null,
-        image: primaryImage,
-        images: processedImages || (primaryImage ? JSON.stringify([primaryImage]) : null),
-        description: description ? description.trim() : '',
-        portions: portions ? portions.trim() : null,
-        flavor: flavor ? flavor.trim() : null,
-        weight: weight ? weight.trim() : null,
-        sizes: processedSizes ? processedSizes.trim() : null,
-        durationInDays: durationInDays ? durationInDays.trim() : null,
-        isFeatured: !!isFeatured,
-        isOffer: !!isOffer,
-        discount: discount !== undefined && discount !== null ? parseFloat(discount) : null,
-        stock: stock !== undefined && stock !== null ? parseInt(stock) : 10,
-        supplierName: supplierName ? supplierName.trim() : null,
-        purchaseType: purchaseType === 'CREDITO' ? 'CREDITO' : 'CONTADO',
-        creditDueDate: creditDueDate ? creditDueDate.trim() : null,
-        creditDebt: creditDebt !== undefined && creditDebt !== null ? parseFloat(creditDebt) : null,
-        creditPaid: !!creditPaid,
-      }
-    });
+    const createData: any = {
+      name: name.trim(),
+      category: category.trim(),
+      goal: processedGoal,
+      price: parseFloat(price),
+      image: primaryImage,
+      description: description ? description.trim() : '',
+      isFeatured: !!isFeatured,
+      isOffer: !!isOffer,
+      discount: discount !== undefined && discount !== null ? parseFloat(discount) : null,
+      stock: stock !== undefined && stock !== null ? parseInt(stock) : 10,
+      portions: portions ? portions.trim() : null,
+      flavor: flavor ? flavor.trim() : null,
+      weight: weight ? weight.trim() : null,
+      sizes: processedSizes ? processedSizes.trim() : null,
+      durationInDays: durationInDays ? durationInDays.trim() : null,
+      purchasePrice: purchasePrice !== undefined && purchasePrice !== null ? parseFloat(purchasePrice) : null,
+      images: processedImages || (primaryImage ? JSON.stringify([primaryImage]) : null),
+      supplierName: supplierName ? supplierName.trim() : null,
+      purchaseType: purchaseType === 'CREDITO' ? 'CREDITO' : 'CONTADO',
+      creditDueDate: creditDueDate ? creditDueDate.trim() : null,
+      creditDebt: creditDebt !== undefined && creditDebt !== null ? parseFloat(creditDebt) : null,
+      creditPaid: !!creditPaid,
+    };
+
+    let newProduct;
+    try {
+      newProduct = await prisma.product.create({ data: createData });
+    } catch (createErr: any) {
+      console.warn('[API PRODUCTS POST] Full creation failed, retrying with core fields:', createErr.message);
+      delete createData.purchasePrice;
+      delete createData.images;
+      delete createData.supplierName;
+      delete createData.purchaseType;
+      delete createData.creditDueDate;
+      delete createData.creditDebt;
+      delete createData.creditPaid;
+      newProduct = await prisma.product.create({ data: createData });
+    }
 
     return NextResponse.json(newProduct, { status: 201 });
   } catch (error: any) {
@@ -370,33 +383,58 @@ export async function PUT(request: Request) {
 
     const processedGoal = goal && typeof goal === 'string' ? goal.trim() : (goal ? String(goal).trim() : '');
 
-    const updatedProduct = await prisma.product.update({
-      where: { id: parseInt(id) },
-      data: {
-        name: name.trim(),
-        category: category.trim(),
-        goal: processedGoal,
-        price: parseFloat(price),
-        purchasePrice: purchasePrice !== undefined && purchasePrice !== null ? parseFloat(purchasePrice) : null,
-        image: primaryImage,
-        images: processedImages || (primaryImage ? JSON.stringify([primaryImage]) : null),
-        description: description ? description.trim() : '',
-        portions: portions ? portions.trim() : null,
-        flavor: flavor ? flavor.trim() : null,
-        weight: weight ? weight.trim() : null,
-        sizes: processedSizes ? processedSizes.trim() : null,
-        durationInDays: durationInDays ? durationInDays.trim() : null,
-        isFeatured: !!isFeatured,
-        isOffer: !!isOffer,
-        discount: discount !== undefined && discount !== null ? parseFloat(discount) : null,
-        stock: stock !== undefined && stock !== null ? parseInt(stock) : 10,
-        supplierName: supplierName !== undefined ? (supplierName ? supplierName.trim() : null) : undefined,
-        purchaseType: purchaseType !== undefined ? (purchaseType === 'CREDITO' ? 'CREDITO' : 'CONTADO') : undefined,
-        creditDueDate: creditDueDate !== undefined ? (creditDueDate ? creditDueDate.trim() : null) : undefined,
-        creditDebt: creditDebt !== undefined ? (creditDebt !== null ? parseFloat(creditDebt) : null) : undefined,
-        creditPaid: creditPaid !== undefined ? !!creditPaid : undefined,
+    const updateData: any = {
+      name: name.trim(),
+      category: category.trim(),
+      goal: processedGoal,
+      price: parseFloat(price),
+      image: primaryImage,
+      description: description ? description.trim() : '',
+      isFeatured: !!isFeatured,
+      isOffer: !!isOffer,
+      discount: discount !== undefined && discount !== null ? parseFloat(discount) : null,
+      stock: stock !== undefined && stock !== null ? parseInt(stock) : 10,
+      portions: portions !== undefined ? (portions ? portions.trim() : null) : undefined,
+      flavor: flavor !== undefined ? (flavor ? flavor.trim() : null) : undefined,
+      weight: weight !== undefined ? (weight ? weight.trim() : null) : undefined,
+      sizes: processedSizes !== undefined ? (processedSizes ? processedSizes.trim() : null) : undefined,
+      durationInDays: durationInDays !== undefined ? (durationInDays ? durationInDays.trim() : null) : undefined,
+      purchasePrice: purchasePrice !== undefined && purchasePrice !== null ? parseFloat(purchasePrice) : null,
+      images: processedImages || (primaryImage ? JSON.stringify([primaryImage]) : null),
+      supplierName: supplierName !== undefined ? (supplierName ? supplierName.trim() : null) : undefined,
+      purchaseType: purchaseType !== undefined ? (purchaseType === 'CREDITO' ? 'CREDITO' : 'CONTADO') : undefined,
+      creditDueDate: creditDueDate !== undefined ? (creditDueDate ? creditDueDate.trim() : null) : undefined,
+      creditDebt: creditDebt !== undefined ? (creditDebt !== null ? parseFloat(creditDebt) : null) : undefined,
+      creditPaid: creditPaid !== undefined ? !!creditPaid : undefined,
+    };
+
+    // Strip undefined values so Prisma only receives defined arguments
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
       }
     });
+
+    let updatedProduct;
+    try {
+      updatedProduct = await prisma.product.update({
+        where: { id: parseInt(id) },
+        data: updateData
+      });
+    } catch (updateErr: any) {
+      console.warn('[API PRODUCTS PUT] Full update failed, retrying with core fields:', updateErr.message);
+      delete updateData.purchasePrice;
+      delete updateData.images;
+      delete updateData.supplierName;
+      delete updateData.purchaseType;
+      delete updateData.creditDueDate;
+      delete updateData.creditDebt;
+      delete updateData.creditPaid;
+      updatedProduct = await prisma.product.update({
+        where: { id: parseInt(id) },
+        data: updateData
+      });
+    }
 
     return NextResponse.json(updatedProduct);
   } catch (error: any) {
