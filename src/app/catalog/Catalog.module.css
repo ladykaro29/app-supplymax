@@ -1,12 +1,12 @@
 .container {
   min-height: 100vh;
-  padding-top: 100px;
 }
 
 .catalogLayout {
-  padding: 40px 5%;
+  padding: 120px 5% 60px;
   max-width: 1600px;
   margin: 0 auto;
+  min-height: 100vh;
   animation: fadeIn 0.8s ease-out;
 }
 
