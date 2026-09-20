@@ -65,13 +65,13 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modul
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
 
-# Copy startup script
-COPY --from=builder --chown=nextjs:nodejs /app/scripts/start.sh ./scripts/start.sh
+# Copy scripts directory (including compiled seed.js and start.sh)
+COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
 RUN chmod +x ./scripts/start.sh
 
-# Ensure the nextjs user can write to the prisma dir and public uploads
+# Ensure the nextjs user can write to the prisma dir, public uploads and node_modules
 USER root
-RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/prisma /app/public
+RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/prisma /app/public /app/node_modules
 USER nextjs
 
 EXPOSE 3000

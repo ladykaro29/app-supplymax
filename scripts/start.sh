@@ -34,6 +34,10 @@ mkdir -p /app/prisma
 echo "Pushing schema to $DATABASE_URL..."
 node $PRISMA_CLI db push --schema=$SCHEMA_PATH --accept-data-loss
 
+# Ensure Prisma client is synchronized with latest schema
+echo "Regenerating Prisma client for runtime..."
+node $PRISMA_CLI generate --schema=$SCHEMA_PATH || true
+
 # Run the compiled seed script
 echo "Running seed script..."
 if [ -f ./scripts/seed.js ]; then

@@ -131,10 +131,10 @@ export default function EditProductsPage() {
       setLoading(true);
       setError('');
       const res = await fetch('/api/admin/products');
+      const data = await res.json().catch(() => null);
       if (!res.ok) {
-        throw new Error('No se pudieron obtener los productos de la base de datos.');
+        throw new Error(data?.error || 'No se pudieron obtener los productos de la base de datos.');
       }
-      const data = await res.json();
       setProducts(Array.isArray(data) ? data : []);
     } catch (err: any) {
       setError(err.message || 'Error de conexión.');

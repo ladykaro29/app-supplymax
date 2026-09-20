@@ -170,7 +170,25 @@ export async function GET() {
     if (products.length === 0) {
       console.log('[API PRODUCTS] Database is empty, populating initial catalog...');
       for (const item of INITIAL_PRODUCTS) {
-        await prisma.product.create({ data: item });
+        try {
+          await prisma.product.create({ data: item as any });
+        } catch (itemErr) {
+          console.warn('[API PRODUCTS] Full item creation failed, falling back to core fields:', itemErr);
+          try {
+            await prisma.product.create({
+              data: {
+                name: item.name,
+                category: item.category,
+                goal: item.goal || '',
+                price: item.price,
+                image: item.image,
+                description: item.description,
+              }
+            });
+          } catch (basicErr) {
+            console.error('[API PRODUCTS] Basic item creation failed:', basicErr);
+          }
+        }
       }
       products = await prisma.product.findMany({
         orderBy: { id: 'asc' }
