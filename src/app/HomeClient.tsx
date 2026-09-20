@@ -43,44 +43,72 @@ export default function HomeClient({
 
   const heroSlides = [
     {
-      src: '/sliders/hero/1.jpg',
+      src: '/Banners-slider/banner-athlete-supps.png',
       title: <>SUPLEMENTACIÓN <span>CIENTÍFICA</span></>,
       desc: 'Construye tu mejor versión con compuestos ultra puros validados por laboratorios de élite.',
       btnText: 'COMPRAR SUPLEMENTOS',
-      btnLink: '/suplementos'
+      btnLink: '/catalog'
     },
     {
-      src: '/sliders/hero/2.png',
+      src: '/Banners-slider/banner-athlete-white.png',
       title: <>ENTRENA CON <span>ESTILO</span></>,
-      desc: 'DENTRO Y FUERA DEL GIMNASIO. Indumentaria urbana oversized y de alto rendimiento.',
-      btnText: 'COMPRAR MERCH',
+      desc: 'DENTRO Y FUERA DEL GIMNASIO. Indumentaria urbana y de compresión de alto rendimiento.',
+      btnText: 'COMPRAR ROPA',
       btnLink: '/ropa'
     },
     {
-      src: '/sliders/hero/3.png',
-      title: <>MÁXIMA <span>POTENCIA</span></>,
-      desc: 'Supera tus límites con fórmulas diseñadas para atletas y entrenadores exigentes.',
-      btnText: 'VER SUPLEMENTOS',
-      btnLink: '/suplementos'
+      src: '/Banners-slider/banner-creatinas.jpeg',
+      title: <>CREATINAS & <span>POTENCIA PURA</span></>,
+      desc: 'Fuerza explosiva y máxima recuperación celular con creatinas micronizadas líderes mundiales.',
+      btnText: 'VER CREATINAS',
+      btnLink: '/catalog'
     },
     {
-      src: '/sliders/hero/4.png',
-      title: <>ESTILO & <span>RENDIMIENTO</span></>,
-      desc: 'Prendas confeccionadas con cortes que destacan el físico y soportan las sesiones más pesadas.',
+      src: '/Banners-slider/banner-choc-protein.jpeg',
+      title: <>PROTEÍNAS & <span>MASA MUSCULAR</span></>,
+      desc: 'Fórmulas hipercalóricas y aislados de suero para una síntesis proteica insuperable.',
+      btnText: 'VER PROTEÍNAS',
+      btnLink: '/catalog'
+    },
+    {
+      src: '/Banners-slider/banner-athlete-box.png',
+      title: <>ENVÍOS <span>ASEGURADOS</span></>,
+      desc: 'Despachos protegidos a toda Venezuela desde nuestra sede central en Mérida.',
+      btnText: 'VER CATÁLOGO',
+      btnLink: '/catalog'
+    },
+    {
+      src: '/Banners-slider/banner-whey-isolate.jpeg',
+      title: <>WHEY & <span>ISOLATE ELITE</span></>,
+      desc: 'Máxima pureza biológica para definición extrema y densidad muscular magra.',
+      btnText: 'VER ISOLATES',
+      btnLink: '/catalog'
+    },
+    {
+      src: '/Banners-slider/banner-compression-gear.png',
+      title: <>HIGH PERFORMANCE <span>GEAR</span></>,
+      desc: 'Prendas confeccionadas para resistir las sesiones más pesadas y destacar tu físico.',
       btnText: 'VER COLECCIÓN',
       btnLink: '/ropa'
     },
     {
-      src: '/sliders/hero/5.png',
-      title: <>CALIDAD <span>GARANTIZADA</span></>,
-      desc: 'Resultados reales con suplementación original y despacho asegurado a toda Venezuela.',
-      btnText: 'COMPRAR AHORA',
-      btnLink: '/suplementos'
+      src: '/Banners-slider/banner-cookies-cream.jpeg',
+      title: <>SABORES <span>EXPLOSIVOS</span></>,
+      desc: 'Deliciosas fórmulas gourmet que transforman cada post-entrenamiento en un placer.',
+      btnText: 'EXPLORAR SABORES',
+      btnLink: '/catalog'
     },
     {
-      src: '/sliders/hero/6.png',
+      src: '/Banners-slider/banner-packaging.jpeg',
+      title: <>EXPERIENCIA <span>SUPPLYMAX</span></>,
+      desc: 'Packaging y protección de primer nivel en cada uno de tus envíos nacionales.',
+      btnText: 'CONOCER MÁS',
+      btnLink: '/sobre-nosotros'
+    },
+    {
+      src: '/Banners-slider/banner-tshirts.png',
       title: <>TEAM <span>SUPPLYMAX</span></>,
-      desc: 'CONSTRUIDO POR ATLETAS, PARA ATLETAS. Únete al movimiento deportivo de mayor crecimiento.',
+      desc: 'CONSTRUIDO POR ATLETAS, PARA ATLETAS. Únete a la comunidad de mayor crecimiento.',
       btnText: 'UNIRME AL TEAM',
       btnLink: '/join-team'
     }
@@ -94,6 +122,7 @@ export default function HomeClient({
   ];
 
   const shipmentImages = [
+    '/Banners-slider/banner-packaging.jpeg',
     '/sliders/envios/envio1.jpg',
     '/sliders/envios/envio2.jpg'
   ];
