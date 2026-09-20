@@ -8,7 +8,7 @@ import { useAppContext } from '@/context/AppContext';
 import styles from './AdminHeader.module.css';
 
 export default function AdminHeader() {
-  const { user, logout, exchangeRate, setExchangeRate } = useAppContext();
+  const { user, logout, exchangeRate, setExchangeRate, setMenuOpen } = useAppContext();
   const pathname = usePathname();
 
   // Exchange rate editing state
@@ -47,22 +47,34 @@ export default function AdminHeader() {
   return (
     <header className={styles.adminHeader}>
       <div className={styles.container}>
-        {/* Brand & Admin Badge */}
-        <Link href="/admin/edit-products" className={styles.brandSection}>
-          <div className={styles.logoWrapper}>
-            <Image 
-              src="/icon-round.png" 
-              alt="SupplyMax Logo" 
-              width={40} 
-              height={40} 
-              className={styles.logoImg}
-            />
-          </div>
-          <div className={styles.brandText}>
-            <span className={styles.brandName}>SUPPLY<span>MAX</span></span>
-            <span className={styles.adminBadge}>MODO ADMINISTRADOR</span>
-          </div>
-        </Link>
+        {/* Brand & Menu Icon */}
+        <div className={styles.brandContainer}>
+          <button 
+            type="button" 
+            className={styles.menuBtn} 
+            onClick={() => setMenuOpen(true)}
+            aria-label="Abrir Menú Principal"
+            title="Abrir Menú de Navegación (Tienda & Admin)"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+
+          <Link href="/admin/edit-products" className={styles.brandSection}>
+            <div className={styles.logoWrapper}>
+              <Image 
+                src="/icon-round.png" 
+                alt="SupplyMax Logo" 
+                width={40} 
+                height={40} 
+                className={styles.logoImg}
+              />
+            </div>
+            <div className={styles.brandText}>
+              <span className={styles.brandName}>SUPPLY<span>MAX</span></span>
+              <span className={styles.adminBadge}>MODO ADMINISTRADOR</span>
+            </div>
+          </Link>
+        </div>
 
         {/* Central Admin Navigation */}
         <nav className={styles.navLinks}>
@@ -119,10 +131,8 @@ export default function AdminHeader() {
           </div>
           <Link 
             href="/" 
-            target="_blank" 
-            rel="noopener noreferrer" 
             className={styles.storeButton}
-            title="Abrir la tienda pública en una pestaña nueva"
+            title="Ir a la Tienda Principal"
           >
             <span>🛒</span>
             <span>Ver Tienda</span>
