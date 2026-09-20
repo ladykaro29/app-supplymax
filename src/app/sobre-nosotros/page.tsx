@@ -100,7 +100,7 @@ export default function SobreNosotrosPage() {
 
           <div className={styles.storyImageWrap}>
             <img 
-              src="/brand-photos/Suplementos + ropa/IMG_6560.jpg" 
+              src="/about/athletes-combo.jpg" 
               alt="SupplyMax Atletas y Suplementación"
               className={styles.storyImage}
             />
@@ -153,7 +153,7 @@ export default function SobreNosotrosPage() {
           <div className={styles.lifestyleGrid}>
             <div className={`${styles.lifestyleItem} ${styles.lifestyleItemLarge}`}>
               <img 
-                src="/brand-photos/Ropa con modelo/IMG_7282.png" 
+                src="/about/clothing-model-1.png" 
                 alt="SupplyMax Lifestyle Athlete" 
                 className={styles.lifestyleImg}
               />
@@ -165,7 +165,7 @@ export default function SobreNosotrosPage() {
 
             <div className={styles.lifestyleItem}>
               <img 
-                src="/brand-photos/Suplementos + ropa/Photoroom_20260328_114247.jpg" 
+                src="/about/supplements-lifestyle.jpg" 
                 alt="Suplementos y Accesorios" 
                 className={styles.lifestyleImg}
               />
@@ -177,7 +177,7 @@ export default function SobreNosotrosPage() {
 
             <div className={styles.lifestyleItem}>
               <img 
-                src="/brand-photos/Ropa con modelo/IMG_7284.png" 
+                src="/about/clothing-model-2.png" 
                 alt="Atletas SupplyMax" 
                 className={styles.lifestyleImg}
               />
@@ -189,7 +189,7 @@ export default function SobreNosotrosPage() {
 
             <div className={styles.lifestyleItem} style={{ gridColumn: 'span 2' }}>
               <img 
-                src="/brand-photos/Envíos nacionales/73F6A189-5ABD-47E7-90A4-695ED13BF547.jpg" 
+                src="/about/shipping-venezuela.jpg" 
                 alt="Envíos Asegurados a Toda Venezuela" 
                 className={styles.lifestyleImg}
               />
