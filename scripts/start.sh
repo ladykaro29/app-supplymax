@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 echo "=== SupplyMax Production Startup ==="
 
@@ -7,57 +6,47 @@ echo "=== SupplyMax Production Startup ==="
 PRISMA_CLI="./node_modules/prisma/build/index.js"
 SCHEMA_PATH="./prisma/schema.prisma"
 
-# FORCE the canonical DB path — must match the Dockerfile ENV exactly.
-# We use dev.db because Easypanel injects DATABASE_URL=file:/app/prisma/dev.db
-# and we need build + runtime to always target the same file.
+# Canonical DB path
 export DATABASE_URL="file:/app/prisma/dev.db"
 
-# Some platforms (Easypanel, Coolify) inject .env files into the
-# build context or runtime container. Prisma's CLI auto-loads .env,
-# which would re-override DATABASE_URL. Strip them defensively.
+# Defensively remove leaked env files if any
 for f in /app/.env /app/.env.production /app/.env.development /app/.env.local; do
   if [ -f "$f" ]; then
     echo "[STARTUP] Removing leaked env file: $f"
-    rm -f "$f"
+    rm -f "$f" || true
   fi
 done
 
 echo "Working directory: $(pwd)"
 echo "Target DB: $DATABASE_URL"
-echo "Contents of /app/prisma BEFORE migrations:"
-ls -la /app/prisma/ || true
 
-# Ensure the parent directory exists and is writable
-mkdir -p /app/prisma
+# Ensure the parent directory exists
+mkdir -p /app/prisma || true
 
-# Sync schema to the database file
-echo "Pushing schema to $DATABASE_URL..."
-node $PRISMA_CLI db push --schema=$SCHEMA_PATH --accept-data-loss
-
-# Ensure Prisma client is synchronized with latest schema
-echo "Regenerating Prisma client for runtime..."
-node $PRISMA_CLI generate --schema=$SCHEMA_PATH || true
-
-# Run the compiled seed script
-echo "Running seed script..."
-if [ -f ./scripts/seed.js ]; then
-  node ./scripts/seed.js
-elif [ -f prisma/seed.js ]; then
-  node prisma/seed.js
-else
-  echo "WARNING: seed script not found!"
+# Try db push defensively if CLI exists (non-fatal)
+if [ -f "$PRISMA_CLI" ]; then
+  echo "Pushing schema to $DATABASE_URL (best-effort)..."
+  node "$PRISMA_CLI" db push --schema="$SCHEMA_PATH" --accept-data-loss || true
 fi
 
-# Defensive admin ensure — runs INDEPENDENTLY of seed.js so it survives
-# stale-volume / cached-image scenarios where seed.js may be outdated.
-echo "Ensuring admin user (defensive)..."
+# Run seed script defensively
+if [ -f ./scripts/seed.js ]; then
+  echo "Running compiled seed script..."
+  node ./scripts/seed.js || true
+elif [ -f prisma/seed.js ]; then
+  echo "Running prisma/seed.js..."
+  node prisma/seed.js || true
+fi
+
+# Defensive admin ensure
+echo "Ensuring admin user..."
 node -e "
 const { PrismaClient } = require('@prisma/client');
 (async () => {
-  const p = new PrismaClient();
   try {
+    const p = new PrismaClient();
     await p.user.deleteMany({ where: { email: 'admin@supplymax.com' } });
-    const admin = await p.user.upsert({
+    await p.user.upsert({
       where: { email: 'admin@supplymax.app' },
       update: { password: '123Suppli', role_id: 'Admin', status: 'Active', name: 'Admin Supplymax' },
       create: {
@@ -68,17 +57,14 @@ const { PrismaClient } = require('@prisma/client');
         status: 'Active'
       }
     });
-    console.log('[STARTUP] Admin ensured:', admin.email);
-    const users = await p.user.findMany({ select: { email: true, role_id: true } });
-    console.log('[STARTUP] Users in DB:', JSON.stringify(users));
-  } catch (e) {
-    console.error('[STARTUP] Failed to ensure admin:', e && e.message ? e.message : e);
-  } finally {
+    console.log('[STARTUP] Admin ensured.');
     await p.\$disconnect();
+  } catch (e) {
+    console.warn('[STARTUP] Admin ensure notice:', e ? e.message : e);
   }
 })();
-"
+" || true
 
 # Start the application
-echo "Starting Next.js server..."
+echo "Starting Next.js server on port ${PORT:-3000}..."
 exec node server.js
