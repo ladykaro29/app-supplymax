@@ -33,7 +33,7 @@ model Product {
   id             Int         @id @default(autoincrement())
   name           String
   category       String
-  goal           String?
+  goal           String?     @default("")
   price          Float
   purchasePrice  Float?
   image          String

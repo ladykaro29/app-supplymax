@@ -282,10 +282,15 @@ export default function EditProductsPage() {
       const isCreation = editingProduct.id === 0;
       const method = isCreation ? 'POST' : 'PUT';
       
+      const payload = {
+        ...editingProduct,
+        goal: editingProduct.goal ? editingProduct.goal.trim() : '',
+      };
+
       const res = await fetch('/api/admin/products', {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingProduct),
+        body: JSON.stringify(payload),
       });
 
       const result = await res.json();

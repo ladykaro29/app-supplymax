@@ -245,11 +245,13 @@ export async function POST(request: Request) {
       processedImages = body.images.trim();
     }
 
+    const processedGoal = goal && typeof goal === 'string' ? goal.trim() : (goal ? String(goal).trim() : '');
+
     const newProduct = await prisma.product.create({
       data: {
         name: name.trim(),
         category: category.trim(),
-        goal: goal ? goal.trim() : null,
+        goal: processedGoal,
         price: parseFloat(price),
         purchasePrice: purchasePrice !== undefined && purchasePrice !== null ? parseFloat(purchasePrice) : null,
         image: primaryImage,
@@ -348,12 +350,14 @@ export async function PUT(request: Request) {
       processedImages = body.images.trim();
     }
 
+    const processedGoal = goal && typeof goal === 'string' ? goal.trim() : (goal ? String(goal).trim() : '');
+
     const updatedProduct = await prisma.product.update({
       where: { id: parseInt(id) },
       data: {
         name: name.trim(),
         category: category.trim(),
-        goal: goal ? goal.trim() : null,
+        goal: processedGoal,
         price: parseFloat(price),
         purchasePrice: purchasePrice !== undefined && purchasePrice !== null ? parseFloat(purchasePrice) : null,
         image: primaryImage,
