@@ -746,18 +746,21 @@ export default function EditProductsPage() {
                   {/* Floating Action Overlay on Hover */}
                   <div className={styles.cardHoverOverlay}>
                     <button 
+                      type="button"
                       className={styles.floatingEditBtn}
                       onClick={(e) => { e.stopPropagation(); handleEdit(product); }}
                       title="Editar Producto y Variaciones"
                     >
-                      ✏️ Editar
+                      <span>✏️</span>
+                      <span>Editar</span>
                     </button>
                     <button 
+                      type="button"
                       className={styles.floatingDeleteBtn}
                       onClick={(e) => { e.stopPropagation(); handleDelete(product.id, product.name); }}
-                      title="Eliminar de DB"
+                      title="Eliminar Producto"
                     >
-                      🗑️
+                      <span>🗑️</span>
                     </button>
                   </div>
                   
