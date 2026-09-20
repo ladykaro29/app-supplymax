@@ -807,12 +807,23 @@ export default function HomeClient({
                 className={`${styles.faqItem} ${isActive ? styles.faqItemActive : ''}`}
               >
                 <button 
+                  type="button"
                   onClick={() => toggleFaq(index)}
                   className={`${styles.faqQuestion} ${isActive ? styles.faqQuestionActive : ''}`}
                 >
-                  {faq.q}
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  <span className={styles.faqQuestionText}>{faq.q}</span>
+                  <svg 
+                    width="22" 
+                    height="22" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth={2.5} 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    className={`${styles.faqChevron} ${isActive ? styles.faqChevronActive : ''}`}
+                  >
+                    <polyline points="6 9 12 15 18 9"></polyline>
                   </svg>
                 </button>
                 <div className={`${styles.faqAnswer} ${isActive ? styles.faqAnswerActive : ''}`}>
