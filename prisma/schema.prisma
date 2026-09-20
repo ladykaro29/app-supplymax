@@ -32,6 +32,7 @@ model User {
 model Product {
   id             Int         @id @default(autoincrement())
   name           String
+  slug           String?     @unique
   category       String
   goal           String?     @default("")
   price          Float

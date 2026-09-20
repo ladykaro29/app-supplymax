@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { slugify } from '@/lib/slugify';
 
 export const dynamic = 'force-dynamic';
 
@@ -195,7 +196,13 @@ export async function GET() {
       });
     }
 
-    return NextResponse.json(products);
+    // Ensure all returned products have a valid SEO slug
+    const productsWithSlug = products.map(p => ({
+      ...p,
+      slug: (p as any).slug || slugify(p.name) || String(p.id)
+    }));
+
+    return NextResponse.json(productsWithSlug);
   } catch (error: any) {
     console.error('[API PRODUCTS GET ERROR]:', error);
     return NextResponse.json(
@@ -231,6 +238,7 @@ export async function POST(request: Request) {
       creditDueDate,
       creditDebt,
       creditPaid,
+      slug,
     } = body;
 
     if (!name || !category || price === undefined || price === null) {
@@ -238,6 +246,16 @@ export async function POST(request: Request) {
         { error: 'El nombre, la categoría y el precio de venta son requeridos.' },
         { status: 400 }
       );
+    }
+
+    // Compute unique SEO slug
+    let rawSlug = slug ? slugify(slug) : slugify(name);
+    if (!rawSlug) rawSlug = `producto-${Date.now()}`;
+    let candidateSlug = rawSlug;
+    let counter = 1;
+    while (await prisma.product.findFirst({ where: { slug: candidateSlug } })) {
+      counter++;
+      candidateSlug = `${rawSlug}-${counter}`;
     }
 
     // Process sizes if it's an array
@@ -267,6 +285,7 @@ export async function POST(request: Request) {
 
     const createData: any = {
       name: name.trim(),
+      slug: candidateSlug,
       category: category.trim(),
       goal: processedGoal,
       price: parseFloat(price),
@@ -302,7 +321,12 @@ export async function POST(request: Request) {
       delete createData.creditDueDate;
       delete createData.creditDebt;
       delete createData.creditPaid;
-      newProduct = await prisma.product.create({ data: createData });
+      try {
+        newProduct = await prisma.product.create({ data: createData });
+      } catch (slugErr: any) {
+        delete createData.slug;
+        newProduct = await prisma.product.create({ data: createData });
+      }
     }
 
     return NextResponse.json(newProduct, { status: 201 });
@@ -342,6 +366,7 @@ export async function PUT(request: Request) {
       creditDueDate,
       creditDebt,
       creditPaid,
+      slug,
     } = body;
 
     if (!id) {
@@ -356,6 +381,20 @@ export async function PUT(request: Request) {
         { error: 'El nombre, la categoría y el precio de venta son requeridos.' },
         { status: 400 }
       );
+    }
+
+    // Compute unique SEO slug if changed or provided
+    let candidateSlug: string | undefined = undefined;
+    if (slug || name) {
+      let rawSlug = slug ? slugify(slug) : slugify(name);
+      if (rawSlug) {
+        candidateSlug = rawSlug;
+        let counter = 1;
+        while (await prisma.product.findFirst({ where: { slug: candidateSlug, NOT: { id: parseInt(id) } } })) {
+          counter++;
+          candidateSlug = `${rawSlug}-${counter}`;
+        }
+      }
     }
 
     // Process sizes if it's an array
@@ -407,6 +446,10 @@ export async function PUT(request: Request) {
       creditDebt: creditDebt !== undefined ? (creditDebt !== null ? parseFloat(creditDebt) : null) : undefined,
       creditPaid: creditPaid !== undefined ? !!creditPaid : undefined,
     };
+
+    if (candidateSlug) {
+      updateData.slug = candidateSlug;
+    }
 
     // Strip undefined values so Prisma only receives defined arguments
     Object.keys(updateData).forEach(key => {

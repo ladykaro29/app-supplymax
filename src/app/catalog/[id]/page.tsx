@@ -5,20 +5,14 @@ import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import prisma from '@/lib/prisma';
 import { notFound } from 'next/navigation';
+import { getProductByIdOrSlug } from '@/lib/productsHelper';
 import ProductDetailClient from './ProductDetailClient';
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const productId = parseInt(id);
-  if (isNaN(productId)) {
-    return { title: 'Producto no encontrado | SupplyMax' };
-  }
-
-  const product = await prisma.product.findUnique({
-    where: { id: productId }
-  });
+  const product = await getProductByIdOrSlug(id);
 
   if (!product) {
     return { title: 'Producto no encontrado | SupplyMax' };
@@ -31,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   const cleanImagePath = product.image.startsWith('/') ? product.image : `/${product.image}`;
   const imageUrl = product.image.startsWith('http') ? product.image : `${siteUrl}${cleanImagePath}`;
-  const pageUrl = `${siteUrl}/catalog/${product.id}`;
+  const pageUrl = `${siteUrl}/catalog/${product.slug || product.id}`;
 
   const title = `${product.name} | SupplyMax`;
   const priceFormatted = (Number(product.price) || 0).toFixed(2);
@@ -68,10 +62,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
-  // Try to find the product in DB
-  const product = await prisma.product.findUnique({
-    where: { id: parseInt(id) }
-  });
+  // Find product in DB or brand catalog
+  const product = await getProductByIdOrSlug(id);
 
   if (!product) {
     return notFound();

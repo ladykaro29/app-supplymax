@@ -66,7 +66,7 @@ export default function LoginPage() {
               <label>Usuario o Email</label>
               <input 
                 type="text" 
-                placeholder="Tu nombre de usuario o email (ej: admin@supplymax.app)"
+                placeholder="Ingresa tu correo electrónico o usuario"
                 className={styles.input} 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -79,7 +79,7 @@ export default function LoginPage() {
               <div className={styles.passwordWrapper}>
                 <input 
                   type={showPassword ? "text" : "password"} 
-                  placeholder="Tu contraseña (ej: 123Suppli)"
+                  placeholder="Ingresa tu contraseña"
                   className={styles.input} 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
