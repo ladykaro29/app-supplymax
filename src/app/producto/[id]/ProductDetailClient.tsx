@@ -90,10 +90,10 @@ export default function ProductDetailClient({
       return photos[index % photos.length];
     } else {
       const photos = [
-        '/brand-photos/Suplementos + ropa/Photoroom_20260328_114247.jpg',
-        '/brand-photos/Suplementos + ropa/Photoroom_20260328_114305.jpg',
-        '/brand-photos/Suplementos + ropa/IMG_6560.jpg',
-        '/brand-photos/Suplementos + ropa/IMG_6561.jpg'
+        '/brand-products/supplymax-combo.jpg',
+        '/brand-products/supplymax-accessories.jpg',
+        '/brand-products/supplymax-lifestyle-1.jpg',
+        '/brand-products/supplymax-lifestyle-2.jpg'
       ];
       return photos[index % photos.length];
     }

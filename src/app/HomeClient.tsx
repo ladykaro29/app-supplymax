@@ -199,18 +199,21 @@ export default function HomeClient({
       });
 
       // 5. Testimonial Cards
-      gsap.from(`.${styles.testimonialCard}`, {
-        scrollTrigger: {
-          trigger: `.${styles.testimonialGrid}`,
-          start: 'top 85%',
-          toggleActions: 'play none none reverse',
-        },
-        opacity: 0,
-        y: 30,
-        stagger: 0.12,
-        duration: 0.7,
-        ease: 'power2.out',
-      });
+      const testimonialCards = document.querySelectorAll(`.${styles.testimonialCard}`);
+      if (testimonialCards.length > 0) {
+        gsap.from(testimonialCards, {
+          scrollTrigger: {
+            trigger: `.${styles.testimonialGrid}`,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+          opacity: 0,
+          y: 30,
+          stagger: 0.12,
+          duration: 0.7,
+          ease: 'power2.out',
+        });
+      }
 
       // 6. FAQ Items
       gsap.from(`.${styles.faqItem}`, {
@@ -544,7 +547,7 @@ export default function HomeClient({
       <section className={styles.bagBannerSection}>
         <Link href="/ropa#bolso" className={styles.bagBanner}>
           <Image 
-            src="/brand-photos/Suplementos + ropa/Photoroom_20260328_114310.jpg" 
+            src="/brand-products/supplymax-bag.jpg" 
             alt="Bolso SupplyMax" 
             fill 
             className={styles.bagBannerImg} 
