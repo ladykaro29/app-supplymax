@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       files = files.slice(0, 10);
     }
 
-    // Validate mime types
+    // Validate mime types and image extensions (including iPhone HEIC/HEIF)
     const validMimes = [
       'image/jpeg',
       'image/jpg',
@@ -35,7 +35,13 @@ export async function POST(req: NextRequest) {
       'image/gif',
       'image/svg+xml',
       'image/avif',
+      'image/heic',
+      'image/heif',
+      'image/pjpeg',
+      'image/x-png',
     ];
+
+    const validExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg', '.avif', '.heic', '.heif'];
 
     const uploadDir = path.join(process.cwd(), 'public', 'uploads');
     await mkdir(uploadDir, { recursive: true });
@@ -44,12 +50,19 @@ export async function POST(req: NextRequest) {
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      if (!validMimes.includes(file.type.toLowerCase())) {
+      const mime = (file.type || '').toLowerCase();
+      const originalName = file.name || `image_${i}.jpg`;
+      const ext = (path.extname(originalName) || '').toLowerCase();
+
+      const isValidMime = validMimes.includes(mime);
+      const isValidExt = validExtensions.includes(ext);
+
+      if (!isValidMime && !isValidExt && mime !== '' && mime !== 'application/octet-stream') {
         continue;
       }
 
-      // Limit to 15MB each
-      const MAX_SIZE = 15 * 1024 * 1024;
+      // Limit to 25MB each
+      const MAX_SIZE = 25 * 1024 * 1024;
       if (file.size > MAX_SIZE) {
         continue;
       }
@@ -57,8 +70,6 @@ export async function POST(req: NextRequest) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      const originalName = file.name || `image_${i}.png`;
-      const ext = path.extname(originalName) || '.png';
       const baseName = path
         .basename(originalName, ext)
         .toLowerCase()

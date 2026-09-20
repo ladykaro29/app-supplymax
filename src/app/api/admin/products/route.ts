@@ -310,22 +310,59 @@ export async function POST(request: Request) {
     };
 
     let newProduct;
-    try {
-      newProduct = await prisma.product.create({ data: createData });
-    } catch (createErr: any) {
-      console.warn('[API PRODUCTS POST] Full creation failed, retrying with core fields:', createErr.message);
-      delete createData.purchasePrice;
-      delete createData.images;
-      delete createData.supplierName;
-      delete createData.purchaseType;
-      delete createData.creditDueDate;
-      delete createData.creditDebt;
-      delete createData.creditPaid;
+    let createAttempts = 0;
+    while (createAttempts < 15) {
+      createAttempts++;
       try {
         newProduct = await prisma.product.create({ data: createData });
-      } catch (slugErr: any) {
-        delete createData.slug;
-        newProduct = await prisma.product.create({ data: createData });
+        break;
+      } catch (err: any) {
+        const msg = err.message || '';
+        const match = msg.match(/Unknown argument [`']([a-zA-Z0-9_]+)[`']/);
+        if (match && match[1] && createData[match[1]] !== undefined) {
+          console.warn(`[API PRODUCTS POST] Stripping unsupported argument '${match[1]}' and retrying...`);
+          delete createData[match[1]];
+          continue;
+        }
+
+        if (createAttempts === 1) {
+          delete createData.purchasePrice;
+          delete createData.images;
+          delete createData.supplierName;
+          delete createData.purchaseType;
+          delete createData.creditDueDate;
+          delete createData.creditDebt;
+          delete createData.creditPaid;
+          delete createData.slug;
+          continue;
+        }
+
+        if (createAttempts === 2) {
+          delete createData.isFeatured;
+          delete createData.isOffer;
+          delete createData.discount;
+          delete createData.stock;
+          delete createData.durationInDays;
+          delete createData.portions;
+          delete createData.flavor;
+          delete createData.weight;
+          delete createData.sizes;
+          continue;
+        }
+
+        if (createAttempts === 3) {
+          const minimalData: any = {
+            name: createData.name,
+            category: createData.category,
+            price: createData.price,
+            image: createData.image,
+            description: createData.description
+          };
+          newProduct = await prisma.product.create({ data: minimalData });
+          break;
+        }
+
+        throw err;
       }
     }
 
@@ -459,24 +496,66 @@ export async function PUT(request: Request) {
     });
 
     let updatedProduct;
-    try {
-      updatedProduct = await prisma.product.update({
-        where: { id: parseInt(id) },
-        data: updateData
-      });
-    } catch (updateErr: any) {
-      console.warn('[API PRODUCTS PUT] Full update failed, retrying with core fields:', updateErr.message);
-      delete updateData.purchasePrice;
-      delete updateData.images;
-      delete updateData.supplierName;
-      delete updateData.purchaseType;
-      delete updateData.creditDueDate;
-      delete updateData.creditDebt;
-      delete updateData.creditPaid;
-      updatedProduct = await prisma.product.update({
-        where: { id: parseInt(id) },
-        data: updateData
-      });
+    let updateAttempts = 0;
+    while (updateAttempts < 15) {
+      updateAttempts++;
+      try {
+        updatedProduct = await prisma.product.update({
+          where: { id: parseInt(id) },
+          data: updateData
+        });
+        break;
+      } catch (err: any) {
+        const msg = err.message || '';
+        const match = msg.match(/Unknown argument [`']([a-zA-Z0-9_]+)[`']/);
+        if (match && match[1] && updateData[match[1]] !== undefined) {
+          console.warn(`[API PRODUCTS PUT] Stripping unsupported argument '${match[1]}' and retrying...`);
+          delete updateData[match[1]];
+          continue;
+        }
+
+        if (updateAttempts === 1) {
+          delete updateData.purchasePrice;
+          delete updateData.images;
+          delete updateData.supplierName;
+          delete updateData.purchaseType;
+          delete updateData.creditDueDate;
+          delete updateData.creditDebt;
+          delete updateData.creditPaid;
+          delete updateData.slug;
+          continue;
+        }
+
+        if (updateAttempts === 2) {
+          delete updateData.isFeatured;
+          delete updateData.isOffer;
+          delete updateData.discount;
+          delete updateData.stock;
+          delete updateData.durationInDays;
+          delete updateData.portions;
+          delete updateData.flavor;
+          delete updateData.weight;
+          delete updateData.sizes;
+          continue;
+        }
+
+        if (updateAttempts === 3) {
+          const minimalData: any = {
+            name: updateData.name,
+            category: updateData.category,
+            price: updateData.price,
+            image: updateData.image,
+            description: updateData.description
+          };
+          updatedProduct = await prisma.product.update({
+            where: { id: parseInt(id) },
+            data: minimalData
+          });
+          break;
+        }
+
+        throw err;
+      }
     }
 
     return NextResponse.json(updatedProduct);

@@ -293,10 +293,15 @@ export default function EditProductsPage() {
         body: JSON.stringify(payload),
       });
 
-      const result = await res.json();
+      let result: any = {};
+      try {
+        result = await res.json();
+      } catch {
+        result = { error: `Error en la respuesta del servidor (Estado ${res.status}).` };
+      }
 
       if (!res.ok) {
-        throw new Error(result.error || 'Error al guardar los cambios.');
+        throw new Error(result.error || 'Error al guardar los cambios en la base de datos.');
       }
 
       alert(isCreation ? `Producto "${result.name}" registrado con éxito.` : `Producto "${result.name}" actualizado.`);
@@ -385,6 +390,56 @@ export default function EditProductsPage() {
     return editingProduct.image ? [editingProduct.image] : [];
   })();
 
+  // Helper to compress camera/iPhone photos to web-optimized JPEG before uploading
+  const compressImage = async (file: File): Promise<File> => {
+    if (file.type === 'image/svg+xml' || file.type === 'image/gif') return file;
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 1200;
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob(
+              (blob) => {
+                if (blob) {
+                  const cleanName = file.name.replace(/\.[^/.]+$/, '') + '.jpg';
+                  resolve(new File([blob], cleanName, { type: 'image/jpeg' }));
+                } else {
+                  resolve(file);
+                }
+              },
+              'image/jpeg',
+              0.82
+            );
+          } else {
+            resolve(file);
+          }
+        };
+        img.onerror = () => resolve(file);
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => resolve(file);
+      reader.readAsDataURL(file);
+    });
+  };
+
   // Multi-Image File Upload Handler (Up to 10 images)
   const handleImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
@@ -407,8 +462,13 @@ export default function EditProductsPage() {
     setUploadSuccess('');
 
     try {
+      // Compress images on-the-fly to prevent mobile payload errors and "Load failed"
+      const compressedFiles = await Promise.all(
+        filesToUpload.map(f => compressImage(f))
+      );
+
       const formData = new FormData();
-      filesToUpload.forEach(file => {
+      compressedFiles.forEach(file => {
         formData.append('files', file);
       });
 
@@ -417,10 +477,15 @@ export default function EditProductsPage() {
         body: formData,
       });
 
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        data = { error: `Error del servidor (código ${res.status}).` };
+      }
 
       if (!res.ok) {
-        throw new Error(data.error || 'Error al subir las imágenes.');
+        throw new Error(data.error || 'Error al subir las imágenes al servidor.');
       }
 
       const uploadedUrls: string[] = Array.isArray(data.urls) ? data.urls : (data.url ? [data.url] : []);
@@ -439,18 +504,19 @@ export default function EditProductsPage() {
       setTimeout(() => setUploadSuccess(''), 4500);
     } catch (err: any) {
       console.warn('Upload API fallback:', err);
-      // Fallback: read locally with FileReader
+      // Fallback: read locally with FileReader using compressed blobs
       try {
         const base64List: string[] = [];
         for (const file of filesToUpload) {
+          const compressed = await compressImage(file);
           const base64 = await new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
             reader.onloadend = () => {
               if (reader.result && typeof reader.result === 'string') resolve(reader.result);
-              else reject(new Error('No se pudo convertir a Base64'));
+              else reject(new Error('No se pudo convertir'));
             };
             reader.onerror = reject;
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(compressed);
           });
           base64List.push(base64);
         }
@@ -461,9 +527,9 @@ export default function EditProductsPage() {
           image: merged[0] || prev.image,
           images: merged,
         }) : null);
-        setUploadSuccess(`Imágenes cargadas en memoria local (${merged.length}/10 fotos).`);
+        setUploadSuccess(`Imágenes cargadas en memoria (${merged.length}/10 fotos).`);
         setTimeout(() => setUploadSuccess(''), 4500);
-      } catch (fallbackErr) {
+      } catch (fallbackErr: any) {
         setUploadError(err.message || 'Error al procesar las imágenes.');
       }
     } finally {
