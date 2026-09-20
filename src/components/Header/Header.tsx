@@ -1,16 +1,38 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAppContext } from '@/context/AppContext';
 import styles from './Header.module.css';
 
 export default function Header() {
   const { user, logout, cart, setCartOpen, setMenuOpen } = useAppContext();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === '/';
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Se activa solo cuando comience a bajar el scroll (> 50px)
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className={`${styles.header} glass`}>
+    <header 
+      className={`${styles.header} ${isHome ? (isScrolled ? styles.headerActive : styles.headerHidden) : styles.headerActive}`}
+    >
       <div className={styles.container}>
         {/* Left: Menu & Categories */}
         <div className={styles.leftSection}>
