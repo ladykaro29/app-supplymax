@@ -25,6 +25,7 @@ export default function Footer() {
           <ul>
             <li><Link href="/">Inicio</Link></li>
             <li><Link href="/catalog">Catálogo</Link></li>
+            <li><Link href="/sobre-nosotros">Quiénes Somos</Link></li>
             <li><Link href="/report-payment">Reportar Pago</Link></li>
           </ul>
         </div>
