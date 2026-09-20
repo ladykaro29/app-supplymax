@@ -99,6 +99,27 @@ export default function ProductDetailClient({
     }
   };
 
+  // Full gallery of up to 10 product images
+  const galleryImages: string[] = (() => {
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      return product.images.filter(Boolean);
+    }
+    if (typeof product.images === 'string' && product.images.trim()) {
+      try {
+        const parsed = JSON.parse(product.images);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.filter(Boolean);
+        }
+      } catch {
+        const parts = product.images.split(',').map((s: string) => s.trim()).filter(Boolean);
+        if (parts.length > 0) return parts;
+      }
+    }
+    return [product.image || '/protein.png'];
+  })();
+
+  const currentDisplayImage = galleryImages[activeThumb] || galleryImages[0] || product.image || '/protein.png';
+
   return (
     <main className={styles.main}>
       {/* Breadcrumb navigation */}
@@ -112,36 +133,32 @@ export default function ProductDetailClient({
         <div className={styles.imageSection}>
           <div className={`${styles.mainImageWrapper} glass`}>
             {product.goal && <div className={styles.goalBadge}>{product.goal.toUpperCase()}</div>}
-            <Image 
-              src={product.image} 
+            <img 
+              src={currentDisplayImage} 
               alt={product.name} 
-              width={600} 
-              height={600} 
               className={styles.mainImage}
-              priority
+              onError={(e) => { (e.target as HTMLImageElement).src = '/protein.png'; }}
             />
           </div>
-          <div className={styles.thumbnails}>
-             <button 
-               onClick={() => setActiveThumb(0)}
-               className={`${styles.thumb} ${activeThumb === 0 ? styles.activeThumb : ''}`}
-             >
-               <Image src={product.image} alt="main photo" width={80} height={80} className={styles.thumbImg} />
-             </button>
-             {/* Dynamic secondary thumbnails */}
-             <button 
-               onClick={() => setActiveThumb(1)}
-               className={`${styles.thumb} ${activeThumb === 1 ? styles.activeThumb : ''}`}
-             >
-               <Image src={getReviewPhoto(0)} alt="model photo 1" width={80} height={80} className={styles.thumbImg} />
-             </button>
-             <button 
-               onClick={() => setActiveThumb(2)}
-               className={`${styles.thumb} ${activeThumb === 2 ? styles.activeThumb : ''}`}
-             >
-               <Image src={getReviewPhoto(1)} alt="model photo 2" width={80} height={80} className={styles.thumbImg} />
-             </button>
-          </div>
+          {galleryImages.length > 1 && (
+            <div className={styles.thumbnails}>
+              {galleryImages.map((imgSrc: string, idx: number) => (
+                <button 
+                  key={`${imgSrc}-${idx}`}
+                  onClick={() => setActiveThumb(idx)}
+                  className={`${styles.thumb} ${activeThumb === idx ? styles.activeThumb : ''}`}
+                  type="button"
+                >
+                  <img 
+                    src={imgSrc} 
+                    alt={`${product.name} foto ${idx + 1}`} 
+                    className={styles.thumbImg} 
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/protein.png'; }}
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Right: Purchase Control Panel */}

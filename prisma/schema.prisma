@@ -37,6 +37,7 @@ model Product {
   price          Float
   purchasePrice  Float?
   image          String
+  images         String?     // Stored as JSON array or comma-separated list of up to 10 image URLs
   description    String
   portions       String?
   flavor         String?

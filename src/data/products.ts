@@ -6,6 +6,7 @@ export interface Product {
   price: number; // Selling price
   purchasePrice?: number | null; // Manufacturing/Purchase price
   image: string;
+  images?: string | string[] | null;
   description: string;
   portions?: string | null; // For supplements
   flavor?: string | null; // For supplements

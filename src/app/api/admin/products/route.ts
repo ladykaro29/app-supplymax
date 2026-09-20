@@ -230,6 +230,21 @@ export async function POST(request: Request) {
       processedSizes = sizes;
     }
 
+    // Process images array (up to 10 images)
+    let processedImages = '';
+    let primaryImage = image ? String(image).trim() : '/protein.png';
+    if (Array.isArray(body.images) && body.images.length > 0) {
+      const validImages = body.images
+        .filter((img: any) => typeof img === 'string' && img.trim().length > 0)
+        .slice(0, 10);
+      if (validImages.length > 0) {
+        processedImages = JSON.stringify(validImages);
+        primaryImage = validImages[0];
+      }
+    } else if (typeof body.images === 'string' && body.images.trim().length > 0) {
+      processedImages = body.images.trim();
+    }
+
     const newProduct = await prisma.product.create({
       data: {
         name: name.trim(),
@@ -237,7 +252,8 @@ export async function POST(request: Request) {
         goal: goal ? goal.trim() : null,
         price: parseFloat(price),
         purchasePrice: purchasePrice !== undefined && purchasePrice !== null ? parseFloat(purchasePrice) : null,
-        image: image ? image.trim() : '/protein.png', // Default placeholder if empty
+        image: primaryImage,
+        images: processedImages || (primaryImage ? JSON.stringify([primaryImage]) : null),
         description: description ? description.trim() : '',
         portions: portions ? portions.trim() : null,
         flavor: flavor ? flavor.trim() : null,
@@ -317,6 +333,21 @@ export async function PUT(request: Request) {
       processedSizes = sizes;
     }
 
+    // Process images array (up to 10 images)
+    let processedImages = '';
+    let primaryImage = image ? String(image).trim() : '/protein.png';
+    if (Array.isArray(body.images) && body.images.length > 0) {
+      const validImages = body.images
+        .filter((img: any) => typeof img === 'string' && img.trim().length > 0)
+        .slice(0, 10);
+      if (validImages.length > 0) {
+        processedImages = JSON.stringify(validImages);
+        primaryImage = validImages[0];
+      }
+    } else if (typeof body.images === 'string' && body.images.trim().length > 0) {
+      processedImages = body.images.trim();
+    }
+
     const updatedProduct = await prisma.product.update({
       where: { id: parseInt(id) },
       data: {
@@ -325,7 +356,8 @@ export async function PUT(request: Request) {
         goal: goal ? goal.trim() : null,
         price: parseFloat(price),
         purchasePrice: purchasePrice !== undefined && purchasePrice !== null ? parseFloat(purchasePrice) : null,
-        image: image ? image.trim() : '/protein.png',
+        image: primaryImage,
+        images: processedImages || (primaryImage ? JSON.stringify([primaryImage]) : null),
         description: description ? description.trim() : '',
         portions: portions ? portions.trim() : null,
         flavor: flavor ? flavor.trim() : null,

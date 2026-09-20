@@ -7,13 +7,26 @@ export const runtime = 'nodejs';
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
-    const file = formData.get('file') as File | null;
+    
+    // Support multiple files from 'files' or 'file'
+    let files = formData.getAll('files') as File[];
+    if (!files || files.length === 0) {
+      const single = formData.getAll('file') as File[];
+      if (single && single.length > 0) {
+        files = single;
+      }
+    }
 
-    if (!file) {
+    if (!files || files.length === 0) {
       return NextResponse.json({ error: 'No se envió ningún archivo.' }, { status: 400 });
     }
 
-    // Validate mime type
+    // Maximum 10 files per upload batch
+    if (files.length > 10) {
+      files = files.slice(0, 10);
+    }
+
+    // Validate mime types
     const validMimes = [
       'image/jpeg',
       'image/jpg',
@@ -24,48 +37,52 @@ export async function POST(req: NextRequest) {
       'image/avif',
     ];
 
-    if (!validMimes.includes(file.type.toLowerCase())) {
-      return NextResponse.json(
-        { error: 'Formato no permitido. Sube una imagen PNG, JPG, WEBP, GIF o AVIF.' },
-        { status: 400 }
-      );
-    }
-
-    // Limit to 15MB
-    const MAX_SIZE = 15 * 1024 * 1024;
-    if (file.size > MAX_SIZE) {
-      return NextResponse.json(
-        { error: 'La imagen excede el límite máximo permitido de 15MB.' },
-        { status: 400 }
-      );
-    }
-
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Sanitize filename
-    const originalName = file.name || 'image.png';
-    const ext = path.extname(originalName) || '.png';
-    const baseName = path
-      .basename(originalName, ext)
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '_')
-      .slice(0, 30);
-
-    const filename = `product_${Date.now()}_${baseName}${ext.toLowerCase()}`;
     const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-
-    // Ensure uploads directory exists
     await mkdir(uploadDir, { recursive: true });
 
-    const filePath = path.join(uploadDir, filename);
-    await writeFile(filePath, buffer);
+    const uploadedUrls: string[] = [];
 
-    const publicUrl = `/uploads/${filename}`;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!validMimes.includes(file.type.toLowerCase())) {
+        continue;
+      }
+
+      // Limit to 15MB each
+      const MAX_SIZE = 15 * 1024 * 1024;
+      if (file.size > MAX_SIZE) {
+        continue;
+      }
+
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const originalName = file.name || `image_${i}.png`;
+      const ext = path.extname(originalName) || '.png';
+      const baseName = path
+        .basename(originalName, ext)
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '_')
+        .slice(0, 30);
+
+      const filename = `product_${Date.now()}_${i}_${baseName}${ext.toLowerCase()}`;
+      const filePath = path.join(uploadDir, filename);
+      await writeFile(filePath, buffer);
+
+      uploadedUrls.push(`/uploads/${filename}`);
+    }
+
+    if (uploadedUrls.length === 0) {
+      return NextResponse.json(
+        { error: 'No se pudieron procesar las imágenes. Verifica que sean formatos válidos (PNG, JPG, WEBP).' },
+        { status: 400 }
+      );
+    }
 
     return NextResponse.json({
-      url: publicUrl,
-      filename,
+      url: uploadedUrls[0],
+      urls: uploadedUrls,
+      count: uploadedUrls.length,
       success: true,
     });
   } catch (error: any) {

@@ -15,18 +15,40 @@ interface ProductDetailClientProps {
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const { addToCart, formatPrice } = useAppContext();
   const [quantity, setQuantity] = useState(1);
+  const [activeThumb, setActiveThumb] = useState(0);
   
   // Normalize flavors and sizes to arrays
   const flavorsArr = Array.isArray(product.flavors) 
     ? product.flavors 
-    : (product.flavor ? product.flavor.split(',').map(s => s.trim()) : []);
+    : (product.flavor ? product.flavor.split(',').map((s: string) => s.trim()) : []);
     
   const sizesArr = Array.isArray(product.sizes)
     ? product.sizes
-    : (typeof product.sizes === 'string' ? product.sizes.split(',').map(s => s.trim()) : []);
+    : (typeof product.sizes === 'string' ? product.sizes.split(',').map((s: string) => s.trim()) : []);
 
   const [selectedFlavor, setSelectedFlavor] = useState(flavorsArr[0] || '');
   const [selectedSize, setSelectedSize] = useState(sizesArr[0] || '');
+
+  // Full gallery of up to 10 product images
+  const galleryImages: string[] = (() => {
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      return product.images.filter(Boolean);
+    }
+    if (typeof product.images === 'string' && product.images.trim()) {
+      try {
+        const parsed = JSON.parse(product.images);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.filter(Boolean);
+        }
+      } catch {
+        const parts = product.images.split(',').map((s: string) => s.trim()).filter(Boolean);
+        if (parts.length > 0) return parts;
+      }
+    }
+    return [product.image || '/protein.png'];
+  })();
+
+  const currentDisplayImage = galleryImages[activeThumb] || galleryImages[0] || product.image || '/protein.png';
 
   const handleAddToCart = () => {
     // Construct variant name if applicable
@@ -52,21 +74,34 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         <div className={styles.imageSection}>
           <div className={`${styles.mainImageWrapper} glass neon-glow`}>
             {product.goal && <div className={styles.goalBadge}>{product.goal.toUpperCase()}</div>}
-            <Image 
-              src={product.image} 
+            <img 
+              src={currentDisplayImage} 
               alt={product.name} 
-              width={500} 
-              height={500} 
               className={styles.mainImage}
-              priority
+              onError={(e) => { (e.target as HTMLImageElement).src = '/protein.png'; }}
             />
           </div>
-          <div className={styles.thumbnails}>
-             <div className={`${styles.thumb} active`}>
-               <Image src={product.image} alt="thumb" width={80} height={80} />
-             </div>
-             {/* Dynamic thumbnails would go here if available */}
-          </div>
+          {galleryImages.length > 1 && (
+            <div className={styles.thumbnails}>
+              {galleryImages.map((imgSrc: string, idx: number) => (
+                <div 
+                  key={`${imgSrc}-${idx}`} 
+                  className={`${styles.thumb} ${activeThumb === idx ? styles.active : ''}`}
+                  onClick={() => setActiveThumb(idx)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <img 
+                    src={imgSrc} 
+                    alt={`${product.name} miniatura ${idx + 1}`} 
+                    width={80} 
+                    height={80} 
+                    style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/protein.png'; }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Right: Info Area */}

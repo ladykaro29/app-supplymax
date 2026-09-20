@@ -12,6 +12,7 @@ interface Product {
   price: number;
   purchasePrice?: number | null;
   image: string;
+  images?: string | string[] | null;
   description: string;
   portions?: string | null;
   flavor?: string | null;
@@ -37,6 +38,7 @@ const BLANK_PRODUCT: Product = {
   price: 0,
   purchasePrice: 0,
   image: '/protein.png',
+  images: ['/protein.png'],
   description: '',
   portions: '',
   flavor: '',
@@ -98,6 +100,7 @@ export default function EditProductsPage() {
   const [selectedMargin, setSelectedMargin] = useState<number>(50);
   const [customFlavor, setCustomFlavor] = useState('');
   const [customWeight, setCustomWeight] = useState('');
+  const [manualImageUrl, setManualImageUrl] = useState('');
 
   // Filter products based on search term and category pills
   const filteredProducts = useMemo(() => {
@@ -201,6 +204,22 @@ export default function EditProductsPage() {
       parsedSizes = product.sizes.split(',').map(s => s.trim()).filter(Boolean);
     }
 
+    // Parse images array if needed (up to 10 images)
+    let parsedImages: string[] = [];
+    if (Array.isArray(product.images)) {
+      parsedImages = product.images.filter(Boolean);
+    } else if (typeof product.images === 'string' && product.images.trim()) {
+      try {
+        const parsed = JSON.parse(product.images);
+        if (Array.isArray(parsed)) parsedImages = parsed.filter(Boolean);
+      } catch {
+        parsedImages = product.images.split(',').map(s => s.trim()).filter(Boolean);
+      }
+    }
+    if (parsedImages.length === 0 && product.image) {
+      parsedImages = [product.image];
+    }
+
     // Calculate effective margin if cost is present
     const cost = product.purchasePrice || 0;
     const price = product.price || 0;
@@ -215,6 +234,8 @@ export default function EditProductsPage() {
     setCustomWeight('');
     setEditingProduct({
       ...product,
+      image: parsedImages[0] || product.image || '/protein.png',
+      images: parsedImages.length > 0 ? parsedImages : [product.image || '/protein.png'],
       sizes: parsedSizes,
     });
   };
@@ -340,10 +361,41 @@ export default function EditProductsPage() {
     });
   };
 
-  // Image File Upload Handler
+  // Plain parser for active images list (no React hooks)
+  const currentImagesList: string[] = (() => {
+    if (!editingProduct) return [];
+    if (Array.isArray(editingProduct.images)) {
+      const arr = editingProduct.images.filter(Boolean);
+      if (arr.length > 0) return arr;
+    }
+    if (typeof editingProduct.images === 'string' && editingProduct.images.trim()) {
+      try {
+        const parsed = JSON.parse(editingProduct.images);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed.filter(Boolean);
+      } catch {
+        const split = editingProduct.images.split(',').map(s => s.trim()).filter(Boolean);
+        if (split.length > 0) return split;
+      }
+    }
+    return editingProduct.image ? [editingProduct.image] : [];
+  })();
+
+  // Multi-Image File Upload Handler (Up to 10 images)
   const handleImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !editingProduct) return;
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0 || !editingProduct) return;
+
+    const remainingSlots = Math.max(0, 10 - currentImagesList.length);
+    if (remainingSlots <= 0) {
+      alert('Ya has alcanzado el límite máximo de 10 imágenes para este producto. Elimina una imagen para agregar otra.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    const filesToUpload = Array.from(fileList).slice(0, remainingSlots);
+    if (fileList.length > remainingSlots) {
+      alert(`Solo se cargarán ${remainingSlots} imagen(es) para no exceder el máximo de 10.`);
+    }
 
     setUploadingImage(true);
     setUploadError('');
@@ -351,7 +403,9 @@ export default function EditProductsPage() {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      filesToUpload.forEach(file => {
+        formData.append('files', file);
+      });
 
       const res = await fetch('/api/admin/upload', {
         method: 'POST',
@@ -361,32 +415,51 @@ export default function EditProductsPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Error al subir la imagen.');
+        throw new Error(data.error || 'Error al subir las imágenes.');
       }
 
+      const uploadedUrls: string[] = Array.isArray(data.urls) ? data.urls : (data.url ? [data.url] : []);
+      if (uploadedUrls.length === 0) {
+        throw new Error('No se recibió ninguna URL de imagen.');
+      }
+
+      const mergedImages = [...currentImagesList, ...uploadedUrls].slice(0, 10);
       setEditingProduct(prev => prev ? ({
         ...prev,
-        image: data.url,
+        image: mergedImages[0] || prev.image,
+        images: mergedImages,
       }) : null);
-      setUploadSuccess('¡Imagen cargada exitosamente!');
-      setTimeout(() => setUploadSuccess(''), 4000);
+
+      setUploadSuccess(`¡${uploadedUrls.length} imagen(es) subida(s) con éxito! (${mergedImages.length}/10 fotos)`);
+      setTimeout(() => setUploadSuccess(''), 4500);
     } catch (err: any) {
-      console.warn('Upload API fallback to data URL:', err);
+      console.warn('Upload API fallback:', err);
+      // Fallback: read locally with FileReader
       try {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          if (reader.result && typeof reader.result === 'string') {
-            setEditingProduct(prev => prev ? ({
-              ...prev,
-              image: reader.result as string,
-            }) : null);
-            setUploadSuccess('Imagen cargada localmente.');
-            setTimeout(() => setUploadSuccess(''), 4000);
-          }
-        };
-        reader.readAsDataURL(file);
+        const base64List: string[] = [];
+        for (const file of filesToUpload) {
+          const base64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              if (reader.result && typeof reader.result === 'string') resolve(reader.result);
+              else reject(new Error('No se pudo convertir a Base64'));
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+          base64List.push(base64);
+        }
+
+        const merged = [...currentImagesList, ...base64List].slice(0, 10);
+        setEditingProduct(prev => prev ? ({
+          ...prev,
+          image: merged[0] || prev.image,
+          images: merged,
+        }) : null);
+        setUploadSuccess(`Imágenes cargadas en memoria local (${merged.length}/10 fotos).`);
+        setTimeout(() => setUploadSuccess(''), 4500);
       } catch (fallbackErr) {
-        setUploadError(err.message || 'Error al procesar la imagen.');
+        setUploadError(err.message || 'Error al procesar las imágenes.');
       }
     } finally {
       setUploadingImage(false);
@@ -394,6 +467,47 @@ export default function EditProductsPage() {
         fileInputRef.current.value = '';
       }
     }
+  };
+
+  const handleRemoveImage = (indexToRemove: number) => {
+    if (!editingProduct) return;
+    const updated = currentImagesList.filter((_, idx) => idx !== indexToRemove);
+    setEditingProduct({
+      ...editingProduct,
+      image: updated[0] || '',
+      images: updated,
+    });
+  };
+
+  const handleSetPrimaryImage = (indexToPrimary: number) => {
+    if (!editingProduct || indexToPrimary === 0) return;
+    const primaryImg = currentImagesList[indexToPrimary];
+    const rest = currentImagesList.filter((_, idx) => idx !== indexToPrimary);
+    const updated = [primaryImg, ...rest];
+    setEditingProduct({
+      ...editingProduct,
+      image: updated[0],
+      images: updated,
+    });
+  };
+
+  const handleAddManualImageUrl = (urlToAdd: string) => {
+    if (!editingProduct || !urlToAdd.trim()) return;
+    const cleaned = urlToAdd.trim();
+    if (currentImagesList.length >= 10) {
+      alert('Ya has alcanzado el límite de 10 imágenes para este producto.');
+      return;
+    }
+    if (currentImagesList.includes(cleaned)) {
+      alert('Esta imagen ya está en la galería del producto.');
+      return;
+    }
+    const updated = [...currentImagesList, cleaned].slice(0, 10);
+    setEditingProduct({
+      ...editingProduct,
+      image: updated[0],
+      images: updated,
+    });
   };
 
   // Plain string parsers for active product (no React hooks)
@@ -807,8 +921,10 @@ export default function EditProductsPage() {
                         else if (cat === 'Creatinas') defaultImg = '/creatine.png';
                         else if (cat === 'Aminoácidos/BCAA') defaultImg = '/amino.png';
                         else defaultImg = '/protein.png';
+                        setEditingProduct({...editingProduct, category: cat, image: defaultImg, images: [defaultImg]});
+                      } else {
+                        setEditingProduct({...editingProduct, category: cat});
                       }
-                      setEditingProduct({...editingProduct, category: cat, image: defaultImg});
                     }}
                   >
                     <option value="Proteínas">Proteínas</option>
@@ -1279,89 +1395,178 @@ export default function EditProductsPage() {
                 </div>
               )}
 
-              {/* Image Upload, Preview & Route */}
+              {/* Image Upload, Multi-Image Gallery (Up to 10 photos) */}
               <div className={styles.formGroup}>
-                <label>Imagen del Producto *</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label style={{ margin: 0, fontWeight: 700, fontSize: '0.92rem' }}>
+                    📸 Galería de Imágenes ({currentImagesList.length}/10 fotos) *
+                  </label>
+                  <span style={{ fontSize: '0.72rem', color: '#00F0FF', fontWeight: 600 }}>
+                    ⭐ La 1ª imagen es la Portada principal
+                  </span>
+                </div>
                 
                 <div className={styles.imageUploadCard}>
-                  <div className={styles.imageUploadMainRow}>
-                    {/* Visual Thumbnail Preview */}
-                    <div className={styles.imagePreviewThumbnail}>
-                      {editingProduct.image ? (
-                        <img 
-                          src={editingProduct.image} 
-                          alt="Vista previa del producto"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/protein.png';
-                          }} 
-                        />
-                      ) : (
-                        <span className={styles.imagePreviewPlaceholder}>📷</span>
-                      )}
-                    </div>
+                  {/* Upload Action Button & Status */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      onChange={handleImageFileUpload} 
+                      accept="image/png, image/jpeg, image/jpg, image/webp, image/gif, image/avif" 
+                      multiple 
+                      style={{ display: 'none' }} 
+                    />
+                    <button 
+                      type="button" 
+                      className={`${styles.uploadFileBtn} ${uploadingImage ? styles.uploadFileBtnLoading : ''}`}
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingImage || currentImagesList.length >= 10}
+                    >
+                      {uploadingImage 
+                        ? '⏳ Subiendo fotos al servidor...' 
+                        : currentImagesList.length >= 10 
+                          ? '✅ Límite alcanzado (10 fotos)' 
+                          : '📁 Subir Fotos desde tu Dispositivo (Hasta 10)'}
+                    </button>
 
-                    {/* Upload Button & Status */}
-                    <div className={styles.uploadActionWrapper}>
-                      <input 
-                        type="file" 
-                        ref={fileInputRef} 
-                        onChange={handleImageFileUpload} 
-                        accept="image/png, image/jpeg, image/jpg, image/webp, image/gif, image/avif" 
-                        style={{ display: 'none' }} 
-                      />
-                      <button 
-                        type="button" 
-                        className={`${styles.uploadFileBtn} ${uploadingImage ? styles.uploadFileBtnLoading : ''}`}
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploadingImage}
-                      >
-                        {uploadingImage ? '⏳ Subiendo imagen...' : '📁 Subir Imagen desde el Dispositivo'}
-                      </button>
-
-                      {uploadSuccess && (
-                        <span className={styles.uploadStatusMsg}>
-                          ✓ {uploadSuccess}
-                        </span>
-                      )}
-
-                      {uploadError && (
-                        <span className={styles.uploadErrorMsg}>
-                          ⚠️ {uploadError}
-                        </span>
-                      )}
-
-                      <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)' }}>
-                        Formatos soportados: PNG, JPG, WEBP, GIF (máx. 15MB)
+                    {uploadSuccess && (
+                      <span className={styles.uploadStatusMsg}>
+                        ✓ {uploadSuccess}
                       </span>
-                    </div>
+                    )}
+
+                    {uploadError && (
+                      <span className={styles.uploadErrorMsg}>
+                        ⚠️ {uploadError}
+                      </span>
+                    )}
+
+                    <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.45)' }}>
+                      Puedes seleccionar varias fotos a la vez (PNG, JPG, WEBP). Se admiten hasta 10 fotos por producto.
+                    </span>
+                  </div>
+
+                  {/* Multi-Image Gallery Grid (10 slots max) */}
+                  <div className={styles.multiImageGalleryGrid}>
+                    {currentImagesList.map((imgUrl, index) => {
+                      const isMain = index === 0;
+                      return (
+                        <div 
+                          key={`${imgUrl}-${index}`} 
+                          className={`${styles.galleryThumbSlot} ${isMain ? styles.galleryThumbMain : ''}`}
+                          onClick={() => {
+                            if (!isMain) handleSetPrimaryImage(index);
+                          }}
+                          title={isMain ? 'Foto de Portada' : 'Haz clic para hacerla Portada principal'}
+                        >
+                          <img 
+                            src={imgUrl} 
+                            alt={`Foto ${index + 1}`} 
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/protein.png';
+                            }}
+                          />
+                          {isMain ? (
+                            <span className={styles.mainThumbBadge}>⭐ Portada</span>
+                          ) : (
+                            <span style={{ 
+                              position: 'absolute', 
+                              bottom: '2px', 
+                              left: '2px', 
+                              right: '2px', 
+                              fontSize: '0.58rem', 
+                              background: 'rgba(0,0,0,0.7)', 
+                              color: '#FFFFFF', 
+                              textAlign: 'center', 
+                              borderRadius: '3px',
+                              padding: '1px'
+                            }}>
+                              Hacer Portada
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            className={styles.removeImgBtn}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveImage(index);
+                            }}
+                            title="Eliminar foto"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      );
+                    })}
+
+                    {/* Add Photo Slot Button if < 10 */}
+                    {currentImagesList.length < 10 && (
+                      <button
+                        type="button"
+                        className={styles.addSlotBtn}
+                        onClick={() => fileInputRef.current?.click()}
+                        title="Subir otra foto"
+                      >
+                        <span style={{ fontSize: '1.3rem', fontWeight: 300 }}>+</span>
+                        <span style={{ fontSize: '0.65rem', fontWeight: 700 }}>Añadir</span>
+                        <span style={{ fontSize: '0.58rem', opacity: 0.6 }}>({10 - currentImagesList.length} lib.)</span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Manual URL Input */}
-                  <div style={{ marginTop: '0.4rem' }}>
-                    <label style={{ fontSize: '0.72rem', marginBottom: '4px', display: 'block', color: 'rgba(255,255,255,0.6)' }}>
-                      O introduce una URL / Ruta manual del servidor:
+                  <div style={{ marginTop: '0.8rem', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.8rem' }}>
+                    <label style={{ fontSize: '0.74rem', marginBottom: '4px', display: 'block', color: 'rgba(255,255,255,0.7)' }}>
+                      O introduce una URL / Ruta de foto para agregar a la galería:
                     </label>
-                    <input 
-                      type="text" 
-                      className={styles.formInput} 
-                      value={editingProduct.image}
-                      onChange={(e) => setEditingProduct({...editingProduct, image: e.target.value})}
-                      placeholder="Ej: /brand-photos/Suplementos/IMG-20260513-WA0017.jpg"
-                      style={{ fontSize: '0.82rem', padding: '0.5rem 0.75rem' }}
-                    />
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input 
+                        type="text" 
+                        className={styles.formInput} 
+                        value={manualImageUrl}
+                        onChange={(e) => setManualImageUrl(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (manualImageUrl.trim()) {
+                              handleAddManualImageUrl(manualImageUrl);
+                              setManualImageUrl('');
+                            }
+                          }
+                        }}
+                        placeholder="Ej: /brand-photos/Suplementos/IMG-20260513-WA0017.jpg"
+                        style={{ fontSize: '0.82rem', padding: '0.5rem 0.75rem', flex: 1 }}
+                      />
+                      <button 
+                        type="button"
+                        className={styles.presetBtn}
+                        style={{ borderColor: '#00F0FF', color: '#00F0FF', whiteSpace: 'nowrap', padding: '0 1rem' }}
+                        onClick={() => {
+                          if (manualImageUrl.trim()) {
+                            handleAddManualImageUrl(manualImageUrl);
+                            setManualImageUrl('');
+                          }
+                        }}
+                        disabled={!manualImageUrl.trim() || currentImagesList.length >= 10}
+                      >
+                        + Agregar a Galería
+                      </button>
+                    </div>
                   </div>
 
                   {/* Default Quick Presets */}
-                  <div className={styles.imagePresets}>
-                    <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', alignSelf: 'center' }}>Preajustes:</span>
+                  <div className={styles.imagePresets} style={{ marginTop: '0.6rem' }}>
+                    <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', alignSelf: 'center' }}>Preajustes rápidos:</span>
                     {['/protein.png', '/creatine.png', '/amino.png', '/hoodie.png'].map(img => (
                       <button 
                         key={img} 
                         type="button" 
-                        onClick={() => setEditingProduct({...editingProduct, image: img})}
-                        className={`${styles.presetBtn} ${editingProduct.image === img ? styles.presetActive : ''}`}
+                        onClick={() => handleAddManualImageUrl(img)}
+                        className={`${styles.presetBtn} ${currentImagesList.includes(img) ? styles.presetActive : ''}`}
+                        title="Agregar imagen predeterminada a la galería"
                       >
-                        {img}
+                        {currentImagesList.includes(img) ? `✓ ${img}` : `+ ${img}`}
                       </button>
                     ))}
                   </div>
