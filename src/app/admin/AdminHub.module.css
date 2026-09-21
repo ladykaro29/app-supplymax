@@ -1,0 +1,242 @@
+.hubContainer {
+  min-height: 100vh;
+  padding: 100px 24px 60px;
+  background-color: #08090d;
+  background-image: 
+    radial-gradient(circle at 20% 15%, rgba(0, 209, 255, 0.05) 0%, transparent 45%),
+    radial-gradient(circle at 80% 85%, rgba(255, 107, 0, 0.04) 0%, transparent 45%);
+  color: #f3f4f6;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.hubMain {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.hubHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.hubGreeting h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 6px 0;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.hubGreeting h1 span {
+  background: linear-gradient(135deg, #00d1ff 0%, #00ff88 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hubGreeting p {
+  color: #9ca3af;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.quickStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(37, 211, 102, 0.1);
+  border: 1px solid rgba(37, 211, 102, 0.25);
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #25d366;
+}
+
+.liveDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #25d366;
+  box-shadow: 0 0 8px #25d366;
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* 6 Grid Modules Container */
+.gridTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modulesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.moduleCard {
+  position: relative;
+  background: rgba(18, 20, 28, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+}
+
+.moduleCard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 209, 255, 0.4);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 209, 255, 0.1);
+}
+
+.moduleIconWrap {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  margin-bottom: 18px;
+  transition: transform 0.3s ease;
+}
+
+.moduleCard:hover .moduleIconWrap {
+  transform: scale(1.1);
+}
+
+/* Different gradients for module icons */
+.posIcon {
+  background: linear-gradient(135deg, rgba(255, 107, 0, 0.2) 0%, rgba(255, 51, 0, 0.35) 100%);
+  border: 1px solid rgba(255, 107, 0, 0.3);
+}
+
+.contabIcon {
+  background: linear-gradient(135deg, rgba(0, 209, 255, 0.2) 0%, rgba(0, 119, 255, 0.35) 100%);
+  border: 1px solid rgba(0, 209, 255, 0.3);
+}
+
+.shopIcon {
+  background: linear-gradient(135deg, rgba(37, 211, 102, 0.2) 0%, rgba(16, 185, 129, 0.35) 100%);
+  border: 1px solid rgba(37, 211, 102, 0.3);
+}
+
+.invIcon {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(126, 34, 206, 0.35) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.servicesIcon {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(190, 24, 93, 0.35) 100%);
+  border: 1px solid rgba(236, 72, 153, 0.3);
+}
+
+.teamIcon {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.35) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.moduleTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+}
+
+.moduleDesc {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  line-height: 1.45;
+  margin: 0 0 16px 0;
+  flex: 1;
+}
+
+.moduleAction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #00d1ff;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 14px;
+}
+
+.moduleBadge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #d1d5db;
+}
+
+/* Quick Summary Bar */
+.summaryBanner {
+  background: linear-gradient(135deg, rgba(20, 24, 38, 0.8) 0%, rgba(12, 15, 24, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.summaryCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.summaryLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+.summaryValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.summaryValueOrange {
+  color: #ff6b00;
+}
+
+.summaryValueGreen {
+  color: #25d366;
+}
+
+@media (max-width: 768px) {
+  .hubContainer {
+    padding: 85px 16px 40px;
+  }
+  .modulesGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -18,6 +18,13 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
   const navSections = [
     {
+      title: 'PANEL & CONTROL',
+      items: [
+        { label: 'Panel General', href: '/admin', icon: '⚡' },
+        { label: 'Punto de Venta (POS)', href: '/admin/pos', icon: '📟' },
+      ],
+    },
+    {
       title: 'GESTIÓN DE CATÁLOGO',
       items: [
         { label: 'Productos & Stock', href: '/admin/edit-products', icon: '📦' },
@@ -28,7 +35,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       title: 'FINANZAS & VENTAS',
       items: [
         { label: 'Pedidos & Ventas', href: '/admin/orders', icon: '🛍️' },
-        { label: 'Finanzas & Métricas', href: '/admin/performance', icon: '📈' },
+        { label: 'Contabilidad & Utilidades', href: '/admin/performance', icon: '📈' },
       ],
     },
     {
