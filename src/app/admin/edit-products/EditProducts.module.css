@@ -1729,3 +1729,27 @@
   text-overflow: ellipsis;
 }
 
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.2rem;
+  }
+  .headerActions {
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+  }
+  .searchBar {
+    width: 100%;
+  }
+  .addBtn, .createNewBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem;
+    font-size: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 240, 255, 0.5);
+  }
+}
+
+

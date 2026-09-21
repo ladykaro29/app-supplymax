@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAppContext } from '@/context/AppContext';
 import styles from './EditProducts.module.css';
 
@@ -58,25 +59,26 @@ const BLANK_PRODUCT: Product = {
 const CATEGORIES = ['Todos', 'Proteínas', 'Creatinas', 'Pre-Entrenos', 'Aminoácidos/BCAA', 'Quemadores/Otros', 'Ropa'];
 
 const PRESET_FLAVORS = [
-  'Vainilla',
-  'Chocolate',
-  'Fresa',
+  'Vainilla Gourmet',
+  'Chocolate Suizo',
+  'Fresa Silvestre',
   'Cookies & Cream',
   'Frutos Rojos',
-  'Banana',
-  'Blue Raspberry',
-  'Fruit Punch',
+  'Blue Razz',
+  'Sandía Refrescante',
   'Manzana Verde',
-  'Neutro / Sin Sabor',
+  'Fruit Punch',
+  'Unflavored (Sin Sabor)',
 ];
 
 const PRESET_WEIGHTS = [
-  '300g',
-  '500g',
-  '1 kg',
-  '2 kg',
-  '2 lbs',
-  '5 lbs',
+  '300g (0.66 lbs)',
+  '500g (1.1 lbs)',
+  '1 kg (2.2 lbs)',
+  '2 kg (4.4 lbs)',
+  '2.5 kg (5.5 lbs)',
+  '3 kg (6.6 lbs)',
+  '5 lbs (2.27 kg)',
   '10 lbs',
   '30 Servicios',
   '60 Servicios',
@@ -86,8 +88,9 @@ const PRESET_WEIGHTS = [
 
 const MARGIN_PRESETS = [30, 40, 50, 75, 100];
 
-export default function EditProductsPage() {
+function EditProductsContent() {
   const { user, formatPrice, authLoading } = useAppContext();
+  const searchParams = useSearchParams();
   const [isMounted, setIsMounted] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -194,6 +197,12 @@ export default function EditProductsPage() {
     setCustomWeight('');
     setEditingProduct({ ...BLANK_PRODUCT });
   };
+
+  useEffect(() => {
+    if (isMounted && searchParams.get('new') === 'true') {
+      handleCreateNew();
+    }
+  }, [isMounted, searchParams]);
 
   const handleEdit = (product: Product) => {
     // Parse sizes array if needed
@@ -710,7 +719,7 @@ export default function EditProductsPage() {
             </div>
             
             <button className={styles.addBtn} onClick={handleCreateNew} id="btn-add-product">
-              <span className={styles.plusIcon}>+</span> Agregar Productos
+              <span className={styles.plusIcon}>+</span> AGREGAR PRODUCTO
             </button>
           </div>
         </header>
@@ -1695,5 +1704,13 @@ export default function EditProductsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function EditProductsPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '60px', textAlign: 'center', color: '#fff' }}>Cargando catálogo...</div>}>
+      <EditProductsContent />
+    </Suspense>
   );
 }

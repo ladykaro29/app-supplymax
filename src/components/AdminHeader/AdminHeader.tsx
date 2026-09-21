@@ -37,6 +37,7 @@ export default function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
   };
 
   const getPageTitle = () => {
+    if (pathname.includes('/admin/orders')) return 'Pedidos & Ventas';
     if (pathname.includes('/admin/team')) return 'Equipo de Trabajo & Roles';
     if (pathname.includes('/admin/edit-products')) return 'Catálogo & Inventario';
     if (pathname.includes('/admin/performance')) return 'Finanzas & Rendimiento';

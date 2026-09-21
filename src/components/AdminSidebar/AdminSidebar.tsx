@@ -27,6 +27,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     {
       title: 'FINANZAS & VENTAS',
       items: [
+        { label: 'Pedidos & Ventas', href: '/admin/orders', icon: '🛍️' },
         { label: 'Finanzas & Métricas', href: '/admin/performance', icon: '📈' },
       ],
     },

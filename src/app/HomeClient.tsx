@@ -653,8 +653,8 @@ export default function HomeClient({
       <section className={styles.bagBannerSection}>
         <Link href="/ropa#bolso" className={styles.bagBanner}>
           <Image 
-            src="/brand-products/supplymax-bag.jpg" 
-            alt="Bolso SupplyMax" 
+            src="/Banners-slider/banner-packaging.jpeg" 
+            alt="Bolso Deportivo SupplyMax Packaging" 
             fill 
             className={styles.bagBannerImg} 
           />

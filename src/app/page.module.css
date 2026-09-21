@@ -1505,6 +1505,15 @@
   cursor: pointer;
 }
 
+.bagBanner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(8, 10, 15, 0.88) 0%, rgba(8, 10, 15, 0.55) 45%, rgba(8, 10, 15, 0.15) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
 .bagBanner:hover {
   border-color: var(--color-accent);
   box-shadow: 0 20px 50px rgba(0, 209, 255, 0.1);
@@ -1513,7 +1522,7 @@
 .bagBannerImg {
   object-fit: cover;
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: brightness(0.4) contrast(1.15);
+  filter: brightness(0.7) contrast(1.08);
 }
 
 .bagBanner:hover .bagBannerImg {
