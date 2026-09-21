@@ -170,11 +170,12 @@
 
 .imageArea {
   height: 300px;
-  background: #0D0D0D;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .productImage {

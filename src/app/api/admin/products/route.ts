@@ -248,14 +248,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Compute unique SEO slug
-    let rawSlug = slug ? slugify(slug) : slugify(name);
-    if (!rawSlug) rawSlug = `producto-${Date.now()}`;
-    let candidateSlug = rawSlug;
-    let counter = 1;
-    while (await prisma.product.findFirst({ where: { slug: candidateSlug } })) {
-      counter++;
-      candidateSlug = `${rawSlug}-${counter}`;
+    // Compute unique SEO slug safely
+    let candidateSlug: string | undefined = undefined;
+    try {
+      let rawSlug = slug ? slugify(slug) : slugify(name);
+      if (!rawSlug) rawSlug = `producto-${Date.now()}`;
+      candidateSlug = rawSlug;
+      let counter = 1;
+      while (await (prisma.product as any).findFirst({ where: { slug: candidateSlug } })) {
+        counter++;
+        candidateSlug = `${rawSlug}-${counter}`;
+      }
+    } catch {
+      // If DB or Prisma client does not have slug column/argument yet, avoid crashing
+      candidateSlug = undefined;
     }
 
     // Process sizes if it's an array
@@ -285,7 +291,7 @@ export async function POST(request: Request) {
 
     const createData: any = {
       name: name.trim(),
-      slug: candidateSlug,
+      ...(candidateSlug ? { slug: candidateSlug } : {}),
       category: category.trim(),
       goal: processedGoal,
       price: parseFloat(price),
@@ -425,11 +431,16 @@ export async function PUT(request: Request) {
     if (slug || name) {
       let rawSlug = slug ? slugify(slug) : slugify(name);
       if (rawSlug) {
-        candidateSlug = rawSlug;
-        let counter = 1;
-        while (await prisma.product.findFirst({ where: { slug: candidateSlug, NOT: { id: parseInt(id) } } })) {
-          counter++;
-          candidateSlug = `${rawSlug}-${counter}`;
+        try {
+          candidateSlug = rawSlug;
+          let counter = 1;
+          while (await (prisma.product as any).findFirst({ where: { slug: candidateSlug, NOT: { id: parseInt(id) } } })) {
+            counter++;
+            candidateSlug = `${rawSlug}-${counter}`;
+          }
+        } catch {
+          // If slug column or argument is not supported in the database/Prisma schema yet, ignore safely
+          candidateSlug = undefined;
         }
       }
     }

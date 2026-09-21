@@ -462,7 +462,7 @@
 .imageWrapper {
   position: relative;
   aspect-ratio: 1;
-  background: rgba(0, 0, 0, 0.15);
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;

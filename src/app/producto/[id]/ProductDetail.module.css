@@ -46,7 +46,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1; /* Formato cuadrado 1:1 */
-  background: #0d0d0d;
+  background: #ffffff;
   border-radius: var(--radius-md);
   border: 1px solid var(--glass-border);
   overflow: hidden;
@@ -79,6 +79,7 @@
   border-radius: 4px;
   letter-spacing: 1px;
   z-index: 5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .thumbnails {
@@ -90,7 +91,7 @@
   width: 80px;
   height: 80px;
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.02);
+  background: #ffffff;
   border: 1px solid var(--glass-border);
   overflow: hidden;
   display: flex;
@@ -567,7 +568,7 @@
 
 .recImageWrapper {
   aspect-ratio: 1 / 1;
-  background: #0d0d0d;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
