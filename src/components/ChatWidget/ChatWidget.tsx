@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { animate } from 'animejs';
 import styles from './ChatWidget.module.css';
 
 export default function ChatWidget() {
@@ -10,12 +11,31 @@ export default function ChatWidget() {
     { text: '¡Hola! Bienvenido a Supply Max. ¿En qué puedo ayudarte hoy?', sender: 'bot' }
   ]);
   const [input, setInput] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  // Animate the newest message with Anime.js whenever messages change
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      const msgElements = messagesContainerRef.current.querySelectorAll(`.${styles.msg}`);
+      if (msgElements.length > 0) {
+        const lastMsg = msgElements[msgElements.length - 1];
+        animate(lastMsg, {
+          opacity: [0, 1],
+          translateY: [25, 0],
+          scale: [0.8, 1],
+          duration: 500,
+          ease: 'outElastic(1, 0.75)',
+        });
+      }
+    }
+  }, [messages]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    setMessages([...messages, { text: input, sender: 'user' }]);
+    setMessages(prev => [...prev, { text: input, sender: 'user' }]);
     setInput('');
 
     // Simulate bot response
@@ -38,12 +58,13 @@ export default function ChatWidget() {
             <button className={styles.closeBtn} onClick={() => setChatOpen(false)}>×</button>
           </div>
           
-          <div className={styles.messages}>
+          <div className={styles.messages} ref={messagesContainerRef}>
             {messages.map((m, i) => (
               <div key={i} className={`${styles.msg} ${styles[m.sender]}`}>
                 {m.text}
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
 
           <form className={styles.inputArea} onSubmit={handleSend}>

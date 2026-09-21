@@ -18,9 +18,6 @@ export default function SobreNosotrosPage() {
   return (
     <div className={styles.container}>
       <Header />
-      <SideMenu />
-      <CartDrawer />
-      <ChatWidget />
 
       {/* Ambient background glows */}
       <div className={styles.ambientGlowTop} />

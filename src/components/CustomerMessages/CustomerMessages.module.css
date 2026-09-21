@@ -1,0 +1,547 @@
+.sectionWrapper {
+  padding: 80px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.subheading {
+  color: var(--color-primary, #e2fd52);
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.heading {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-family: 'Oswald', sans-serif;
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.heading span {
+  color: #25d366; /* WhatsApp Green */
+}
+
+.description {
+  color: var(--color-text-muted, #aaa);
+  max-width: 650px;
+  margin: 1rem auto 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Chat Showcase Grid */
+.showcaseGrid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .showcaseGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Clients Selector Sidebar */
+.clientTabs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (max-width: 992px) {
+  .clientTabs {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+}
+
+.clientTabBtn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  min-width: 240px;
+}
+
+.clientTabBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(37, 211, 102, 0.4);
+  transform: translateX(4px);
+}
+
+@media (max-width: 992px) {
+  .clientTabBtn:hover {
+    transform: none;
+  }
+}
+
+.clientTabBtn.activeTab {
+  background: linear-gradient(135deg, rgba(37, 211, 102, 0.15) 0%, rgba(15, 22, 28, 0.9) 100%);
+  border-color: #25d366;
+  box-shadow: 0 0 25px rgba(37, 211, 102, 0.15);
+}
+
+.tabAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #1f2c34;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff;
+  border: 2px solid rgba(37, 211, 102, 0.3);
+  flex-shrink: 0;
+}
+
+.tabInfo {
+  flex: 1;
+}
+
+.tabName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tabPreview {
+  font-size: 0.78rem;
+  color: #8696a0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 170px;
+}
+
+.tabBadge {
+  font-size: 0.65rem;
+  background: rgba(37, 211, 102, 0.2);
+  color: #25d366;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+/* Phone Mockup Window */
+.phoneMockup {
+  background: #0b141a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(37, 211, 102, 0.08);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* WhatsApp Header */
+.waHeader {
+  background: #202c33;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  z-index: 2;
+}
+
+.waUserMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.waAvatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #005c4b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.waDetails h4 {
+  font-size: 0.95rem;
+  color: #e9edef;
+  margin: 0;
+  font-weight: 600;
+}
+
+.waDetails p {
+  font-size: 0.72rem;
+  color: #25d366;
+  margin: 1px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.waActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #aebac1;
+}
+
+.viewScreenshotBtn {
+  background: rgba(37, 211, 102, 0.15);
+  border: 1px solid rgba(37, 211, 102, 0.4);
+  color: #25d366;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.viewScreenshotBtn:hover {
+  background: #25d366;
+  color: #0b141a;
+}
+
+/* WhatsApp Chat Area */
+.chatBody {
+  padding: 24px 20px;
+  min-height: 420px;
+  background-color: #0b141a;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+
+.dateDivider {
+  text-align: center;
+  margin: 6px 0 14px;
+}
+
+.dateDivider span {
+  background: #182229;
+  color: #8696a0;
+  font-size: 0.72rem;
+  padding: 5px 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Chat Message Bubbles */
+.chatBubble {
+  max-width: 82%;
+  padding: 10px 14px 8px 14px;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  will-change: transform, opacity;
+}
+
+.clientBubble {
+  align-self: flex-start;
+  background: #202c33;
+  color: #e9edef;
+  border-bottom-left-radius: 3px;
+}
+
+.supplyBubble {
+  align-self: flex-end;
+  background: #005c4b;
+  color: #e9edef;
+  border-bottom-right-radius: 3px;
+}
+
+.bubbleMeta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 0.68rem;
+  color: #8696a0;
+}
+
+.supplyBubble .bubbleMeta {
+  color: #89c5b6;
+}
+
+.blueCheck {
+  color: #53bdeb;
+}
+
+/* Pago Móvil Graphic Preview */
+.receiptCard {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+}
+
+.receiptHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.receiptBank {
+  color: #e2fd52;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.receiptAmount {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.25rem;
+  color: #25d366;
+  font-weight: 700;
+  margin: 6px 0;
+}
+
+/* Audio Player Bubble */
+.audioBubble {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+  min-width: 200px;
+}
+
+.playBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #25d366;
+  border: none;
+  color: #0b141a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.waveform {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 24px;
+}
+
+.waveBar {
+  width: 3px;
+  background: #8696a0;
+  border-radius: 2px;
+  transition: height 0.2s ease;
+}
+
+.activeBar {
+  background: #25d366;
+}
+
+/* Replay / Animation trigger bar */
+.controlFooter {
+  background: #202c33;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.replayBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e9edef;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.replayBtn:hover {
+  background: #25d366;
+  color: #0b141a;
+  border-color: #25d366;
+}
+
+.animBadge {
+  font-size: 0.72rem;
+  color: #8696a0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.animeJsLogo {
+  color: #e2fd52;
+  font-weight: 700;
+}
+
+/* Modal Lightbox for Full Screenshot */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modalContent {
+  position: relative;
+  max-width: 440px;
+  max-height: 90vh;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.modalClose {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Floating Live Customer Notification Toast */
+.floatingToast {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 9999;
+  background: #111b21;
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  border-radius: 16px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(37, 211, 102, 0.15);
+  max-width: 380px;
+  cursor: pointer;
+  will-change: transform, opacity;
+}
+
+@media (max-width: 600px) {
+  .floatingToast {
+    left: 16px;
+    right: 16px;
+    max-width: none;
+    bottom: 16px;
+  }
+}
+
+.toastIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #005c4b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #25d366;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.toastContent {
+  flex: 1;
+}
+
+.toastSender {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toastText {
+  font-size: 0.78rem;
+  color: #8696a0;
+  margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.toastClose {
+  background: none;
+  border: none;
+  color: #8696a0;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+}

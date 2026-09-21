@@ -3,6 +3,7 @@ import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
 import CartDrawer from '@/components/CartDrawer/CartDrawer';
 import SideMenu from '@/components/SideMenu/SideMenu';
+import ChatWidget from '@/components/ChatWidget/ChatWidget';
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -61,6 +62,7 @@ export default function RootLayout({
           {children}
           <CartDrawer />
           <SideMenu />
+          <ChatWidget />
         </AppProvider>
       </body>
     </html>

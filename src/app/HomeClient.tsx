@@ -9,6 +9,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import styles from './page.module.css';
 import PartnerCarousel from '@/components/PartnerCarousel/PartnerCarousel';
 import PremiumHero from '@/components/PremiumHero/PremiumHero';
+import CustomerMessages from '@/components/CustomerMessages/CustomerMessages';
 
 interface HomeClientProps {
   featuredProducts: any[];
@@ -826,7 +827,10 @@ export default function HomeClient({
         <PartnerCarousel partners={partners} />
       </section>
 
-      {/* 8. Testimonials & Verified Athletes Section */}
+      {/* 8. Real WhatsApp Customer Messages with Anime.js Animation */}
+      <CustomerMessages />
+
+      {/* 8.5 Testimonials & Verified Athletes Section */}
       <section className={styles.testimonials}>
         <div className={styles.sectionHeader}>
           <p>LO QUE DICEN NUESTROS ATLETAS</p>
