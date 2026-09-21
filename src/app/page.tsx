@@ -68,7 +68,7 @@ const DEFAULT_REVIEWS = [
   {
     id: "r5",
     rating: 5,
-    comment: "El bolso deportivo tiene espacio separado para zapatos y los suplementos entran perfectos. Calidad de exportación.",
+    comment: "El bolso tipo saco es súper práctico y cómodo para el gym, entran mis suplementos, el shaker y la toalla perfecto. Excelente calidad.",
     user: { name: "Daniela F." },
     isVerified: true,
   },

@@ -122,7 +122,7 @@ async function main() {
       goal: "ACCESORIO",
       price: 39.99,
       image: "/brand-photos/Suplementos + ropa/Photoroom_20260328_114310.jpg",
-      description: "Bolso de entrenamiento premium. Compartimento aislado para calzado húmedo, espacio para suplementos y costuras reforzadas ultra resistentes.",
+      description: "Bolso deportivo tipo saco, liviano, práctico y resistente para llevar tus suplementos, shaker y ropa de entrenamiento al gimnasio.",
       sizes: "Único"
     }
   ];
@@ -213,7 +213,7 @@ async function main() {
       isVerified: true,
     },
     {
-      comment: "El bolso es muy espacioso, cabe todo el equipo del gimnasio y los compartimentos son súper útiles.",
+      comment: "El bolso tipo saco es súper práctico y cómodo para el gym, entran mis suplementos, el shaker y la toalla perfecto. Excelente calidad.",
       rating: 5,
       isVerified: true,
     }

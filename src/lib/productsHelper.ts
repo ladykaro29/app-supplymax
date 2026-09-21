@@ -156,7 +156,7 @@ export const DEFAULT_APPAREL_PRODUCTS: ProductData[] = [
     goal: "ACCESORIO",
     price: 45.00,
     image: "/brand-products/supplymax-bag.jpg",
-    description: "Bolso impermeable de alta capacidad para gimnasio con compartimento para calzado húmedo.",
+    description: "Bolso deportivo tipo saco, liviano, práctico y resistente para llevar tus suplementos, shaker y ropa de entrenamiento al gimnasio.",
     sizes: "Único",
     stock: 15,
   }
