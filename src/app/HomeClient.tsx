@@ -794,26 +794,89 @@ export default function HomeClient({
       {/* 6. Recruitment Dynamic Conversional Banner */}
       <section className={styles.recruitment}>
         <div className={styles.recruitmentBanner}>
-          <span className={styles.recruitmentBadge}>PROGRAMA DE SINDICATO</span>
-          <h2 className={styles.recruitmentTitle}>
-            ¿Eres Entrenador, Nutricionista o Influencer? <br />
-            <span>Monetiza tu Pasión con SupplyMax</span>
-          </h2>
-          <p className={styles.recruitmentDesc}>
-            Únete a nuestra red de coaches y embajadores. Recomienda suplementación científica respaldada, 
-            provee descuentos masivos a tus asesorados y cobra comisiones directas en dólares cada fin de mes.
-          </p>
-          <div className={styles.recruitmentActions}>
-            <Link href="/join-team">
-              <button className={`${styles.primaryCta} !bg-white !text-zinc-950 font-bold hover:!bg-zinc-200 transition-colors`}>
-                Postularme al Equipo
-              </button>
-            </Link>
-            <Link href="/coaches">
-              <button className={styles.secondaryCta}>
-                Ver Coaches Activos
-              </button>
-            </Link>
+          <div className={styles.recruitmentContent}>
+            <div className={styles.recruitmentBadge}>
+              <span className={styles.badgePulse} />
+              PROGRAMA DE COACHES & EMBAJADORES
+            </div>
+            <h2 className={styles.recruitmentTitle}>
+              ¿Eres Entrenador, Nutricionista o Atleta? <br />
+              <span>Monetiza tu Pasión con SupplyMax</span>
+            </h2>
+            <p className={styles.recruitmentDesc}>
+              Únete a nuestra red oficial de coaches y embajadores. Recomienda suplementación científica de alto estándar, 
+              provee descuentos exclusivos a tus asesorados y cobra comisiones directas en divisas cada fin de mes.
+            </p>
+
+            <div className={styles.recruitmentBenefits}>
+              <div className={styles.benefitItem}>
+                <div className={styles.benefitIcon}>💵</div>
+                <div>
+                  <strong>Comisiones en Dólares</strong>
+                  <span>Pagos directos mensuales</span>
+                </div>
+              </div>
+              <div className={styles.benefitItem}>
+                <div className={styles.benefitIcon}>🏷️</div>
+                <div>
+                  <strong>Código Exclusivo</strong>
+                  <span>Hasta 15% OFF para tus alumnos</span>
+                </div>
+              </div>
+              <div className={styles.benefitItem}>
+                <div className={styles.benefitIcon}>🏆</div>
+                <div>
+                  <strong>Kits & Patrocinio</strong>
+                  <span>Suplementos e indumentaria gratis</span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.recruitmentActions}>
+              <Link href="/join-team" className={styles.primaryRecruitBtn}>
+                <span>POSTULARME AL EQUIPO</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </Link>
+              <Link href="/coaches" className={styles.secondaryRecruitBtn}>
+                <span>VER COACHES ACTIVOS</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+              </Link>
+            </div>
+          </div>
+
+          <div className={styles.recruitmentVisual}>
+            <div className={styles.coachVipCard}>
+              <div className={styles.cardHeader}>
+                <div className={styles.cardBrand}>
+                  <span className={styles.brandDot} />
+                  SUPPLYMAX ATHLETES
+                </div>
+                <span className={styles.tierGoldBadge}>★ NIVEL ORO</span>
+              </div>
+
+              <div className={styles.coachImageWrapper}>
+                <Image 
+                  src="/partners/coach-hero.png" 
+                  alt="Coach Oficial SupplyMax" 
+                  width={380} 
+                  height={380}
+                  className={styles.coachImage}
+                  priority
+                />
+                <div className={styles.imageOverlayGradient} />
+              </div>
+
+              <div className={styles.cardFooter}>
+                <div className={styles.coachMeta}>
+                  <strong>COACH DESTACADO</strong>
+                  <span>Mérida, Venezuela</span>
+                </div>
+                <div className={styles.codePill}>
+                  <span>CÓDIGO:</span>
+                  <code>PRO_COACH</code>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
