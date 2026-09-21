@@ -97,11 +97,9 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               <span className={styles.sectionTitle}>{section.title}</span>
               <nav className={styles.navLinks}>
                 {section.items.map((item) => {
-                  const isActive = pathname === item.href.split('?')[0] && (
-                    item.href.includes('?') 
-                      ? (typeof window !== 'undefined' && window.location.search.includes('new=true'))
-                      : (!item.href.includes('?') && (typeof window === 'undefined' || !window.location.search.includes('new=true')))
-                  );
+                  const itemPath = item.href.split('?')[0];
+                  const hasNewParam = item.href.includes('new=true');
+                  const isActive = pathname === itemPath && (!hasNewParam || pathname === itemPath);
 
                   return (
                     <Link

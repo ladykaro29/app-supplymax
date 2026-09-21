@@ -149,21 +149,25 @@ function EditProductsContent() {
   useEffect(() => {
     if (isMounted) {
       loadProducts();
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('new') === 'true' || window.location.hash === '#new') {
-          setSelectedMargin(50);
-          setCustomFlavor('');
-          setCustomWeight('');
-          setEditingProduct({ ...BLANK_PRODUCT });
-        }
-      }
     }
   }, [isMounted]);
 
   // Allowed Roles (case-insensitive check)
   const allowedRoles = ['admin', 'administrador', 'subgerente', 'administrador de inventarios'];
   
+  const handleCreateNew = () => {
+    setSelectedMargin(50);
+    setCustomFlavor('');
+    setCustomWeight('');
+    setEditingProduct({ ...BLANK_PRODUCT });
+  };
+
+  useEffect(() => {
+    if (isMounted && searchParams.get('new') === 'true') {
+      handleCreateNew();
+    }
+  }, [isMounted, searchParams]);
+
   if (authLoading || !isMounted) {
     return (
       <div className={styles.premiumLoaderContainer}>
@@ -175,7 +179,8 @@ function EditProductsContent() {
     );
   }
 
-  const userRole = (user?.role_id || '').toLowerCase().trim();
+  const rawRole = user?.role_id || (user as any)?.role || '';
+  const userRole = String(rawRole).toLowerCase().trim();
   if (!user || !allowedRoles.includes(userRole)) {
     return (
       <div className={styles.unauthorized}>
@@ -190,19 +195,6 @@ function EditProductsContent() {
       </div>
     );
   }
-
-  const handleCreateNew = () => {
-    setSelectedMargin(50);
-    setCustomFlavor('');
-    setCustomWeight('');
-    setEditingProduct({ ...BLANK_PRODUCT });
-  };
-
-  useEffect(() => {
-    if (isMounted && searchParams.get('new') === 'true') {
-      handleCreateNew();
-    }
-  }, [isMounted, searchParams]);
 
   const handleEdit = (product: Product) => {
     // Parse sizes array if needed

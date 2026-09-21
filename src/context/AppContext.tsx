@@ -118,31 +118,48 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Local Storage Persistence
   useEffect(() => {
-    const savedCart = localStorage.getItem('supplymax_cart');
-    const savedOrders = localStorage.getItem('supplymax_orders');
-    const savedUser = localStorage.getItem('supplymax_user');
-    const savedRate = localStorage.getItem('supplymax_exchange_rate');
-    const savedBcv = localStorage.getItem('supplymax_bcv_info');
-
-    if (savedCart) setCart(JSON.parse(savedCart));
-    if (savedOrders) setOrders(JSON.parse(savedOrders));
-    if (savedBcv) {
-      try {
-        setBcvInfo(JSON.parse(savedBcv));
-      } catch (e) {}
-    }
-    if (savedRate) {
-      const parsedRate = parseFloat(savedRate);
-      if (!isNaN(parsedRate) && parsedRate > 0) {
-        setExchangeRateInternal(parsedRate);
+    try {
+      const savedCart = localStorage.getItem('supplymax_cart');
+      if (savedCart) {
+        try { setCart(JSON.parse(savedCart)); } catch (e) { console.error('Invalid cart in storage:', e); }
       }
+
+      const savedOrders = localStorage.getItem('supplymax_orders');
+      if (savedOrders) {
+        try { setOrders(JSON.parse(savedOrders)); } catch (e) { console.error('Invalid orders in storage:', e); }
+      }
+
+      const savedBcv = localStorage.getItem('supplymax_bcv_info');
+      if (savedBcv) {
+        try { setBcvInfo(JSON.parse(savedBcv)); } catch (e) {}
+      }
+
+      const savedRate = localStorage.getItem('supplymax_exchange_rate');
+      if (savedRate) {
+        const parsedRate = parseFloat(savedRate);
+        if (!isNaN(parsedRate) && parsedRate > 0) {
+          setExchangeRateInternal(parsedRate);
+        }
+      }
+
+      const savedUser = localStorage.getItem('supplymax_user');
+      if (savedUser) {
+        try {
+          const parsed = JSON.parse(savedUser);
+          if (parsed && typeof parsed === 'object') {
+            setUser(parsed);
+            if (parsed.id) fetchOrders(parsed.id);
+          }
+        } catch (e) {
+          console.error('Invalid user in storage:', e);
+          localStorage.removeItem('supplymax_user');
+        }
+      }
+    } catch (storageErr) {
+      console.error('Error accessing localStorage:', storageErr);
+    } finally {
+      setAuthLoading(false);
     }
-    if (savedUser) {
-      const parsed = JSON.parse(savedUser);
-      setUser(parsed);
-      fetchOrders(parsed.id);
-    }
-    setAuthLoading(false);
 
     // Fetch official live BCV rate
     fetchBcvRate();
