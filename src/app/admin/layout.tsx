@@ -1,10 +1,10 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import AdminHeader from '@/components/AdminHeader/AdminHeader';
+import AdminLayoutWrapper from '@/components/AdminLayoutWrapper/AdminLayoutWrapper';
 
 export const metadata: Metadata = {
   title: 'Panel de Administración | SupplyMax',
-  description: 'Gestión integral de inventario, finanzas, afiliados y staff de SupplyMax.',
+  description: 'Gestión integral de inventario, finanzas, afiliados y equipo de SupplyMax.',
 };
 
 export default function AdminLayout({
@@ -13,9 +13,8 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0B0B0B', color: '#FFFFFF' }}>
-      <AdminHeader />
+    <AdminLayoutWrapper>
       {children}
-    </div>
+    </AdminLayoutWrapper>
   );
 }

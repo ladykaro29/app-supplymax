@@ -1,14 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAppContext } from '@/context/AppContext';
 import styles from './AdminHeader.module.css';
 
-export default function AdminHeader() {
-  const { user, logout, exchangeRate, setExchangeRate, setMenuOpen } = useAppContext();
+interface AdminHeaderProps {
+  onToggleSidebar?: () => void;
+}
+
+export default function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
+  const { user, logout, exchangeRate, setExchangeRate } = useAppContext();
   const pathname = usePathname();
 
   // Exchange rate editing state
@@ -33,65 +36,41 @@ export default function AdminHeader() {
     }
   };
 
-  const navItems = [
-    { label: 'Productos', href: '/admin/edit-products', icon: '📦' },
-    { label: 'Agregar Producto', href: '/admin/edit-products?new=true', icon: '➕' },
-    { label: 'Finanzas & Métricas', href: '/admin/performance', icon: '📈' },
-    { label: 'Coaches & Afiliados', href: '/admin/affiliates-and-coaches', icon: '👥' },
-    { label: 'Postulaciones', href: '/admin/applications', icon: '📝' },
-    { label: 'Equipo & Roles', href: '/admin/team', icon: '🛡️' },
-  ];
+  const getPageTitle = () => {
+    if (pathname.includes('/admin/team')) return 'Equipo de Trabajo & Roles';
+    if (pathname.includes('/admin/edit-products')) return 'Catálogo & Inventario';
+    if (pathname.includes('/admin/performance')) return 'Finanzas & Rendimiento';
+    if (pathname.includes('/admin/affiliates-and-coaches')) return 'Coaches & Afiliados';
+    if (pathname.includes('/admin/applications')) return 'Postulaciones Recibidas';
+    return 'Panel de Administración';
+  };
 
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'A';
 
   return (
     <header className={styles.adminHeader}>
       <div className={styles.container}>
-        {/* Brand & Menu Icon */}
-        <div className={styles.brandContainer}>
+        {/* Left: Sidebar Toggle Button & Current Section Title */}
+        <div className={styles.leftSection}>
           <button 
             type="button" 
             className={styles.menuBtn} 
-            onClick={() => setMenuOpen(true)}
-            aria-label="Abrir Menú Principal"
-            title="Abrir Menú de Navegación (Tienda & Admin)"
+            onClick={onToggleSidebar}
+            aria-label="Abrir Menú Lateral"
+            title="Abrir Menú de Navegación Lateral"
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
           </button>
 
-          <Link href="/admin/edit-products" className={styles.brandSection}>
-            <div className={styles.logoWrapper}>
-              <Image 
-                src="/icon-round.png" 
-                alt="SupplyMax Logo" 
-                width={40} 
-                height={40} 
-                className={styles.logoImg}
-              />
-            </div>
-            <div className={styles.brandText}>
-              <span className={styles.brandName}>SUPPLY<span>MAX</span></span>
-              <span className={styles.adminBadge}>MODO ADMINISTRADOR</span>
-            </div>
-          </Link>
+          <div className={styles.pageBreadcrumb}>
+            <span className={styles.breadcrumbPrefix}>PANEL /</span>
+            <h1 className={styles.pageTitle}>{getPageTitle()}</h1>
+          </div>
         </div>
-
-        {/* Central Admin Navigation */}
-        <nav className={styles.navLinks}>
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link 
-                key={item.href} 
-                href={item.href}
-                className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
-              >
-                <span className={styles.navIcon}>{item.icon}</span>
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
 
         {/* Right Actions: Daily Rate Widget, Public Store Link & Session */}
         <div className={styles.rightActions}>
@@ -129,13 +108,14 @@ export default function AdminHeader() {
               </>
             )}
           </div>
+
           <Link 
             href="/" 
             className={styles.storeButton}
             title="Ir a la Tienda Principal"
           >
             <span>🛒</span>
-            <span>Ver Tienda</span>
+            <span className={styles.storeButtonText}>Ver Tienda</span>
           </Link>
 
           <div className={styles.userProfile}>
@@ -143,7 +123,7 @@ export default function AdminHeader() {
               {userInitial}
             </div>
             <div className={styles.userInfo}>
-              <span className={styles.userName}>{user?.name || 'Administrador'}</span>
+              <span className={styles.userName}>{user?.name || 'Admin'}</span>
               <span className={styles.userRole}>{user?.role_id || 'Admin'}</span>
             </div>
             <button 
