@@ -31,8 +31,8 @@ export const PRODUCTS: Product[] = [
     image: "/protein.png",
     description: "Proteína de suero de alta calidad para máxima recuperación muscular.",
     portions: "30",
-    flavor: "Vainilla Ice Cream",
-    weight: "2 lbs",
+    flavor: "Vainilla Ice Cream, Chocolate Suizo",
+    weight: "2 lbs ($49.99), 5 lbs ($89.99)",
     isFeatured: true,
     highlights: ["25g Proteína por servicio", "0g Azúcar añadida"]
   },
@@ -46,8 +46,8 @@ export const PRODUCTS: Product[] = [
     image: "/creatine.png",
     description: "Creatina monohidratada micronizada de grado farmacéutico.",
     portions: "60",
-    flavor: "Unflavored",
-    weight: "300g",
+    flavor: "Unflavored, Fruit Punch",
+    weight: "300g ($34.99), 500g ($49.99), 1 kg ($79.99)",
     isOffer: true,
     discount: 5,
     highlights: ["100% Monohidrato puro"]

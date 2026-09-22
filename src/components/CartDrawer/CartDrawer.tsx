@@ -13,11 +13,13 @@ export default function CartDrawer() {
 
   const vesTotal = cartTotal * exchangeRate;
 
+  const totalUnits = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
   return (
     <div className={styles.overlay} onClick={() => setCartOpen(false)}>
       <div className={styles.drawer} onClick={(e) => e.stopPropagation()}>
         <header className={styles.header}>
-          <h2>TU CARRITO <span>({cart.length})</span></h2>
+          <h2>TU CARRITO <span>({totalUnits})</span></h2>
           <button className={styles.closeBtn} onClick={() => setCartOpen(false)}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
@@ -30,25 +32,35 @@ export default function CartDrawer() {
               <button className={styles.shopBtn} onClick={() => setCartOpen(false)}>EMPEZAR A COMPRAR</button>
             </div>
           ) : (
-            cart.map((item) => (
-              <div key={item.id} className={styles.item}>
-                <div className={styles.imgWrapper}>
-                  <Image src={item.image} alt={item.name} width={70} height={70} />
-                </div>
-                <div className={styles.details}>
-                  <h4>{item.name}</h4>
-                  <div className={styles.priceRow}>
-                    <div className={styles.qtyControls}>
-                       <button onClick={() => updateQuantity(item.id, -1)} className={styles.qtyBtn}>-</button>
-                       <span className={styles.qtyNumber}>{item.quantity}</span>
-                       <button onClick={() => updateQuantity(item.id, 1)} className={styles.qtyBtn}>+</button>
-                    </div>
-                    <span className={styles.itemPrice}>{formatPrice(item.price * item.quantity)}</span>
+            cart.map((item) => {
+              const itemKey = item.cartItemId || `${item.id}-${item.name}-${item.price}`;
+              const itemImage = item.image && item.image.trim() ? item.image : '/protein.png';
+              return (
+                <div key={itemKey} className={styles.item}>
+                  <div className={styles.imgWrapper}>
+                    <Image 
+                      src={itemImage} 
+                      alt={item.name} 
+                      width={70} 
+                      height={70} 
+                      unoptimized={itemImage.startsWith('http') || itemImage.startsWith('data:')}
+                    />
                   </div>
-                  <button onClick={() => removeFromCart(item.id)} className={styles.removeBtn}>ELIMINAR</button>
+                  <div className={styles.details}>
+                    <h4>{item.name}</h4>
+                    <div className={styles.priceRow}>
+                      <div className={styles.qtyControls}>
+                         <button onClick={() => updateQuantity(itemKey, -1)} className={styles.qtyBtn}>-</button>
+                         <span className={styles.qtyNumber}>{item.quantity}</span>
+                         <button onClick={() => updateQuantity(itemKey, 1)} className={styles.qtyBtn}>+</button>
+                      </div>
+                      <span className={styles.itemPrice}>{formatPrice(item.price * item.quantity)}</span>
+                    </div>
+                    <button onClick={() => removeFromCart(itemKey)} className={styles.removeBtn}>ELIMINAR</button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 

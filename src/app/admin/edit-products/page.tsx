@@ -103,6 +103,7 @@ function EditProductsContent() {
   const [selectedMargin, setSelectedMargin] = useState<number>(50);
   const [customFlavor, setCustomFlavor] = useState('');
   const [customWeight, setCustomWeight] = useState('');
+  const [customWeightPrice, setCustomWeightPrice] = useState<string>('');
   const [manualImageUrl, setManualImageUrl] = useState('');
 
   // Filter products based on search term and category pills
@@ -606,13 +607,24 @@ function EditProductsContent() {
     setEditingProduct({ ...editingProduct, flavor: updated });
   };
 
-  const handleAddWeight = (weightToAdd: string) => {
+  const handleAddWeight = (weightToAdd: string, specificPrice?: number | string) => {
     if (!editingProduct || !weightToAdd.trim()) return;
-    const cleaned = weightToAdd.trim();
-    if (currentWeightsList.includes(cleaned)) return;
-    const updated = [...currentWeightsList, cleaned].join(', ');
+    const cleanLabel = weightToAdd.trim().replace(/\s*\(\$?[0-9.]+(?:\s*USD)?\)$/i, '').trim();
+    const priceNum = specificPrice !== undefined && specificPrice !== '' ? parseFloat(String(specificPrice)) : null;
+    const formattedEntry = (priceNum !== null && !isNaN(priceNum) && priceNum > 0)
+      ? `${cleanLabel} ($${priceNum.toFixed(2)})`
+      : cleanLabel;
+
+    // Filter out existing presentation with same label if updating
+    const existingFiltered = currentWeightsList.filter(w => {
+      const existingLabel = w.replace(/\s*\(\$?[0-9.]+(?:\s*USD)?\)$/i, '').trim();
+      return existingLabel.toLowerCase() !== cleanLabel.toLowerCase();
+    });
+
+    const updated = [...existingFiltered, formattedEntry].join(', ');
     setEditingProduct({ ...editingProduct, weight: updated });
     setCustomWeight('');
+    setCustomWeightPrice('');
   };
 
   const handleRemoveWeight = (weightToRemove: string) => {
@@ -1384,27 +1396,49 @@ function EditProductsContent() {
                       )}
                     </div>
 
-                    {/* Add custom weight input */}
-                    <div className={styles.addTagRow}>
+                    {/* Add custom weight input with optional specific price */}
+                    <div className={styles.addTagRow} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       <input 
                         type="text" 
                         className={styles.addTagInput}
+                        style={{ flex: '2 1 180px' }}
                         value={customWeight}
                         onChange={(e) => setCustomWeight(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault();
-                            handleAddWeight(customWeight);
+                            handleAddWeight(customWeight, customWeightPrice);
                           }
                         }}
-                        placeholder="Ej: 300g, 5 lbs, 60 cápsulas, 1 Galón..."
+                        placeholder="Ej: 300g, 500g, 1 kg, 5 lbs..."
                       />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: '1 1 130px' }}>
+                        <span style={{ fontSize: '0.8rem', color: '#25D366', fontWeight: 'bold' }}>$</span>
+                        <input 
+                          type="number" 
+                          step="0.01"
+                          min="0"
+                          className={styles.addTagInput}
+                          style={{ flex: 1, padding: '8px 8px' }}
+                          value={customWeightPrice}
+                          onChange={(e) => setCustomWeightPrice(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddWeight(customWeight, customWeightPrice);
+                            }
+                          }}
+                          placeholder="Precio USD (opc.)"
+                          title="Precio de venta específico para esta presentación"
+                        />
+                      </div>
                       <button 
                         type="button" 
                         className={styles.addTagBtn}
-                        onClick={() => handleAddWeight(customWeight)}
+                        onClick={() => handleAddWeight(customWeight, customWeightPrice)}
+                        style={{ borderColor: '#25D366', color: '#25D366', background: 'rgba(37, 211, 102, 0.08)' }}
                       >
-                        + Agregar Presentación
+                        + Agregar con Precio
                       </button>
                     </div>
 

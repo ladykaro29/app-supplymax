@@ -819,7 +819,7 @@ export default function CheckoutPage() {
           <h3>RESUMEN DE ORDEN</h3>
           <div className={styles.summaryList}>
             {cart.map((i) => (
-              <div key={i.id} className={styles.summaryItem}>
+              <div key={i.cartItemId || `${i.id}-${i.name}-${i.price}`} className={styles.summaryItem}>
                 <span>
                   {i.name} x{i.quantity}
                 </span>

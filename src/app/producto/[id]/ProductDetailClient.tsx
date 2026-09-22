@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import Image from 'next/image';
 import Link from 'next/link';
+import { parseWeightOptions, WeightOption } from '@/lib/weightHelper';
 import styles from './ProductDetail.module.css';
 
 interface ProductDetailClientProps {
@@ -17,7 +18,7 @@ export default function ProductDetailClient({
   reviews, 
   recommendations 
 }: ProductDetailClientProps) {
-  const { addToCart, formatPrice } = useAppContext();
+  const { addToCart, formatPrice, exchangeRate } = useAppContext();
   const [quantity, setQuantity] = useState(1);
   const [activeThumb, setActiveThumb] = useState(0);
 
@@ -25,28 +26,42 @@ export default function ProductDetailClient({
   const [showSpecs, setShowSpecs] = useState(false);
   const [showShipping, setShowShipping] = useState(false);
 
-  // Normalize flavors and sizes to arrays
+  // Base price
+  const basePrice = Number(product.price) || 0;
+
+  // Normalize flavors
   const flavorsArr = Array.isArray(product.flavors) 
     ? product.flavors 
     : (product.flavor ? product.flavor.split(',').map((s: string) => s.trim()) : []);
-    
+
+  // Weight options with dynamic pricing
+  const weightOptions: WeightOption[] = parseWeightOptions(product.weight, basePrice);
+
+  // Clothing sizes
   const sizesArr = Array.isArray(product.sizes)
     ? product.sizes
     : (typeof product.sizes === 'string' ? product.sizes.split(',').map((s: string) => s.trim()) : []);
 
   const [selectedFlavor, setSelectedFlavor] = useState(flavorsArr[0] || '');
+  const [selectedWeight, setSelectedWeight] = useState<WeightOption | null>(weightOptions[0] || null);
   const [selectedSize, setSelectedSize] = useState(sizesArr[0] || '');
   const [copiedLink, setCopiedLink] = useState(false);
 
+  // Active unit price calculated from selected weight or base price
+  const currentUnitPrice = selectedWeight?.price !== undefined ? selectedWeight.price : basePrice;
+  const discountVal = (product.isOffer && product.discount) ? Number(product.discount) : 0;
+  const activeFinalPrice = Math.max(0, currentUnitPrice - discountVal);
+
   const handleShareWhatsApp = () => {
     const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
-    const priceFormatted = (Number(product.price) || 0).toFixed(2);
-    const shareText = `🔥 *${product.name}*\n💰 Precio: $${priceFormatted} USD\n\n👉 Mira todos los detalles y fotos aquí:\n${currentUrl}`;
+    const priceFormatted = activeFinalPrice.toFixed(2);
+    const weightText = selectedWeight ? ` [${selectedWeight.label}]` : '';
+    const shareText = `🔥 *${product.name}*${weightText}\n💰 Precio: $${priceFormatted} USD\n\n👉 Mira todos los detalles y fotos aquí:\n${currentUrl}`;
 
     if (typeof navigator !== 'undefined' && navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
       navigator.share({
         title: product.name,
-        text: `🔥 ${product.name} - $${priceFormatted} USD en SupplyMax`,
+        text: `🔥 ${product.name}${weightText} - $${priceFormatted} USD en SupplyMax`,
         url: currentUrl,
       }).catch(() => {
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
@@ -65,17 +80,27 @@ export default function ProductDetailClient({
   };
 
   const handleAddToCart = () => {
-    // Construct variant name if applicable
-    const variantName = [selectedFlavor, selectedSize].filter(Boolean).join(' - ');
+    // Construct variant tags: Flavor and Weight/Presentation or Clothing Size
+    const variantParts = [
+      selectedFlavor,
+      selectedWeight ? selectedWeight.label : '',
+      selectedSize
+    ].filter(Boolean);
+
+    const variantName = variantParts.join(' - ');
+    const fullName = variantName ? `${product.name} (${variantName})` : product.name;
+    const cartItemId = `${product.id}-${fullName}-${activeFinalPrice}`;
+
     const productWithVariant = {
       ...product,
-      name: variantName ? `${product.name} (${variantName})` : product.name
+      name: fullName,
+      price: activeFinalPrice,
+      weight: selectedWeight ? selectedWeight.label : product.weight,
+      cartItemId,
     };
 
-    for (let i = 0; i < quantity; i++) {
-      addToCart(productWithVariant);
-    }
-    alert(`${quantity} x "${product.name}" añadido al carrito.`);
+    addToCart(productWithVariant, quantity);
+    alert(`✓ ${quantity} x "${fullName}" añadido al carrito por ${formatPrice(activeFinalPrice * quantity)}.`);
   };
 
   // Map real review photos for community reviews
@@ -168,14 +193,15 @@ export default function ProductDetailClient({
           
           <div className={styles.priceContainer}>
             <div className={styles.mainPrice}>
-              {product.isOffer && product.discount ? formatPrice(product.price - product.discount) : formatPrice(product.price)}
+              {formatPrice(activeFinalPrice)}
             </div>
-            {product.isOffer && product.discount && (
-              <div className={styles.oldPrice}>{formatPrice(product.price)}</div>
+            {product.isOffer && discountVal > 0 && (
+              <div className={styles.oldPrice}>{formatPrice(currentUnitPrice)}</div>
             )}
-            {product.durationInDays && (
-              <div className={styles.vesConversion}>Rinde aprox: {product.durationInDays} días</div>
-            )}
+            <div className={styles.vesConversion}>
+              Bs. {(activeFinalPrice * (exchangeRate || 60)).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {product.durationInDays && <span> • Rinde aprox: {product.durationInDays} días</span>}
+            </div>
           </div>
 
           <p className={styles.description}>
@@ -184,6 +210,42 @@ export default function ProductDetailClient({
 
           {/* Variants Selectors */}
           <div className={styles.variationSection}>
+            {/* Weight / Presentation Selector (with dynamic price) */}
+            {weightOptions.length > 0 && (
+              <div className={styles.variantGroup}>
+                <span className={styles.variationTitle}>
+                  PRESENTACIÓN / PESO: {selectedWeight ? selectedWeight.label : 'Base'}
+                </span>
+                <div className={styles.variationGrid}>
+                  {weightOptions.map((w) => {
+                    const isSelected = selectedWeight?.label === w.label;
+                    return (
+                      <button 
+                        key={w.label} 
+                        type="button"
+                        className={`${styles.varBtn} ${isSelected ? styles.activeVar : ''}`}
+                        onClick={() => setSelectedWeight(w)}
+                        title={`Seleccionar ${w.label} - ${formatPrice(w.price ?? basePrice)}`}
+                      >
+                        <span>{w.label}</span>
+                        {w.price !== undefined && (
+                          <span style={{ 
+                            marginLeft: '6px', 
+                            fontSize: '0.8rem', 
+                            color: isSelected ? '#00e5ff' : 'rgba(255, 255, 255, 0.6)',
+                            fontWeight: 600
+                          }}>
+                            (${w.price.toFixed(2)})
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Flavor Selector */}
             {flavorsArr.length > 0 && (
               <div className={styles.variantGroup}>
                 <span className={styles.variationTitle}>SABOR SELECCIONADO: {selectedFlavor}</span>
@@ -191,6 +253,7 @@ export default function ProductDetailClient({
                   {flavorsArr.map((f: string) => (
                     <button 
                       key={f} 
+                      type="button"
                       className={`${styles.varBtn} ${selectedFlavor === f ? styles.activeVar : ''}`}
                       onClick={() => setSelectedFlavor(f)}
                     >
@@ -201,13 +264,15 @@ export default function ProductDetailClient({
               </div>
             )}
 
+            {/* Clothing Size Selector */}
             {sizesArr.length > 0 && (
               <div className={styles.variantGroup}>
-                <span className={styles.variationTitle}>PRESENTACIÓN / TALLA: {selectedSize}</span>
+                <span className={styles.variationTitle}>TALLA: {selectedSize}</span>
                 <div className={styles.variationGrid}>
                   {sizesArr.map((s: string) => (
                     <button 
                       key={s} 
+                      type="button"
                       className={`${styles.varBtn} ${selectedSize === s ? styles.activeVar : ''}`}
                       onClick={() => setSelectedSize(s)}
                     >

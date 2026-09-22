@@ -39,12 +39,12 @@ export const DEFAULT_FEATURED_PRODUCTS: ProductData[] = [
     isFeatured: true,
     portions: "70",
     flavor: "Vainilla, Chocolate",
-    weight: "2.2kg, 5 lbs",
+    weight: "2.2kg ($65.00), 5 lbs ($95.00)",
     stock: 25,
   },
   {
     id: 102,
-    name: "Creatine Micronized 300g",
+    name: "Creatine Micronized",
     slug: "creatine-micronized-300g",
     category: "Creatinas",
     goal: "OFERTA",
@@ -54,7 +54,7 @@ export const DEFAULT_FEATURED_PRODUCTS: ProductData[] = [
     image: "/brand-photos/Suplementos/IMG-20260513-WA0017.jpg",
     description: "Creatina monohidratada pura para aumento de fuerza y potencia celular.",
     isFeatured: true,
-    weight: "300g",
+    weight: "300g ($35.00), 500g ($52.00), 1 kg ($85.00)",
     stock: 30,
   },
   {

@@ -35,7 +35,8 @@ interface User {
   addresses: Address[];
 }
 
-interface CartItem extends Product {
+export interface CartItem extends Product {
+  cartItemId?: string;
   quantity: number;
 }
 
@@ -69,9 +70,9 @@ interface AppContextType {
   formatPrice: (usdPrice: number) => string;
   login: (userData: any) => void;
   logout: () => void;
-  addToCart: (product: Product) => void;
-  updateQuantity: (productId: number, amount: number) => void;
-  removeFromCart: (productId: number) => void;
+  addToCart: (product: Product, quantity?: number) => void;
+  updateQuantity: (idOrCartItemId: number | string, amount: number) => void;
+  removeFromCart: (idOrCartItemId: number | string) => void;
   addAddress: (label: string, value: string) => void;
   removeAddress: (id: string) => void;
   clearCart: () => void;
@@ -257,22 +258,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setUser({ ...user, addresses: user.addresses.filter(a => a.id !== id) });
   };
 
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, quantityToAdd: number = 1) => {
+    const qty = Math.max(1, quantityToAdd);
+    // Generate unique key based on id, variant name, and price
+    const uniqueKey = (product as any).cartItemId || `${product.id}-${product.name}-${product.price}`;
+
     setCart(prev => {
-      const existing = prev.find(item => item.id === product.id);
+      const existing = prev.find(item => (item.cartItemId || `${item.id}-${item.name}-${item.price}`) === uniqueKey);
       if (existing) {
-        return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+        return prev.map(item => {
+          const itemKey = item.cartItemId || `${item.id}-${item.name}-${item.price}`;
+          return itemKey === uniqueKey ? { ...item, quantity: item.quantity + qty } : item;
+        });
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, cartItemId: uniqueKey, quantity: qty }];
     });
   };
 
-  const updateQuantity = (productId: number, amount: number) => {
+  const updateQuantity = (idOrCartItemId: number | string, amount: number) => {
     setCart(prev => {
       return prev.map(item => {
-        if (item.id === productId) {
+        const itemKey = item.cartItemId || `${item.id}-${item.name}-${item.price}`;
+        const matches = typeof idOrCartItemId === 'string'
+          ? (item.cartItemId === idOrCartItemId || itemKey === idOrCartItemId)
+          : (item.id === idOrCartItemId);
+
+        if (matches) {
           const newQty = item.quantity + amount;
-          // Floor validation: remove if <= 0
           return newQty > 0 ? { ...item, quantity: newQty } : null;
         }
         return item;
@@ -280,8 +292,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const removeFromCart = (productId: number) => {
-    setCart(prev => prev.filter(item => item.id !== productId));
+  const removeFromCart = (idOrCartItemId: number | string) => {
+    setCart(prev => prev.filter(item => {
+      const itemKey = item.cartItemId || `${item.id}-${item.name}-${item.price}`;
+      if (typeof idOrCartItemId === 'string') {
+        return item.cartItemId !== idOrCartItemId && itemKey !== idOrCartItemId;
+      }
+      return item.id !== idOrCartItemId;
+    }));
   };
 
   const clearCart = () => setCart([]);
