@@ -108,3 +108,14 @@ button {
   margin: 0 auto;
   padding: 0 5%;
 }
+
+/* Global Select & Dropdown Styling */
+select {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #1a1c23 !important;
+  color: #ffffff !important;
+  padding: 8px 12px;
+}
