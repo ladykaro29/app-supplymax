@@ -160,9 +160,89 @@ const INITIAL_PRODUCTS = [
   }
 ];
 
+function toSafeFloat(val: any, fallback: number | null = null): number | null {
+  if (val === undefined || val === null || val === '') return fallback;
+  const str = typeof val === 'string' ? val.replace(/,/g, '.').trim() : String(val);
+  if (!str) return fallback;
+  const num = Number(str);
+  return Number.isFinite(num) ? num : fallback;
+}
+
+function toSafeInt(val: any, fallback: number = 10): number {
+  if (val === undefined || val === null || val === '') return fallback;
+  const num = parseInt(String(val).trim(), 10);
+  return Number.isFinite(num) ? num : fallback;
+}
+
+function toSafeStr(val: any, fallback: string | null = null): string | null {
+  if (val === undefined || val === null) return fallback;
+  const trimmed = String(val).trim();
+  return trimmed.length > 0 ? trimmed : fallback;
+}
+
+function sanitizeJsonPayload<T extends Record<string, any>>(obj: T): Record<string, any> {
+  const clean: Record<string, any> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v === undefined) continue;
+    if (typeof v === 'number' && !Number.isFinite(v)) continue;
+    if (typeof v === 'bigint') {
+      clean[k] = Number(v);
+      continue;
+    }
+    clean[k] = v;
+  }
+  return clean;
+}
+
+let schemaChecked = false;
+async function ensureProductTableSchema() {
+  if (schemaChecked) return;
+  try {
+    const columns: Array<{ name: string }> = await prisma.$queryRawUnsafe(`PRAGMA table_info("Product")`);
+    const existing = new Set((columns || []).map(c => c.name));
+
+    const alterStatements: Array<[string, string]> = [
+      ['slug', `ALTER TABLE "Product" ADD COLUMN "slug" TEXT`],
+      ['goal', `ALTER TABLE "Product" ADD COLUMN "goal" TEXT DEFAULT ''`],
+      ['purchasePrice', `ALTER TABLE "Product" ADD COLUMN "purchasePrice" REAL`],
+      ['images', `ALTER TABLE "Product" ADD COLUMN "images" TEXT`],
+      ['portions', `ALTER TABLE "Product" ADD COLUMN "portions" TEXT`],
+      ['flavor', `ALTER TABLE "Product" ADD COLUMN "flavor" TEXT`],
+      ['weight', `ALTER TABLE "Product" ADD COLUMN "weight" TEXT`],
+      ['sizes', `ALTER TABLE "Product" ADD COLUMN "sizes" TEXT`],
+      ['durationInDays', `ALTER TABLE "Product" ADD COLUMN "durationInDays" TEXT`],
+      ['isFeatured', `ALTER TABLE "Product" ADD COLUMN "isFeatured" BOOLEAN NOT NULL DEFAULT 0`],
+      ['isOffer', `ALTER TABLE "Product" ADD COLUMN "isOffer" BOOLEAN NOT NULL DEFAULT 0`],
+      ['discount', `ALTER TABLE "Product" ADD COLUMN "discount" REAL`],
+      ['stock', `ALTER TABLE "Product" ADD COLUMN "stock" INTEGER NOT NULL DEFAULT 10`],
+      ['supplierName', `ALTER TABLE "Product" ADD COLUMN "supplierName" TEXT`],
+      ['purchaseType', `ALTER TABLE "Product" ADD COLUMN "purchaseType" TEXT DEFAULT 'CONTADO'`],
+      ['creditDueDate', `ALTER TABLE "Product" ADD COLUMN "creditDueDate" TEXT`],
+      ['creditDebt', `ALTER TABLE "Product" ADD COLUMN "creditDebt" REAL`],
+      ['creditPaid', `ALTER TABLE "Product" ADD COLUMN "creditPaid" BOOLEAN DEFAULT 0`],
+    ];
+
+    for (const [colName, sql] of alterStatements) {
+      if (existing.size > 0 && !existing.has(colName)) {
+        try {
+          await prisma.$executeRawUnsafe(sql);
+          console.log(`[DB AUTO-MIGRATE] Added missing column Product.${colName}`);
+        } catch (alterErr) {
+          console.warn(`[DB AUTO-MIGRATE] Notice adding ${colName}:`, alterErr);
+        }
+      }
+    }
+    schemaChecked = true;
+  } catch (err) {
+    console.warn('[DB AUTO-MIGRATE] Could not inspect Product table:', err);
+  }
+}
+
 // GET: Fetch all products from SQLite (with auto-initialization fallback)
 export async function GET() {
   try {
+    await ensureProductTableSchema();
+
     let products = await prisma.product.findMany({
       orderBy: { id: 'asc' }
     });
@@ -172,7 +252,7 @@ export async function GET() {
       console.log('[API PRODUCTS] Database is empty, populating initial catalog...');
       for (const item of INITIAL_PRODUCTS) {
         try {
-          await prisma.product.create({ data: item as any });
+          await prisma.product.create({ data: sanitizeJsonPayload(item) as any });
         } catch (itemErr) {
           console.warn('[API PRODUCTS] Full item creation failed, falling back to core fields:', itemErr);
           try {
@@ -196,8 +276,8 @@ export async function GET() {
       });
     }
 
-    // Ensure all returned products have a valid SEO slug
-    const productsWithSlug = products.map(p => ({
+    // Ensure all returned products have a valid SEO slug and are JSON-serializable
+    const productsWithSlug = products.map(p => sanitizeJsonPayload({
       ...p,
       slug: (p as any).slug || slugify(p.name) || String(p.id)
     }));
@@ -215,6 +295,8 @@ export async function GET() {
 // POST: Create (register) a new product
 export async function POST(request: Request) {
   try {
+    await ensureProductTableSchema();
+
     const body = await request.json();
     const {
       name,
@@ -241,9 +323,13 @@ export async function POST(request: Request) {
       slug,
     } = body;
 
-    if (!name || !category || price === undefined || price === null) {
+    const cleanName = toSafeStr(name);
+    const cleanCategory = toSafeStr(category);
+    const cleanPrice = toSafeFloat(price);
+
+    if (!cleanName || !cleanCategory || cleanPrice === null || cleanPrice <= 0) {
       return NextResponse.json(
-        { error: 'El nombre, la categoría y el precio de venta son requeridos.' },
+        { error: 'El nombre, la categoría y un precio de venta válido (> 0) son requeridos.' },
         { status: 400 }
       );
     }
@@ -251,7 +337,7 @@ export async function POST(request: Request) {
     // Compute unique SEO slug safely
     let candidateSlug: string | undefined = undefined;
     try {
-      let rawSlug = slug ? slugify(slug) : slugify(name);
+      let rawSlug = slug ? slugify(String(slug)) : slugify(cleanName);
       if (!rawSlug) rawSlug = `producto-${Date.now()}`;
       candidateSlug = rawSlug;
       let counter = 1;
@@ -260,24 +346,25 @@ export async function POST(request: Request) {
         candidateSlug = `${rawSlug}-${counter}`;
       }
     } catch {
-      // If DB or Prisma client does not have slug column/argument yet, avoid crashing
       candidateSlug = undefined;
     }
 
     // Process sizes if it's an array
-    let processedSizes = '';
+    let processedSizes: string | null = null;
     if (Array.isArray(sizes)) {
-      processedSizes = sizes.join(',');
-    } else if (typeof sizes === 'string') {
-      processedSizes = sizes;
+      const joined = sizes.map(s => String(s).trim()).filter(Boolean).join(',');
+      processedSizes = joined.length > 0 ? joined : null;
+    } else if (typeof sizes === 'string' && sizes.trim().length > 0) {
+      processedSizes = sizes.trim();
     }
 
     // Process images array (up to 10 images)
-    let processedImages = '';
-    let primaryImage = image ? String(image).trim() : '/protein.png';
+    let processedImages: string | null = null;
+    let primaryImage = toSafeStr(image, '/protein.png') || '/protein.png';
     if (Array.isArray(body.images) && body.images.length > 0) {
       const validImages = body.images
         .filter((img: any) => typeof img === 'string' && img.trim().length > 0)
+        .map((img: string) => img.trim())
         .slice(0, 10);
       if (validImages.length > 0) {
         processedImages = JSON.stringify(validImages);
@@ -287,96 +374,129 @@ export async function POST(request: Request) {
       processedImages = body.images.trim();
     }
 
-    const processedGoal = goal && typeof goal === 'string' ? goal.trim() : (goal ? String(goal).trim() : '');
-
-    const createData: any = {
-      name: name.trim(),
+    const createData: Record<string, any> = sanitizeJsonPayload({
+      name: cleanName,
       ...(candidateSlug ? { slug: candidateSlug } : {}),
-      category: category.trim(),
-      goal: processedGoal,
-      price: parseFloat(price),
+      category: cleanCategory,
+      goal: toSafeStr(goal, '') ?? '',
+      price: cleanPrice,
       image: primaryImage,
-      description: description ? description.trim() : '',
-      isFeatured: !!isFeatured,
-      isOffer: !!isOffer,
-      discount: discount !== undefined && discount !== null ? parseFloat(discount) : null,
-      stock: stock !== undefined && stock !== null ? parseInt(stock) : 10,
-      portions: portions ? portions.trim() : null,
-      flavor: flavor ? flavor.trim() : null,
-      weight: weight ? weight.trim() : null,
-      sizes: processedSizes ? processedSizes.trim() : null,
-      durationInDays: durationInDays ? durationInDays.trim() : null,
-      purchasePrice: purchasePrice !== undefined && purchasePrice !== null ? parseFloat(purchasePrice) : null,
-      images: processedImages || (primaryImage ? JSON.stringify([primaryImage]) : null),
-      supplierName: supplierName ? supplierName.trim() : null,
+      description: toSafeStr(description, '') ?? '',
+      isFeatured: Boolean(isFeatured),
+      isOffer: Boolean(isOffer),
+      discount: toSafeFloat(discount, null),
+      stock: toSafeInt(stock, 10),
+      portions: toSafeStr(portions, null),
+      flavor: toSafeStr(flavor, null),
+      weight: toSafeStr(weight, null),
+      sizes: processedSizes,
+      durationInDays: toSafeStr(durationInDays, null),
+      purchasePrice: toSafeFloat(purchasePrice, null),
+      images: processedImages || JSON.stringify([primaryImage]),
+      supplierName: toSafeStr(supplierName, null),
       purchaseType: purchaseType === 'CREDITO' ? 'CREDITO' : 'CONTADO',
-      creditDueDate: creditDueDate ? creditDueDate.trim() : null,
-      creditDebt: creditDebt !== undefined && creditDebt !== null ? parseFloat(creditDebt) : null,
-      creditPaid: !!creditPaid,
-    };
+      creditDueDate: toSafeStr(creditDueDate, null),
+      creditDebt: toSafeFloat(creditDebt, null),
+      creditPaid: Boolean(creditPaid),
+    });
 
-    let newProduct;
-    let createAttempts = 0;
-    while (createAttempts < 15) {
-      createAttempts++;
+    let newProduct: any = null;
+    let lastError: any = null;
+
+    // Strategy 1: Try full create, stripping any unknown Prisma arguments dynamically
+    const workingData = { ...createData };
+    for (let attempt = 0; attempt < 25; attempt++) {
       try {
-        newProduct = await prisma.product.create({ data: createData });
-        break;
+        newProduct = await prisma.product.create({ data: sanitizeJsonPayload(workingData) as any });
+        if (newProduct) break;
       } catch (err: any) {
-        const msg = err.message || '';
-        const match = msg.match(/Unknown argument [`']([a-zA-Z0-9_]+)[`']/);
-        if (match && match[1] && createData[match[1]] !== undefined) {
+        lastError = err;
+        const msg = String(err?.message || '');
+        const match = msg.match(/Unknown argument [`'"]?([a-zA-Z0-9_]+)[`'"]?/);
+        if (match && match[1] && workingData[match[1]] !== undefined) {
           console.warn(`[API PRODUCTS POST] Stripping unsupported argument '${match[1]}' and retrying...`);
-          delete createData[match[1]];
+          delete workingData[match[1]];
           continue;
         }
-
-        if (createAttempts === 1) {
-          delete createData.purchasePrice;
-          delete createData.images;
-          delete createData.supplierName;
-          delete createData.purchaseType;
-          delete createData.creditDueDate;
-          delete createData.creditDebt;
-          delete createData.creditPaid;
-          delete createData.slug;
-          continue;
-        }
-
-        if (createAttempts === 2) {
-          delete createData.isFeatured;
-          delete createData.isOffer;
-          delete createData.discount;
-          delete createData.stock;
-          delete createData.durationInDays;
-          delete createData.portions;
-          delete createData.flavor;
-          delete createData.weight;
-          delete createData.sizes;
-          continue;
-        }
-
-        if (createAttempts === 3) {
-          const minimalData: any = {
-            name: createData.name,
-            category: createData.category,
-            price: createData.price,
-            image: createData.image,
-            description: createData.description
-          };
-          newProduct = await prisma.product.create({ data: minimalData });
-          break;
-        }
-
-        throw err;
+        break;
       }
     }
 
-    return NextResponse.json(newProduct, { status: 201 });
+    // Strategy 2: Progressive fallback tiers if Strategy 1 failed
+    if (!newProduct) {
+      const tiers: Array<Record<string, any>> = [
+        {
+          name: cleanName,
+          category: cleanCategory,
+          goal: toSafeStr(goal, '') ?? '',
+          price: cleanPrice,
+          image: primaryImage,
+          description: toSafeStr(description, '') ?? '',
+          isFeatured: Boolean(isFeatured),
+          isOffer: Boolean(isOffer),
+          discount: toSafeFloat(discount, null),
+          stock: toSafeInt(stock, 10),
+          portions: toSafeStr(portions, null),
+          flavor: toSafeStr(flavor, null),
+          weight: toSafeStr(weight, null),
+          sizes: processedSizes,
+          durationInDays: toSafeStr(durationInDays, null),
+        },
+        {
+          name: cleanName,
+          category: cleanCategory,
+          goal: toSafeStr(goal, '') ?? '',
+          price: cleanPrice,
+          image: primaryImage,
+          description: toSafeStr(description, '') ?? '',
+        },
+      ];
+
+      for (const tierData of tiers) {
+        try {
+          newProduct = await prisma.product.create({ data: sanitizeJsonPayload(tierData) as any });
+          if (newProduct) break;
+        } catch (err) {
+          lastError = err;
+        }
+      }
+    }
+
+    // Strategy 3: Direct SQLite raw INSERT fallback if Prisma client schema is out of sync with DB
+    if (!newProduct) {
+      try {
+        await prisma.$executeRawUnsafe(
+          `INSERT INTO "Product" ("name", "category", "goal", "price", "image", "description", "updatedAt") VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          cleanName,
+          cleanCategory,
+          toSafeStr(goal, '') ?? '',
+          cleanPrice,
+          primaryImage,
+          toSafeStr(description, '') ?? ''
+        );
+        const rows: any[] = await prisma.$queryRawUnsafe(
+          `SELECT * FROM "Product" ORDER BY "id" DESC LIMIT 1`
+        );
+        newProduct = (rows && rows[0]) ? rows[0] : { id: Date.now(), ...createData };
+      } catch (rawErr) {
+        lastError = rawErr;
+      }
+    }
+
+    if (!newProduct) {
+      throw lastError || new Error('No se pudo insertar el producto en la base de datos.');
+    }
+
+    const safeResponse = sanitizeJsonPayload({
+      ...newProduct,
+      name: newProduct.name || cleanName,
+    });
+
+    return NextResponse.json(safeResponse, { status: 201 });
   } catch (error: any) {
     console.error('[API PRODUCTS POST ERROR]:', error);
     return NextResponse.json(
-      { error: `Error al crear el producto: ${error.message || 'Desconocido'}` },
+      { error: `Error al crear el producto: ${error?.message || 'Desconocido'}` },
       { status: 500 }
     );
   }
@@ -385,6 +505,8 @@ export async function POST(request: Request) {
 // PUT: Update an existing product
 export async function PUT(request: Request) {
   try {
+    await ensureProductTableSchema();
+
     const body = await request.json();
     const {
       id,
@@ -412,53 +534,59 @@ export async function PUT(request: Request) {
       slug,
     } = body;
 
-    if (!id) {
+    const productId = toSafeInt(id, 0);
+    if (!productId) {
       return NextResponse.json(
         { error: 'El ID del producto es requerido para realizar la actualización.' },
         { status: 400 }
       );
     }
 
-    if (!name || !category || price === undefined || price === null) {
+    const cleanName = toSafeStr(name);
+    const cleanCategory = toSafeStr(category);
+    const cleanPrice = toSafeFloat(price);
+
+    if (!cleanName || !cleanCategory || cleanPrice === null || cleanPrice <= 0) {
       return NextResponse.json(
-        { error: 'El nombre, la categoría y el precio de venta son requeridos.' },
+        { error: 'El nombre, la categoría y un precio de venta válido (> 0) son requeridos.' },
         { status: 400 }
       );
     }
 
     // Compute unique SEO slug if changed or provided
     let candidateSlug: string | undefined = undefined;
-    if (slug || name) {
-      let rawSlug = slug ? slugify(slug) : slugify(name);
+    if (slug || cleanName) {
+      const rawSlug = slug ? slugify(String(slug)) : slugify(cleanName);
       if (rawSlug) {
         try {
           candidateSlug = rawSlug;
           let counter = 1;
-          while (await (prisma.product as any).findFirst({ where: { slug: candidateSlug, NOT: { id: parseInt(id) } } })) {
+          while (await (prisma.product as any).findFirst({ where: { slug: candidateSlug, NOT: { id: productId } } })) {
             counter++;
             candidateSlug = `${rawSlug}-${counter}`;
           }
         } catch {
-          // If slug column or argument is not supported in the database/Prisma schema yet, ignore safely
           candidateSlug = undefined;
         }
       }
     }
 
     // Process sizes if it's an array
-    let processedSizes = '';
+    let processedSizes: string | null = null;
     if (Array.isArray(sizes)) {
-      processedSizes = sizes.join(',');
-    } else if (typeof sizes === 'string') {
-      processedSizes = sizes;
+      const joined = sizes.map(s => String(s).trim()).filter(Boolean).join(',');
+      processedSizes = joined.length > 0 ? joined : null;
+    } else if (typeof sizes === 'string' && sizes.trim().length > 0) {
+      processedSizes = sizes.trim();
     }
 
     // Process images array (up to 10 images)
-    let processedImages = '';
-    let primaryImage = image ? String(image).trim() : '/protein.png';
+    let processedImages: string | null = null;
+    let primaryImage = toSafeStr(image, '/protein.png') || '/protein.png';
     if (Array.isArray(body.images) && body.images.length > 0) {
       const validImages = body.images
         .filter((img: any) => typeof img === 'string' && img.trim().length > 0)
+        .map((img: string) => img.trim())
         .slice(0, 10);
       if (validImages.length > 0) {
         processedImages = JSON.stringify(validImages);
@@ -468,112 +596,135 @@ export async function PUT(request: Request) {
       processedImages = body.images.trim();
     }
 
-    const processedGoal = goal && typeof goal === 'string' ? goal.trim() : (goal ? String(goal).trim() : '');
-
-    const updateData: any = {
-      name: name.trim(),
-      category: category.trim(),
-      goal: processedGoal,
-      price: parseFloat(price),
+    const updateData: Record<string, any> = sanitizeJsonPayload({
+      name: cleanName,
+      ...(candidateSlug ? { slug: candidateSlug } : {}),
+      category: cleanCategory,
+      goal: toSafeStr(goal, '') ?? '',
+      price: cleanPrice,
       image: primaryImage,
-      description: description ? description.trim() : '',
-      isFeatured: !!isFeatured,
-      isOffer: !!isOffer,
-      discount: discount !== undefined && discount !== null ? parseFloat(discount) : null,
-      stock: stock !== undefined && stock !== null ? parseInt(stock) : 10,
-      portions: portions !== undefined ? (portions ? portions.trim() : null) : undefined,
-      flavor: flavor !== undefined ? (flavor ? flavor.trim() : null) : undefined,
-      weight: weight !== undefined ? (weight ? weight.trim() : null) : undefined,
-      sizes: processedSizes !== undefined ? (processedSizes ? processedSizes.trim() : null) : undefined,
-      durationInDays: durationInDays !== undefined ? (durationInDays ? durationInDays.trim() : null) : undefined,
-      purchasePrice: purchasePrice !== undefined && purchasePrice !== null ? parseFloat(purchasePrice) : null,
-      images: processedImages || (primaryImage ? JSON.stringify([primaryImage]) : null),
-      supplierName: supplierName !== undefined ? (supplierName ? supplierName.trim() : null) : undefined,
-      purchaseType: purchaseType !== undefined ? (purchaseType === 'CREDITO' ? 'CREDITO' : 'CONTADO') : undefined,
-      creditDueDate: creditDueDate !== undefined ? (creditDueDate ? creditDueDate.trim() : null) : undefined,
-      creditDebt: creditDebt !== undefined ? (creditDebt !== null ? parseFloat(creditDebt) : null) : undefined,
-      creditPaid: creditPaid !== undefined ? !!creditPaid : undefined,
-    };
-
-    if (candidateSlug) {
-      updateData.slug = candidateSlug;
-    }
-
-    // Strip undefined values so Prisma only receives defined arguments
-    Object.keys(updateData).forEach(key => {
-      if (updateData[key] === undefined) {
-        delete updateData[key];
-      }
+      description: toSafeStr(description, '') ?? '',
+      isFeatured: Boolean(isFeatured),
+      isOffer: Boolean(isOffer),
+      discount: toSafeFloat(discount, null),
+      stock: toSafeInt(stock, 10),
+      portions: toSafeStr(portions, null),
+      flavor: toSafeStr(flavor, null),
+      weight: toSafeStr(weight, null),
+      sizes: processedSizes,
+      durationInDays: toSafeStr(durationInDays, null),
+      purchasePrice: toSafeFloat(purchasePrice, null),
+      images: processedImages || JSON.stringify([primaryImage]),
+      supplierName: toSafeStr(supplierName, null),
+      purchaseType: purchaseType === 'CREDITO' ? 'CREDITO' : 'CONTADO',
+      creditDueDate: toSafeStr(creditDueDate, null),
+      creditDebt: toSafeFloat(creditDebt, null),
+      creditPaid: Boolean(creditPaid),
     });
 
-    let updatedProduct;
-    let updateAttempts = 0;
-    while (updateAttempts < 15) {
-      updateAttempts++;
+    let updatedProduct: any = null;
+    let lastError: any = null;
+
+    const workingData = { ...updateData };
+    for (let attempt = 0; attempt < 25; attempt++) {
       try {
         updatedProduct = await prisma.product.update({
-          where: { id: parseInt(id) },
-          data: updateData
+          where: { id: productId },
+          data: sanitizeJsonPayload(workingData) as any,
         });
-        break;
+        if (updatedProduct) break;
       } catch (err: any) {
-        const msg = err.message || '';
-        const match = msg.match(/Unknown argument [`']([a-zA-Z0-9_]+)[`']/);
-        if (match && match[1] && updateData[match[1]] !== undefined) {
+        lastError = err;
+        const msg = String(err?.message || '');
+        const match = msg.match(/Unknown argument [`'"]?([a-zA-Z0-9_]+)[`'"]?/);
+        if (match && match[1] && workingData[match[1]] !== undefined) {
           console.warn(`[API PRODUCTS PUT] Stripping unsupported argument '${match[1]}' and retrying...`);
-          delete updateData[match[1]];
+          delete workingData[match[1]];
           continue;
         }
-
-        if (updateAttempts === 1) {
-          delete updateData.purchasePrice;
-          delete updateData.images;
-          delete updateData.supplierName;
-          delete updateData.purchaseType;
-          delete updateData.creditDueDate;
-          delete updateData.creditDebt;
-          delete updateData.creditPaid;
-          delete updateData.slug;
-          continue;
-        }
-
-        if (updateAttempts === 2) {
-          delete updateData.isFeatured;
-          delete updateData.isOffer;
-          delete updateData.discount;
-          delete updateData.stock;
-          delete updateData.durationInDays;
-          delete updateData.portions;
-          delete updateData.flavor;
-          delete updateData.weight;
-          delete updateData.sizes;
-          continue;
-        }
-
-        if (updateAttempts === 3) {
-          const minimalData: any = {
-            name: updateData.name,
-            category: updateData.category,
-            price: updateData.price,
-            image: updateData.image,
-            description: updateData.description
-          };
-          updatedProduct = await prisma.product.update({
-            where: { id: parseInt(id) },
-            data: minimalData
-          });
-          break;
-        }
-
-        throw err;
+        break;
       }
     }
 
-    return NextResponse.json(updatedProduct);
+    if (!updatedProduct) {
+      const tiers: Array<Record<string, any>> = [
+        {
+          name: cleanName,
+          category: cleanCategory,
+          goal: toSafeStr(goal, '') ?? '',
+          price: cleanPrice,
+          image: primaryImage,
+          description: toSafeStr(description, '') ?? '',
+          isFeatured: Boolean(isFeatured),
+          isOffer: Boolean(isOffer),
+          discount: toSafeFloat(discount, null),
+          stock: toSafeInt(stock, 10),
+          portions: toSafeStr(portions, null),
+          flavor: toSafeStr(flavor, null),
+          weight: toSafeStr(weight, null),
+          sizes: processedSizes,
+          durationInDays: toSafeStr(durationInDays, null),
+        },
+        {
+          name: cleanName,
+          category: cleanCategory,
+          goal: toSafeStr(goal, '') ?? '',
+          price: cleanPrice,
+          image: primaryImage,
+          description: toSafeStr(description, '') ?? '',
+        },
+      ];
+
+      for (const tierData of tiers) {
+        try {
+          updatedProduct = await prisma.product.update({
+            where: { id: productId },
+            data: sanitizeJsonPayload(tierData) as any,
+          });
+          if (updatedProduct) break;
+        } catch (err) {
+          lastError = err;
+        }
+      }
+    }
+
+    // Strategy 3: Direct SQLite raw UPDATE fallback
+    if (!updatedProduct) {
+      try {
+        await prisma.$executeRawUnsafe(
+          `UPDATE "Product" SET "name" = ?, "category" = ?, "goal" = ?, "price" = ?, "image" = ?, "description" = ?, "updatedAt" = CURRENT_TIMESTAMP WHERE "id" = ?`,
+          cleanName,
+          cleanCategory,
+          toSafeStr(goal, '') ?? '',
+          cleanPrice,
+          primaryImage,
+          toSafeStr(description, '') ?? '',
+          productId
+        );
+        const rows: any[] = await prisma.$queryRawUnsafe(
+          `SELECT * FROM "Product" WHERE "id" = ? LIMIT 1`,
+          productId
+        );
+        updatedProduct = (rows && rows[0]) ? rows[0] : { id: productId, ...updateData };
+      } catch (rawErr) {
+        lastError = rawErr;
+      }
+    }
+
+    if (!updatedProduct) {
+      throw lastError || new Error('No se pudo actualizar el producto en la base de datos.');
+    }
+
+    const safeResponse = sanitizeJsonPayload({
+      ...updatedProduct,
+      name: updatedProduct.name || cleanName,
+    });
+
+    return NextResponse.json(safeResponse);
   } catch (error: any) {
     console.error('[API PRODUCTS PUT ERROR]:', error);
     return NextResponse.json(
-      { error: `Error al actualizar el producto: ${error.message || 'Desconocido'}` },
+      { error: `Error al actualizar el producto: ${error?.message || 'Desconocido'}` },
       { status: 500 }
     );
   }
@@ -592,7 +743,7 @@ export async function DELETE(request: Request) {
       );
     }
 
-    const productId = parseInt(idParam);
+    const productId = parseInt(idParam, 10);
 
     // Business Logic Safety Check: Check if this product is part of any orders
     const relatedOrderItemsCount = await prisma.orderItem.count({
@@ -611,11 +762,11 @@ export async function DELETE(request: Request) {
       where: { id: productId }
     });
 
-    return NextResponse.json({
+    return NextResponse.json(sanitizeJsonPayload({
       success: true,
       message: `Producto "${deletedProduct.name}" eliminado correctamente.`,
-      product: deletedProduct
-    });
+      product: sanitizeJsonPayload(deletedProduct as any),
+    }));
   } catch (error: any) {
     console.error('[API PRODUCTS DELETE ERROR]:', error);
     return NextResponse.json(
