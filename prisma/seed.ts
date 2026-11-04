@@ -3,132 +3,133 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('Cleaning existing product-related data...');
-  await prisma.review.deleteMany();
-  await prisma.orderItem.deleteMany();
-  await prisma.product.deleteMany();
+  const existingProductCount = await prisma.product.count();
 
-  console.log('Seeding products with brand photos...');
-  const products = [
-    {
-      name: "Pure Whey Impact 5lb",
-      category: "Proteínas",
-      goal: "MÁS VENDIDO",
-      price: 65.00,
-      image: "/brand-photos/Suplementos/IMG-20260513-WA0013.jpg",
-      description: "Proteína de suero de alta calidad para máxima recuperación muscular.",
-      isFeatured: true,
-      portions: "70",
-      flavor: "Vainilla",
-      weight: "2.2kg",
-      durationInDays: "30"
-    },
-    {
-      name: "Creatine Micronized 300g",
-      category: "Creatinas",
-      goal: "FUERZA MÁXIMA",
-      price: 35.00,
-      image: "/brand-photos/Suplementos/IMG-20260513-WA0017.jpg",
-      description: "Creatina monohidratada pura para aumento de fuerza y potencia celular.",
-      isOffer: true,
-      discount: 10,
-      weight: "300g",
-      durationInDays: "60"
-    },
-    {
-      name: "Creatina Creapure Elite 500g",
-      category: "Creatinas",
-      goal: "PREMIUM",
-      price: 49.99,
-      image: "/brand-photos/Suplementos/IMG-20260513-WA0018.jpg",
-      description: "Creatina Creapure alemana patentada de máxima solubilidad y pureza científica.",
-      weight: "500g",
-      durationInDays: "100"
-    },
-    {
-      name: "Creatina HCL Concentrated 150g",
-      category: "Creatinas",
-      goal: "POTENCIA CELULAR",
-      price: 39.99,
-      image: "/brand-photos/Suplementos/IMG-20260513-WA0019.jpg",
-      description: "Creatina clorhidrato concentrada de rápida absorción sin retención de líquido extracelular.",
-      weight: "150g",
-      durationInDays: "50"
-    },
-    {
-      name: "Creatine Plus Energy 300g",
-      category: "Creatinas",
-      goal: "ENERGÍA EXTRA",
-      price: 37.99,
-      image: "/brand-photos/Suplementos/IMG-20260513-WA0016.jpg",
-      description: "Creatina monohidratada adicionada con taurina y electrolitos para una contracción muscular potente.",
-      weight: "300g",
-      durationInDays: "60"
-    },
-    {
-      name: "Elite Amino Recovery",
-      category: "Aminoácidos/BCAA",
-      goal: "RECUPERACIÓN",
-      price: 29.99,
-      image: "/brand-photos/Suplementos/IMG-20260513-WA0020.jpg",
-      description: "BCAA premium para evitar el catabolismo y promover la hidratación muscular.",
-      weight: "400g",
-      durationInDays: "45"
-    },
-    {
-      name: "Pre-Workout Nitro",
-      category: "Pre-Entrenos",
-      goal: "ENERGÍA",
-      price: 45.00,
-      image: "/brand-photos/Suplementos/IMG-20260513-WA0024.jpg",
-      description: "Explosión de energía para tus entrenamientos más pesados y enfoque mental extremo.",
-      portions: "30",
-      flavor: "Fruit Punch",
-      durationInDays: "30"
-    },
-    {
-      name: "Camiseta Oversized Blanca SupplyMax",
-      category: "Ropa",
-      goal: "COLECCIÓN BLANCA",
-      price: 25.00,
-      image: "/brand-photos/Ropa con modelo/IMG_7283.png",
-      description: "Camiseta oversized blanca de algodón premium pesado, corte lifestyle ultra estético.",
-      isFeatured: true,
-      sizes: "S,M,L,XL"
-    },
-    {
-      name: "Camiseta Oversized Negra SupplyMax",
-      category: "Ropa",
-      goal: "COLECCIÓN NEGRA",
-      price: 25.00,
-      image: "/brand-photos/Ropa con modelo/IMG_7282.png",
-      description: "Camiseta oversized negra de algodón pesado con logo de la marca, horma perfecta.",
-      isFeatured: true,
-      sizes: "S,M,L,XL"
-    },
-    {
-      name: "Performance Joggers Negros",
-      category: "Ropa",
-      goal: "COLECCIÓN NEGRA",
-      price: 45.00,
-      image: "/brand-photos/Ropa con modelo/IMG_7287.png",
-      description: "Pantalones deportivos ajustados de color negro con tecnología dry-fit y bolsillos con cierre.",
-      isFeatured: true,
-      sizes: "M,L,XL"
-    },
-    {
-      name: "Bolso Deportivo SupplyMax",
-      category: "Ropa",
-      goal: "ACCESORIO",
-      price: 39.99,
-      image: "/brand-photos/Suplementos + ropa/Photoroom_20260328_114310.jpg",
-      description: "Bolso deportivo tipo saco, liviano, práctico y resistente para llevar tus suplementos, shaker y ropa de entrenamiento al gimnasio.",
-      sizes: "Único"
+  if (existingProductCount === 0) {
+    console.log('Database has 0 products. Seeding initial products with brand photos...');
+    const products = [
+      {
+        name: "Pure Whey Impact 5lb",
+        category: "Proteínas",
+        goal: "MÁS VENDIDO",
+        price: 65.00,
+        image: "/brand-photos/Suplementos/IMG-20260513-WA0013.jpg",
+        description: "Proteína de suero de alta calidad para máxima recuperación muscular.",
+        isFeatured: true,
+        portions: "70",
+        flavor: "Vainilla",
+        weight: "2.2kg",
+        durationInDays: "30"
+      },
+      {
+        name: "Creatine Micronized 300g",
+        category: "Creatinas",
+        goal: "FUERZA MÁXIMA",
+        price: 35.00,
+        image: "/brand-photos/Suplementos/IMG-20260513-WA0017.jpg",
+        description: "Creatina monohidratada pura para aumento de fuerza y potencia celular.",
+        isOffer: true,
+        discount: 10,
+        weight: "300g",
+        durationInDays: "60"
+      },
+      {
+        name: "Creatina Creapure Elite 500g",
+        category: "Creatinas",
+        goal: "PREMIUM",
+        price: 49.99,
+        image: "/brand-photos/Suplementos/IMG-20260513-WA0018.jpg",
+        description: "Creatina Creapure alemana patentada de máxima solubilidad y pureza científica.",
+        weight: "500g",
+        durationInDays: "100"
+      },
+      {
+        name: "Creatina HCL Concentrated 150g",
+        category: "Creatinas",
+        goal: "POTENCIA CELULAR",
+        price: 39.99,
+        image: "/brand-photos/Suplementos/IMG-20260513-WA0019.jpg",
+        description: "Creatina clorhidrato concentrada de rápida absorción sin retención de líquido extracelular.",
+        weight: "150g",
+        durationInDays: "50"
+      },
+      {
+        name: "Creatine Plus Energy 300g",
+        category: "Creatinas",
+        goal: "ENERGÍA EXTRA",
+        price: 37.99,
+        image: "/brand-photos/Suplementos/IMG-20260513-WA0016.jpg",
+        description: "Creatina monohidratada adicionada con taurina y electrolitos para una contracción muscular potente.",
+        weight: "300g",
+        durationInDays: "60"
+      },
+      {
+        name: "Elite Amino Recovery",
+        category: "Aminoácidos/BCAA",
+        goal: "RECUPERACIÓN",
+        price: 29.99,
+        image: "/brand-photos/Suplementos/IMG-20260513-WA0020.jpg",
+        description: "BCAA premium para evitar el catabolismo y promover la hidratación muscular.",
+        weight: "400g",
+        durationInDays: "45"
+      },
+      {
+        name: "Pre-Workout Nitro",
+        category: "Pre-Entrenos",
+        goal: "ENERGÍA",
+        price: 45.00,
+        image: "/brand-photos/Suplementos/IMG-20260513-WA0024.jpg",
+        description: "Explosión de energía para tus entrenamientos más pesados y enfoque mental extremo.",
+        portions: "30",
+        flavor: "Fruit Punch",
+        durationInDays: "30"
+      },
+      {
+        name: "Camiseta Oversized Blanca SupplyMax",
+        category: "Ropa",
+        goal: "COLECCIÓN BLANCA",
+        price: 25.00,
+        image: "/brand-photos/Ropa con modelo/IMG_7283.png",
+        description: "Camiseta oversized blanca de algodón premium pesado, corte lifestyle ultra estético.",
+        isFeatured: true,
+        sizes: "S,M,L,XL"
+      },
+      {
+        name: "Camiseta Oversized Negra SupplyMax",
+        category: "Ropa",
+        goal: "COLECCIÓN NEGRA",
+        price: 25.00,
+        image: "/brand-photos/Ropa con modelo/IMG_7282.png",
+        description: "Camiseta oversized negra de algodón pesado con logo de la marca, horma perfecta.",
+        isFeatured: true,
+        sizes: "S,M,L,XL"
+      },
+      {
+        name: "Performance Joggers Negros",
+        category: "Ropa",
+        goal: "COLECCIÓN NEGRA",
+        price: 45.00,
+        image: "/brand-photos/Ropa con modelo/IMG_7287.png",
+        description: "Pantalones deportivos ajustados de color negro con tecnología dry-fit y bolsillos con cierre.",
+        isFeatured: true,
+        sizes: "M,L,XL"
+      },
+      {
+        name: "Bolso Deportivo SupplyMax",
+        category: "Ropa",
+        goal: "ACCESORIO",
+        price: 39.99,
+        image: "/brand-photos/Suplementos + ropa/Photoroom_20260328_114310.jpg",
+        description: "Bolso deportivo tipo saco, liviano, práctico y resistente para llevar tus suplementos, shaker y ropa de entrenamiento al gimnasio.",
+        sizes: "Único"
+      }
+    ];
+
+    for (const p of products) {
+      await prisma.product.create({ data: p });
     }
-  ];
-
-  for (const p of products) {
-    await prisma.product.create({ data: p });
+  } else {
+    console.log(`Database already has ${existingProductCount} products. Preserving existing catalog.`);
   }
 
   console.log('Ensuring users & partners exist...');
@@ -192,47 +193,50 @@ async function main() {
     });
   }
 
-  console.log('Seeding reviews...');
-  const seededProducts = await prisma.product.findMany();
-  const seededUsers = await prisma.user.findMany();
-  
-  const reviewsData = [
-    {
-      comment: "Excelente calidad de la proteína, se disuelve súper rápido y el sabor Vainilla es increíble.",
-      rating: 5,
-      isVerified: true,
-    },
-    {
-      comment: "La creatina me ha ayudado muchísimo con mi fuerza. La disolución es perfecta.",
-      rating: 5,
-      isVerified: true,
-    },
-    {
-      comment: "El diseño oversized de la camiseta queda espectacular. Tela de gran calidad y muy fresca.",
-      rating: 5,
-      isVerified: true,
-    },
-    {
-      comment: "El bolso tipo saco es súper práctico y cómodo para el gym, entran mis suplementos, el shaker y la toalla perfecto. Excelente calidad.",
-      rating: 5,
-      isVerified: true,
-    }
-  ];
-
-  for (let i = 0; i < seededProducts.length; i++) {
-    const product = seededProducts[i];
-    const user = seededUsers[i % seededUsers.length];
-    const review = reviewsData[i % reviewsData.length];
+  const existingReviewsCount = await prisma.review.count();
+  if (existingReviewsCount === 0) {
+    console.log('Seeding reviews...');
+    const seededProducts = await prisma.product.findMany();
+    const seededUsers = await prisma.user.findMany();
     
-    await prisma.review.create({
-      data: {
-        productId: product.id,
-        userId: user.id,
-        comment: review.comment,
-        rating: review.rating,
-        isVerified: review.isVerified,
+    const reviewsData = [
+      {
+        comment: "Excelente calidad de la proteína, se disuelve súper rápido y el sabor Vainilla es increíble.",
+        rating: 5,
+        isVerified: true,
+      },
+      {
+        comment: "La creatina me ha ayudado muchísimo con mi fuerza. La disolución es perfecta.",
+        rating: 5,
+        isVerified: true,
+      },
+      {
+        comment: "El diseño oversized de la camiseta queda espectacular. Tela de gran calidad y muy fresca.",
+        rating: 5,
+        isVerified: true,
+      },
+      {
+        comment: "El bolso tipo saco es súper práctico y cómodo para el gym, entran mis suplementos, el shaker y la toalla perfecto. Excelente calidad.",
+        rating: 5,
+        isVerified: true,
       }
-    });
+    ];
+
+    for (let i = 0; i < seededProducts.length; i++) {
+      const product = seededProducts[i];
+      const user = seededUsers[i % seededUsers.length];
+      const review = reviewsData[i % reviewsData.length];
+      
+      await prisma.review.create({
+        data: {
+          productId: product.id,
+          userId: user.id,
+          comment: review.comment,
+          rating: review.rating,
+          isVerified: review.isVerified,
+        }
+      });
+    }
   }
 
   console.log('Seed completed.');

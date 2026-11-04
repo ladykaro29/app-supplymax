@@ -245,6 +245,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     setOrders([]);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('supplymax_user');
+      } catch (e) {
+        console.error('Error removing user from localStorage:', e);
+      }
+    }
   };
 
   const addAddress = (label: string, value: string) => {

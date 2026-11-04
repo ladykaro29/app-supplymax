@@ -45,7 +45,7 @@ const BLANK_PRODUCT: Product = {
   flavor: '',
   weight: '',
   sizes: [],
-  isFeatured: false,
+  isFeatured: true,
   isOffer: false,
   discount: 0,
   stock: 10,
@@ -99,8 +99,13 @@ function EditProductsContent() {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  // Profit & Margin state
+  // Profit & Margin state + iPhone decimal-friendly text inputs
   const [selectedMargin, setSelectedMargin] = useState<number>(50);
+  const [costInput, setCostInput] = useState<string>('');
+  const [priceInput, setPriceInput] = useState<string>('');
+  const [stockInput, setStockInput] = useState<string>('10');
+  const [discountInput, setDiscountInput] = useState<string>('');
+  const [savingProduct, setSavingProduct] = useState<boolean>(false);
   const [customFlavor, setCustomFlavor] = useState('');
   const [customWeight, setCustomWeight] = useState('');
   const [customWeightPrice, setCustomWeightPrice] = useState<string>('');
@@ -125,6 +130,7 @@ function EditProductsContent() {
   const [uploadError, setUploadError] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -158,6 +164,12 @@ function EditProductsContent() {
   
   const handleCreateNew = () => {
     setSelectedMargin(50);
+    setCostInput('');
+    setPriceInput('');
+    setStockInput('10');
+    setDiscountInput('');
+    setUploadError('');
+    setUploadSuccess('');
     setCustomFlavor('');
     setCustomWeight('');
     setEditingProduct({ ...BLANK_PRODUCT });
@@ -223,8 +235,8 @@ function EditProductsContent() {
     }
 
     // Calculate effective margin if cost is present
-    const cost = product.purchasePrice || 0;
-    const price = product.price || 0;
+    const cost = Number(product.purchasePrice) || 0;
+    const price = Number(product.price) || 0;
     if (cost > 0 && price > cost) {
       const calcMargin = Math.round(((price - cost) / cost) * 100);
       setSelectedMargin(calcMargin);
@@ -232,6 +244,12 @@ function EditProductsContent() {
       setSelectedMargin(50);
     }
 
+    setCostInput(cost > 0 ? String(cost) : '');
+    setPriceInput(price > 0 ? String(price) : '');
+    setStockInput(String(product.stock ?? 10));
+    setDiscountInput(product.discount ? String(product.discount) : '');
+    setUploadError('');
+    setUploadSuccess('');
     setCustomFlavor('');
     setCustomWeight('');
     setEditingProduct({
@@ -269,23 +287,40 @@ function EditProductsContent() {
     setEditingProduct(null);
   };
 
+  const parseDecimalInput = (raw: string): number => {
+    const normalized = String(raw || '').replace(/,/g, '.').replace(/[^0-9.]/g, '');
+    const parsed = parseFloat(normalized);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
   const handleSave = async () => {
-    if (!editingProduct) return;
+    if (!editingProduct || savingProduct) return;
     if (!editingProduct.name.trim()) {
       alert('El nombre del producto es requerido.');
       return;
     }
-    if (editingProduct.price <= 0) {
+
+    const finalPrice = editingProduct.price > 0 ? editingProduct.price : parseDecimalInput(priceInput);
+    const finalCost = editingProduct.purchasePrice ? editingProduct.purchasePrice : parseDecimalInput(costInput);
+    const finalStock = stockInput !== '' ? Math.max(0, parseInt(stockInput, 10) || 0) : editingProduct.stock;
+    const finalDiscount = discountInput !== '' ? parseDecimalInput(discountInput) : (editingProduct.discount || 0);
+
+    if (finalPrice <= 0) {
       alert('El precio de venta debe ser mayor a 0.');
       return;
     }
 
+    setSavingProduct(true);
     try {
       const isCreation = editingProduct.id === 0;
       const method = isCreation ? 'POST' : 'PUT';
       
       const payload = {
         ...editingProduct,
+        price: finalPrice,
+        purchasePrice: finalCost,
+        stock: finalStock,
+        discount: finalDiscount,
         goal: editingProduct.goal ? editingProduct.goal.trim() : '',
       };
 
@@ -311,6 +346,8 @@ function EditProductsContent() {
       loadProducts();
     } catch (err: any) {
       alert(`Error al guardar: ${err.message}`);
+    } finally {
+      setSavingProduct(false);
     }
   };
 
@@ -331,14 +368,15 @@ function EditProductsContent() {
     }
   };
 
-  // Pricing & Margin calculation handlers
-  const handleCostChange = (newCost: number) => {
+  // Pricing & Margin calculation handlers (iPhone decimal comma/dot safe)
+  const handleCostTextChange = (rawVal: string) => {
+    setCostInput(rawVal);
     if (!editingProduct) return;
-    const cost = Math.max(0, newCost);
+    const cost = Math.max(0, parseDecimalInput(rawVal));
     const calculatedPrice = selectedMargin > 0
       ? Math.round((cost * (1 + selectedMargin / 100)) * 100) / 100
       : cost;
-    
+    setPriceInput(calculatedPrice > 0 ? String(calculatedPrice) : '');
     setEditingProduct({
       ...editingProduct,
       purchasePrice: cost,
@@ -349,9 +387,10 @@ function EditProductsContent() {
   const handleMarginPresetClick = (margin: number) => {
     setSelectedMargin(margin);
     if (!editingProduct) return;
-    const cost = Number(editingProduct.purchasePrice) || 0;
+    const cost = Number(editingProduct.purchasePrice) || parseDecimalInput(costInput);
     if (cost > 0) {
       const calculatedPrice = Math.round((cost * (1 + margin / 100)) * 100) / 100;
+      setPriceInput(String(calculatedPrice));
       setEditingProduct({
         ...editingProduct,
         price: calculatedPrice,
@@ -359,10 +398,11 @@ function EditProductsContent() {
     }
   };
 
-  const handleSellingPriceChange = (newPrice: number) => {
+  const handleSellingPriceTextChange = (rawVal: string) => {
+    setPriceInput(rawVal);
     if (!editingProduct) return;
-    const price = Math.max(0, newPrice);
-    const cost = Number(editingProduct.purchasePrice) || 0;
+    const price = Math.max(0, parseDecimalInput(rawVal));
+    const cost = Number(editingProduct.purchasePrice) || parseDecimalInput(costInput);
     if (cost > 0 && price > cost) {
       const effectiveMarkup = Math.round(((price - cost) / cost) * 100);
       setSelectedMargin(effectiveMarkup);
@@ -392,65 +432,114 @@ function EditProductsContent() {
     return editingProduct.image ? [editingProduct.image] : [];
   })();
 
-  // Helper to compress camera/iPhone photos to web-optimized JPEG before uploading
-  const compressImage = async (file: File): Promise<File> => {
-    if (file.type === 'image/svg+xml' || file.type === 'image/gif') return file;
+  // iPhone / iOS WebKit memory-safe image compressor:
+  // Compresses file weight (bytes) while preserving the original pixel resolution (width x height).
+  const compressImage = async (file: File): Promise<{ file: File; dataUrl?: string }> => {
+    if (file.type === 'image/svg+xml' || file.type === 'image/gif') {
+      return { file };
+    }
     return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const maxDim = 1200;
-          let width = img.width;
-          let height = img.height;
-          if (width > maxDim || height > maxDim) {
-            if (width > height) {
-              height = Math.round((height * maxDim) / width);
-              width = maxDim;
-            } else {
-              width = Math.round((width * maxDim) / height);
-              height = maxDim;
-            }
+      const objectUrl = URL.createObjectURL(file);
+      const img = new window.Image();
+
+      img.onload = () => {
+        try {
+          // Keep 100% original resolution (naturalWidth x naturalHeight).
+          // Only apply a safety ceiling if the sensor exceeds iOS Safari's 16.7MP (4096x4096) hardware canvas limit.
+          let width = img.naturalWidth || img.width || 1200;
+          let height = img.naturalHeight || img.height || 1200;
+          const IOS_MAX_CANVAS_PIXELS = 16777216; // 4096 x 4096 WebKit hardware limit
+          if (width * height > IOS_MAX_CANVAS_PIXELS) {
+            const scale = Math.sqrt(IOS_MAX_CANVAS_PIXELS / (width * height));
+            width = Math.floor(width * scale);
+            height = Math.floor(height * scale);
           }
+
           const canvas = document.createElement('canvas');
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
+
           if (ctx) {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+
+            const isTransparentFormat =
+              file.type === 'image/png' || file.type === 'image/webp';
+            const outputMime = isTransparentFormat ? 'image/webp' : 'image/jpeg';
+            const outputExt = isTransparentFormat ? '.webp' : '.jpg';
+            // 0.82 quality significantly reduces file weight (MB -> KB) without losing visual sharpness or resolution
+            const quality = 0.82;
+
+            if (!isTransparentFormat) {
+              ctx.fillStyle = '#FFFFFF';
+              ctx.fillRect(0, 0, width, height);
+            }
             ctx.drawImage(img, 0, 0, width, height);
+
             canvas.toBlob(
               (blob) => {
+                URL.revokeObjectURL(objectUrl);
+                canvas.width = 0;
+                canvas.height = 0;
                 if (blob) {
-                  const cleanName = file.name.replace(/\.[^/.]+$/, '') + '.jpg';
-                  resolve(new File([blob], cleanName, { type: 'image/jpeg' }));
+                  const base = (file.name || 'iphone_photo').replace(/\.[^/.]+$/, '');
+                  const cleanName = `${base}${outputExt}`;
+                  const compressedFile = new File([blob], cleanName, { type: outputMime });
+
+                  // If original file is already smaller and is a standard web format, keep original
+                  const isStandardWeb = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type);
+                  const bestFile = (isStandardWeb && file.size > 0 && file.size < compressedFile.size)
+                    ? file
+                    : compressedFile;
+
+                  resolve({ file: bestFile });
                 } else {
-                  resolve(file);
+                  resolve({ file });
                 }
               },
-              'image/jpeg',
-              0.82
+              outputMime,
+              quality
             );
           } else {
-            resolve(file);
+            URL.revokeObjectURL(objectUrl);
+            resolve({ file });
           }
-        };
-        img.onerror = () => resolve(file);
-        img.src = e.target?.result as string;
+        } catch {
+          URL.revokeObjectURL(objectUrl);
+          resolve({ file });
+        }
       };
-      reader.onerror = () => resolve(file);
-      reader.readAsDataURL(file);
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve({ file });
+      };
+
+      img.src = objectUrl;
     });
   };
 
-  // Multi-Image File Upload Handler (Up to 10 images)
+  // Multi-Image File Upload Handler (Up to 10 images - iPhone Safari sequential upload)
   const handleImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     if (!fileList || fileList.length === 0 || !editingProduct) return;
 
-    const remainingSlots = Math.max(0, 10 - currentImagesList.length);
+    // Remove the default placeholder '/protein.png' / '/creatine.png' / '/amino.png' / '/hoodie.png'
+    // when the user uploads their first real photo on a new product
+    const defaultPlaceholders = ['/protein.png', '/creatine.png', '/amino.png', '/hoodie.png'];
+    const baseExisting =
+      editingProduct.id === 0 &&
+      currentImagesList.length === 1 &&
+      defaultPlaceholders.includes(currentImagesList[0])
+        ? []
+        : currentImagesList;
+
+    const remainingSlots = Math.max(0, 10 - baseExisting.length);
     if (remainingSlots <= 0) {
       alert('Ya has alcanzado el límite máximo de 10 imágenes para este producto. Elimina una imagen para agregar otra.');
       if (fileInputRef.current) fileInputRef.current.value = '';
+      if (cameraInputRef.current) cameraInputRef.current.value = '';
       return;
     }
 
@@ -463,15 +552,17 @@ function EditProductsContent() {
     setUploadError('');
     setUploadSuccess('');
 
-    try {
-      // Compress images on-the-fly to prevent mobile payload errors and "Load failed"
-      const compressedFiles = await Promise.all(
-        filesToUpload.map(f => compressImage(f))
-      );
+    // Process sequentially to avoid iOS Safari Canvas RAM exhaustion on 48MP iPhone photos
+    const processedItems: { file: File; dataUrl?: string }[] = [];
+    for (const rawFile of filesToUpload) {
+      const item = await compressImage(rawFile);
+      processedItems.push(item);
+    }
 
+    try {
       const formData = new FormData();
-      compressedFiles.forEach(file => {
-        formData.append('files', file);
+      processedItems.forEach((item) => {
+        formData.append('files', item.file);
       });
 
       const res = await fetch('/api/admin/upload', {
@@ -495,50 +586,52 @@ function EditProductsContent() {
         throw new Error('No se recibió ninguna URL de imagen.');
       }
 
-      const mergedImages = [...currentImagesList, ...uploadedUrls].slice(0, 10);
+      const mergedImages = [...baseExisting, ...uploadedUrls].slice(0, 10);
       setEditingProduct(prev => prev ? ({
         ...prev,
         image: mergedImages[0] || prev.image,
         images: mergedImages,
       }) : null);
 
-      setUploadSuccess(`¡${uploadedUrls.length} imagen(es) subida(s) con éxito! (${mergedImages.length}/10 fotos)`);
+      setUploadSuccess(`¡${uploadedUrls.length} foto(s) cargada(s) con éxito! (${mergedImages.length}/10 fotos)`);
       setTimeout(() => setUploadSuccess(''), 4500);
     } catch (err: any) {
       console.warn('Upload API fallback:', err);
-      // Fallback: read locally with FileReader using compressed blobs
+      // Fallback: convert the compressed File blobs to DataURLs only if API upload failed
       try {
-        const base64List: string[] = [];
-        for (const file of filesToUpload) {
-          const compressed = await compressImage(file);
-          const base64 = await new Promise<string>((resolve, reject) => {
+        const fallbackDataUrls: string[] = [];
+        for (const item of processedItems) {
+          const dataUrl = await new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
             reader.onloadend = () => {
-              if (reader.result && typeof reader.result === 'string') resolve(reader.result);
-              else reject(new Error('No se pudo convertir'));
+              if (typeof reader.result === 'string') resolve(reader.result);
+              else reject(new Error('No se pudo leer la imagen comprimida'));
             };
             reader.onerror = reject;
-            reader.readAsDataURL(compressed);
+            reader.readAsDataURL(item.file);
           });
-          base64List.push(base64);
+          fallbackDataUrls.push(dataUrl);
         }
 
-        const merged = [...currentImagesList, ...base64List].slice(0, 10);
-        setEditingProduct(prev => prev ? ({
-          ...prev,
-          image: merged[0] || prev.image,
-          images: merged,
-        }) : null);
-        setUploadSuccess(`Imágenes cargadas en memoria (${merged.length}/10 fotos).`);
-        setTimeout(() => setUploadSuccess(''), 4500);
-      } catch (fallbackErr: any) {
-        setUploadError(err.message || 'Error al procesar las imágenes.');
+        if (fallbackDataUrls.length > 0) {
+          const merged = [...baseExisting, ...fallbackDataUrls].slice(0, 10);
+          setEditingProduct(prev => prev ? ({
+            ...prev,
+            image: merged[0] || prev.image,
+            images: merged,
+          }) : null);
+          setUploadSuccess(`¡${fallbackDataUrls.length} foto(s) comprimida(s) lista(s)! (${merged.length}/10 fotos)`);
+          setTimeout(() => setUploadSuccess(''), 4500);
+        } else {
+          setUploadError(err.message || 'No se pudo procesar la foto. Intenta tomarla o elegirla desde la Fototeca.');
+        }
+      } catch {
+        setUploadError(err.message || 'No se pudo procesar la foto. Intenta tomarla o elegirla desde la Fototeca.');
       }
     } finally {
       setUploadingImage(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (cameraInputRef.current) cameraInputRef.current.value = '';
     }
   };
 
@@ -1062,25 +1155,24 @@ function EditProductsContent() {
                   <div className={styles.formGroup}>
                     <label style={{ color: '#00F0FF' }}>Costo de Compra ($ USD)</label>
                     <input 
-                      type="number" 
+                      type="text"
+                      inputMode="decimal"
                       className={styles.formInput} 
-                      value={editingProduct.purchasePrice || 0}
-                      onChange={(e) => handleCostChange(parseFloat(e.target.value) || 0)}
-                      step="0.01"
-                      min="0"
-                      placeholder="Costo unitario del proveedor"
+                      value={costInput}
+                      onChange={(e) => handleCostTextChange(e.target.value)}
+                      placeholder="Ej: 28.00"
                     />
                   </div>
 
                   <div className={styles.formGroup}>
                     <label style={{ color: '#25D366' }}>Precio de Venta Sugerido ($ USD) *</label>
                     <input 
-                      type="number" 
+                      type="text"
+                      inputMode="decimal"
                       className={styles.formInput} 
-                      value={editingProduct.price || 0}
-                      onChange={(e) => handleSellingPriceChange(parseFloat(e.target.value) || 0)}
-                      step="0.01"
-                      min="0"
+                      value={priceInput}
+                      onChange={(e) => handleSellingPriceTextChange(e.target.value)}
+                      placeholder="Ej: 45.00"
                       required
                     />
                   </div>
@@ -1116,11 +1208,16 @@ function EditProductsContent() {
                 <div className={styles.formGroup}>
                   <label>Stock Físico en Inventario *</label>
                   <input 
-                    type="number" 
+                    type="text"
+                    inputMode="numeric"
                     className={styles.formInput} 
-                    value={editingProduct.stock}
-                    onChange={(e) => setEditingProduct({...editingProduct, stock: parseInt(e.target.value) || 0})}
-                    min="0"
+                    value={stockInput}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9]/g, '');
+                      setStockInput(raw);
+                      setEditingProduct({ ...editingProduct, stock: parseInt(raw, 10) || 0 });
+                    }}
+                    placeholder="Ej: 10"
                     required
                   />
                 </div>
@@ -1129,13 +1226,15 @@ function EditProductsContent() {
                   <div className={styles.formGroup}>
                     <label>Monto de Descuento ($ USD)</label>
                     <input 
-                      type="number" 
+                      type="text"
+                      inputMode="decimal"
                       className={styles.formInput} 
                       placeholder="Restar al precio final"
-                      value={editingProduct.discount || 0}
-                      onChange={(e) => setEditingProduct({...editingProduct, discount: parseFloat(e.target.value) || 0})}
-                      step="0.01"
-                      min="0"
+                      value={discountInput}
+                      onChange={(e) => {
+                        setDiscountInput(e.target.value);
+                        setEditingProduct({ ...editingProduct, discount: parseDecimalInput(e.target.value) });
+                      }}
                     />
                   </div>
                 )}
@@ -1516,28 +1615,52 @@ function EditProductsContent() {
                 </div>
                 
                 <div className={styles.imageUploadCard}>
-                  {/* Upload Action Button & Status */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {/* Upload Action Button & Status (iPhone / iOS Safari Native Picker) */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
                     <input 
+                      id="iphone-product-photo-input"
                       type="file" 
                       ref={fileInputRef} 
                       onChange={handleImageFileUpload} 
-                      accept="image/png, image/jpeg, image/jpg, image/webp, image/gif, image/avif" 
+                      accept="image/*,image/heic,image/heif,.heic,.heif,.jpg,.jpeg,.png,.webp" 
                       multiple 
-                      style={{ display: 'none' }} 
-                    />
-                    <button 
-                      type="button" 
-                      className={`${styles.uploadFileBtn} ${uploadingImage ? styles.uploadFileBtnLoading : ''}`}
-                      onClick={() => fileInputRef.current?.click()}
                       disabled={uploadingImage || currentImagesList.length >= 10}
-                    >
-                      {uploadingImage 
-                        ? '⏳ Subiendo fotos al servidor...' 
-                        : currentImagesList.length >= 10 
-                          ? '✅ Límite alcanzado (10 fotos)' 
-                          : '📁 Subir Fotos desde tu Dispositivo (Hasta 10)'}
-                    </button>
+                      style={{ position: 'absolute', width: '0.1px', height: '0.1px', opacity: 0, overflow: 'hidden', zIndex: -1 }} 
+                    />
+                    <input 
+                      id="iphone-product-camera-input"
+                      type="file" 
+                      ref={cameraInputRef} 
+                      onChange={handleImageFileUpload} 
+                      accept="image/*" 
+                      capture="environment"
+                      disabled={uploadingImage || currentImagesList.length >= 10}
+                      style={{ position: 'absolute', width: '0.1px', height: '0.1px', opacity: 0, overflow: 'hidden', zIndex: -1 }} 
+                    />
+
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <label 
+                        htmlFor="iphone-product-photo-input"
+                        className={`${styles.uploadFileBtn} ${uploadingImage || currentImagesList.length >= 10 ? styles.uploadFileBtnLoading : ''}`}
+                        style={{ flex: '1 1 200px', margin: 0, textTransform: 'none' }}
+                      >
+                        {uploadingImage 
+                          ? '⏳ Optimizando y subiendo...' 
+                          : currentImagesList.length >= 10 
+                            ? '✅ Límite alcanzado (10 fotos)' 
+                            : '🖼️ Elegir de Fototeca / Galería'}
+                      </label>
+
+                      {currentImagesList.length < 10 && !uploadingImage && (
+                        <label 
+                          htmlFor="iphone-product-camera-input"
+                          className={styles.uploadFileBtn}
+                          style={{ flex: '1 1 160px', margin: 0, textTransform: 'none', borderColor: '#25D366', background: 'rgba(37, 211, 102, 0.14)' }}
+                        >
+                          📷 Tomar Foto (Cámara)
+                        </label>
+                      )}
+                    </div>
 
                     {uploadSuccess && (
                       <span className={styles.uploadStatusMsg}>
@@ -1552,7 +1675,7 @@ function EditProductsContent() {
                     )}
 
                     <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.45)' }}>
-                      Puedes seleccionar varias fotos a la vez (PNG, JPG, WEBP). Se admiten hasta 10 fotos por producto.
+                      Compatible con iPhone (HEIC / Live Photos / Cámara), Android y PC. Se optimizan automáticamente (máx. 10 fotos).
                     </span>
                   </div>
 
@@ -1611,16 +1734,16 @@ function EditProductsContent() {
 
                     {/* Add Photo Slot Button if < 10 */}
                     {currentImagesList.length < 10 && (
-                      <button
-                        type="button"
+                      <label
+                        htmlFor="iphone-product-photo-input"
                         className={styles.addSlotBtn}
-                        onClick={() => fileInputRef.current?.click()}
                         title="Subir otra foto"
+                        style={{ margin: 0 }}
                       >
                         <span style={{ fontSize: '1.3rem', fontWeight: 300 }}>+</span>
                         <span style={{ fontSize: '0.65rem', fontWeight: 700 }}>Añadir</span>
                         <span style={{ fontSize: '0.58rem', opacity: 0.6 }}>({10 - currentImagesList.length} lib.)</span>
-                      </button>
+                      </label>
                     )}
                   </div>
 
@@ -1721,9 +1844,13 @@ function EditProductsContent() {
             </div>
 
             <div className={styles.modalFooter}>
-              <button className={styles.cancelBtn} onClick={closeModal} type="button">Cancelar</button>
-              <button className={styles.saveBtn} onClick={handleSave} type="button">
-                {editingProduct.id === 0 ? 'Registrar Producto' : 'Guardar Cambios'}
+              <button className={styles.cancelBtn} onClick={closeModal} type="button" disabled={savingProduct}>Cancelar</button>
+              <button className={styles.saveBtn} onClick={handleSave} type="button" disabled={savingProduct || uploadingImage}>
+                {savingProduct
+                  ? '⏳ Guardando...'
+                  : editingProduct.id === 0
+                    ? '✓ Registrar Producto'
+                    : '✓ Guardar Cambios'}
               </button>
             </div>
           </div>

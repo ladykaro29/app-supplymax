@@ -17,7 +17,7 @@ export default async function SuplementosPage() {
           category: 'Ropa'
         }
       },
-      orderBy: { id: 'asc' }
+      orderBy: { id: 'desc' }
     });
   } catch (error) {
     console.error('Suplementos DB error:', error);

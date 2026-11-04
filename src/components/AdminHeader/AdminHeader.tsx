@@ -128,7 +128,12 @@ export default function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
               <span className={styles.userRole}>{user?.role_id || 'Admin'}</span>
             </div>
             <button 
-              onClick={logout} 
+              onClick={() => {
+                logout();
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/login';
+                }
+              }} 
               className={styles.logoutBtn} 
               title="Cerrar Sesión de Administrador"
               type="button"

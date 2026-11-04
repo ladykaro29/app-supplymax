@@ -25,14 +25,15 @@ export default function CatalogClient({ initialProducts }: CatalogClientProps) {
     <div className={styles.productGrid}>
       {products.map(product => (
         <div key={product.id} className={styles.productCard}>
-          <Link href={`/catalog/${product.id}`} className={styles.cardLink}>
+          <Link href={`/producto/${product.id}`} className={styles.cardLink}>
             <div className={styles.imageArea}>
                <Image 
-                src={product.image} 
+                src={product.image || '/protein.png'} 
                 alt={product.name} 
                 width={250} 
                 height={250} 
                 className={styles.productImage}
+                unoptimized
                />
             </div>
             <div className={styles.info}>
@@ -99,21 +100,33 @@ export default function CatalogClient({ initialProducts }: CatalogClientProps) {
           /* "Lineas de Productos" View */
           <div className={styles.linesContainer}>
             {/* Featured Line */}
-            <section className={styles.categorySection}>
-              <div className={styles.sectionHeader}>
-                <h2>💣 LO MÁS <span>DESTACADO</span></h2>
-                <button className={styles.viewMore} onClick={() => setActiveCategory('Destacados')}>VER TODO</button>
-              </div>
-              {renderProductGrid(initialProducts.filter(p => p.isFeatured).slice(0, 4))}
-            </section>
+            {initialProducts.some(p => p.isFeatured) && (
+              <section className={styles.categorySection}>
+                <div className={styles.sectionHeader}>
+                  <h2>💣 LO MÁS <span>DESTACADO</span></h2>
+                  <button className={styles.viewMore} onClick={() => setActiveCategory('Destacados')}>VER TODO</button>
+                </div>
+                {renderProductGrid(initialProducts.filter(p => p.isFeatured).slice(0, 8))}
+              </section>
+            )}
 
             {/* Offers Line */}
+            {initialProducts.some(p => p.isOffer) && (
+              <section className={styles.categorySection}>
+                <div className={styles.sectionHeader}>
+                  <h2>💸 PRODUCTOS EN <span>OFERTA</span></h2>
+                  <button className={styles.viewMore} onClick={() => setActiveCategory('Oferta')}>VER TODO</button>
+                </div>
+                {renderProductGrid(initialProducts.filter(p => p.isOffer).slice(0, 8))}
+              </section>
+            )}
+
+            {/* Complete Catalog Line so every uploaded product is always visible */}
             <section className={styles.categorySection}>
               <div className={styles.sectionHeader}>
-                <h2>💸 PRODUCTOS EN <span>OFERTA</span></h2>
-                <button className={styles.viewMore} onClick={() => setActiveCategory('Oferta')}>VER TODO</button>
+                <h2>📦 CATÁLOGO <span>COMPLETO</span></h2>
               </div>
-              {renderProductGrid(initialProducts.filter(p => p.isOffer).slice(0, 4))}
+              {renderProductGrid(initialProducts)}
             </section>
           </div>
         ) : (

@@ -10,9 +10,9 @@ export default async function CatalogPage() {
   let products: any[] = [];
   
   try {
-    // Fetch real products from DB
+    // Fetch real products from DB (newest first so newly uploaded items appear immediately)
     products = await prisma.product.findMany({
-      orderBy: { id: 'asc' }
+      orderBy: { id: 'desc' }
     });
   } catch (error) {
     console.error('Catalog DB error:', error);

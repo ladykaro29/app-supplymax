@@ -1729,6 +1729,12 @@
   text-overflow: ellipsis;
 }
 
+@media (hover: none) {
+  .cardHoverOverlay {
+    display: none !important;
+  }
+}
+
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
@@ -1749,6 +1755,50 @@
     padding: 1rem;
     font-size: 1rem;
     box-shadow: 0 4px 20px rgba(0, 240, 255, 0.5);
+  }
+  /* Prevent iOS Safari forced auto-zoom on inputs (< 16px) */
+  .formInput,
+  .formSelect,
+  .formTextarea,
+  .addTagInput,
+  .searchInput {
+    font-size: 16px !important;
+  }
+  .priceGrid {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+  .modalOverlay {
+    padding: 0.5rem;
+    align-items: flex-end;
+  }
+  .modal {
+    max-height: 92dvh;
+    border-radius: 16px 16px 12px 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .modalHeader {
+    padding: 1rem 1.25rem;
+    position: sticky;
+    top: 0;
+    background: var(--color-bg-alt);
+    z-index: 5;
+  }
+  .modalBody {
+    padding: 1.15rem 1.25rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .modalFooter {
+    padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
+    position: sticky;
+    bottom: 0;
+    background: var(--color-bg-alt);
+    z-index: 5;
+  }
+  .saveBtn, .cancelBtn {
+    flex: 1;
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
   }
 }
 

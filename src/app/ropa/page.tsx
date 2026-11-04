@@ -15,7 +15,7 @@ export default async function RopaPage() {
       where: {
         category: 'Ropa'
       },
-      orderBy: { id: 'asc' }
+      orderBy: { id: 'desc' }
     });
   } catch (error) {
     console.error('Ropa DB error:', error);

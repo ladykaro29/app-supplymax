@@ -57,6 +57,14 @@ export default function RopaClient({ products }: RopaClientProps) {
     )
   );
 
+  // Any other clothing items uploaded that don't match the specific keywords above
+  const matchedIds = new Set([
+    ...coleccionBlanca.map(p => p.id),
+    ...coleccionNegra.map(p => p.id),
+    ...accesorios.map(p => p.id),
+  ]);
+  const otraIndumentaria = products.filter(p => p.stock > 0 && !matchedIds.has(p.id));
+
   // Scroll to Bolso support
   const bolsoRef = useRef<HTMLDivElement>(null);
   const [highlightBolso, setHighlightBolso] = useState(false);
@@ -93,11 +101,12 @@ export default function RopaClient({ products }: RopaClientProps) {
                  {product.goal && <div className={styles.cardBadge}>{product.goal}</div>}
                  <div className={styles.imgContainer}>
                   <Image 
-                    src={product.image} 
+                    src={product.image || '/hoodie.png'} 
                     alt={product.name} 
                     width={280} 
                     height={280} 
                     className={styles.productImage}
+                    unoptimized
                   />
                  </div>
               </div>
@@ -213,8 +222,19 @@ export default function RopaClient({ products }: RopaClientProps) {
           </section>
         )}
 
+        {/* Row 4: Nuevos Ingresos / Indumentaria General */}
+        {otraIndumentaria.length > 0 && (
+          <section className={styles.rowSection}>
+            <div className={styles.rowHeader}>
+              <h2>COLECCIÓN <span>DEPORTIVA</span></h2>
+              <p>Nuevos ingresos e indumentaria exclusiva SupplyMax</p>
+            </div>
+            {renderProductGrid(otraIndumentaria)}
+          </section>
+        )}
+
         {/* Fallback if all lists collapsed */}
-        {coleccionBlanca.length === 0 && coleccionNegra.length === 0 && accesorios.length === 0 && (
+        {coleccionBlanca.length === 0 && coleccionNegra.length === 0 && accesorios.length === 0 && otraIndumentaria.length === 0 && (
           <div className={styles.emptyState}>
             <h2>Colección agotada</h2>
             <p>Disculpe las molestias. Estamos confeccionando nuestro próximo drop de indumentaria deportiva de alta calidad.</p>

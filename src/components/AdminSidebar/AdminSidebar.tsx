@@ -50,6 +50,14 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'A';
 
+  const handleLogout = () => {
+    logout();
+    if (onClose) onClose();
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
+  };
+
   return (
     <>
       {/* Mobile backdrop */}
@@ -141,7 +149,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           </div>
           <button 
             type="button" 
-            onClick={logout} 
+            onClick={handleLogout} 
             className={styles.logoutBtn}
             title="Cerrar sesión"
           >

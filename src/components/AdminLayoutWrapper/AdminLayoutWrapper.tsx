@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAppContext } from '@/context/AppContext';
 import AdminSidebar from '@/components/AdminSidebar/AdminSidebar';
 import AdminHeader from '@/components/AdminHeader/AdminHeader';
 import styles from './AdminLayoutWrapper.module.css';
@@ -11,6 +13,16 @@ export default function AdminLayoutWrapper({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, authLoading } = useAppContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        router.replace('/login');
+      }
+    }
+  }, [user, authLoading, router]);
 
   return (
     <div className={styles.layoutContainer}>

@@ -45,11 +45,12 @@ export default function SuplementosClient({ products }: SuplementosClientProps) 
                {product.goal && <div className={styles.cardBadge}>{product.goal}</div>}
                <div className={styles.imgContainer}>
                 <Image 
-                  src={product.image} 
+                  src={product.image || '/protein.png'} 
                   alt={product.name} 
                   width={280} 
                   height={280} 
                   className={styles.productImage}
+                  unoptimized
                 />
                </div>
             </div>
