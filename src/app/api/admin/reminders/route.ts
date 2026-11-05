@@ -1,63 +1,61 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-
-export const dynamic = 'force-dynamic';
+import { ensureDatabaseSchema, sanitizeJsonPayload } from '@/lib/dbInit';
 
 export async function GET() {
   try {
-    // Find all users who have orders
+    await ensureDatabaseSchema();
+
     const orders = await prisma.order.findMany({
       where: {
-        status: 'VERIFICADO', // Only consider confirmed orders
+        status: {
+          in: ['VERIFICADO', 'COMPLETADA', 'ENTREGADO', 'ENVIADO'],
+        },
       },
       include: {
-        user: {
-          select: {
-            name: true,
-            email: true,
-          }
-        },
+        user: true,
         items: {
           include: {
-            product: true
-          }
-        }
+            product: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
     });
 
     const now = new Date();
-    const reminders: any[] = [];
+    const alerts: any[] = [];
 
-    orders.forEach(order => {
-      order.items.forEach(item => {
-        if (item.product.durationInDays) {
-          const duration = parseInt(item.product.durationInDays);
-          const purchaseDate = new Date(order.createdAt);
-          const depletionDate = new Date(purchaseDate);
-          depletionDate.setDate(purchaseDate.getDate() + duration);
+    orders.forEach((order) => {
+      const orderDate = new Date(order.createdAt);
+      const diffTime = Math.abs(now.getTime() - orderDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-          // If depletion is within 7 days from now, or already depleted
-          const diffDays = Math.ceil((depletionDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      (order.items || []).forEach((item) => {
+        const rawDuration = item.product?.durationInDays;
+        const duration = parseInt(rawDuration || '0', 10);
 
-          if (diffDays <= 7) {
-            reminders.push({
-              userName: order.user.name,
-              userEmail: order.user.email,
-              productName: item.product.name,
+        if (duration > 0) {
+          const daysRemaining = duration - diffDays;
+
+          // Alert if 5 days or fewer are left (or up to 10 days overdue)
+          if (daysRemaining <= 5 && daysRemaining >= -10) {
+            alerts.push({
+              orderId: order.id,
+              userName: order.customerName || order.user?.name || 'Cliente SupplyMax',
+              userEmail: order.customerEmail || order.user?.email || '',
+              productName: item.product?.name || 'Suplemento',
               purchaseDate: order.createdAt,
-              depletionDate,
-              daysRemaining: diffDays,
-              status: diffDays < 0 ? 'AGOTADO' : 'POR AGOTARSE'
+              daysRemaining,
+              status: daysRemaining <= 0 ? 'EXPIRADO' : 'PRÓXIMO A AGOTARSE',
             });
           }
         }
       });
     });
 
-    return NextResponse.json(reminders);
+    return NextResponse.json(sanitizeJsonPayload(alerts));
   } catch (error) {
-    console.error('Reminders API error:', error);
-    return NextResponse.json({ error: 'Error al obtener recordatorios' }, { status: 500 });
+    console.error('[REMINDERS ERROR]:', error);
+    return NextResponse.json({ error: 'Error al procesar recordatorios' }, { status: 500 });
   }
 }

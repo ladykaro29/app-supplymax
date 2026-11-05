@@ -107,7 +107,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                 {section.items.map((item) => {
                   const itemPath = item.href.split('?')[0];
                   const hasNewParam = item.href.includes('new=true');
-                  const isActive = pathname === itemPath && (!hasNewParam || pathname === itemPath);
+                  const isActive = pathname === itemPath && !hasNewParam;
 
                   return (
                     <Link

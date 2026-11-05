@@ -20,7 +20,7 @@ export default function SideMenu() {
   if (!isMenuOpen) return null;
 
   const role = (user?.role_id || '').toLowerCase().trim();
-  const isAdmin = role === 'admin';
+  const isAdmin = ['admin', 'administrador', 'subgerente'].includes(role);
   const isCoach = role === 'coach';
   const isInfluencer = role === 'influencer';
 
@@ -89,6 +89,18 @@ export default function SideMenu() {
             <div className={styles.section}>
               <span className={`${styles.sectionTitle} ${styles.adminTitle}`}>🛡️ Panel Administrativo</span>
               
+              <Link href="/admin" className={styles.navItem} onClick={() => setMenuOpen(false)}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                Panel General
+              </Link>
+              <Link href="/admin/pos" className={styles.navItem} onClick={() => setMenuOpen(false)}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="6.01" y2="8"></line><line x1="10" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="18" y2="12"></line><line x1="6" y1="16" x2="14" y2="16"></line></svg>
+                Punto de Venta (POS)
+              </Link>
+              <Link href="/admin/orders" className={styles.navItem} onClick={() => setMenuOpen(false)}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                Pedidos & Ventas
+              </Link>
               <Link href="/admin/edit-products" className={styles.navItem} onClick={() => setMenuOpen(false)}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 Catálogo de Productos

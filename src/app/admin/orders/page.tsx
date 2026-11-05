@@ -110,7 +110,7 @@ export default function AdminOrdersPage() {
   // Calculate statistics
   const totalCount = orders.length;
   const pendingCount = orders.filter(o => o.status.toUpperCase() === 'PENDIENTE').length;
-  const verifiedCount = orders.filter(o => o.status.toUpperCase() === 'VERIFICADO').length;
+  const verifiedCount = orders.filter(o => ['VERIFICADO', 'COMPLETADA', 'ENTREGADO', 'ENVIADO'].includes(o.status.toUpperCase())).length;
   const deliveredCount = orders.filter(o => o.status.toUpperCase() === 'ENTREGADO').length;
   const totalVolumeUSD = orders
     .filter(o => o.status.toUpperCase() !== 'CANCELADO')
@@ -187,6 +187,7 @@ export default function AdminOrdersPage() {
             <option value="ALL">Todos los Estados</option>
             <option value="PENDIENTE">⏳ Pendientes</option>
             <option value="VERIFICADO">✅ Verificados</option>
+            <option value="COMPLETADA">⚡ POS Completadas</option>
             <option value="ENVIADO">🚚 Enviados</option>
             <option value="ENTREGADO">📦 Entregados</option>
             <option value="CANCELADO">✕ Cancelados</option>
@@ -425,6 +426,7 @@ export default function AdminOrdersPage() {
                         alt={item.product?.name || 'Producto'} 
                         width={40} 
                         height={40} 
+                        unoptimized
                       />
                     </div>
                     <div className={styles.itemDetails}>

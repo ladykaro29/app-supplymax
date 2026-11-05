@@ -230,6 +230,7 @@ export default function PosPage() {
                         fill
                         className={styles.productImg}
                         sizes="180px"
+                        unoptimized
                       />
                     </div>
                     <h4 className={styles.productName} title={p.name}>{p.name}</h4>

@@ -138,10 +138,11 @@ export default function PerformancePage() {
   };
 
   // ----------------------------------------------------
-  // FILTERING LOGIC BY DATES
+  // FILTERING LOGIC BY DATES (excluding CANCELADO orders)
   // ----------------------------------------------------
   const filteredOrders = useMemo(() => {
     return localOrders.filter(order => {
+      if ((order.status || '').toUpperCase() === 'CANCELADO') return false;
       const orderDate = new Date(order.createdAt || order.date);
       if (startDate) {
         const start = new Date(startDate);

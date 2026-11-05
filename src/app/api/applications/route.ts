@@ -22,10 +22,11 @@ export async function POST(req: Request) {
 
     let degreesPath = '';
 
-    // Handle File Upload if present
+    // Handle File Upload if present (served via /api/uploads/[filename] in standalone mode)
     if (degreesFile && degreesFile.size > 0) {
-      const fileName = `${Date.now()}_${degreesFile.name.replace(/\s+/g, '_')}`;
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'applications');
+      const safeName = degreesFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const fileName = `app_${Date.now()}_${safeName}`;
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
       
       // Ensure directory exists
       await fs.mkdir(uploadDir, { recursive: true });
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
       const buffer = Buffer.from(await degreesFile.arrayBuffer());
       await fs.writeFile(filePath, buffer);
       
-      degreesPath = `/uploads/applications/${fileName}`;
+      degreesPath = `/api/uploads/${fileName}`;
     }
 
     const application = await prisma.application.create({
