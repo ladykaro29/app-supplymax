@@ -1,17 +1,21 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
 import { ensureDatabaseSchema, sanitizeJsonPayload } from '@/lib/dbInit';
 
 const ADMIN_FALLBACK = {
   id: 'admin-fallback-001',
-  name: 'Administrador Principal',
+  name: 'Admin Supplymax',
   email: 'admin@supplymax.app',
+  password: '123Suppli',
   role_id: 'Admin',
-  level: 'Oro',
-  sub_level: 'Elite',
+  level: 'Bronce',
+  sub_level: null,
   status: 'Active',
   tokens: 0,
+  affiliate_code: null,
+  coach_tier: null,
+  is_featured: false,
+  image: null,
   addresses: [],
 };
 
@@ -22,80 +26,81 @@ export async function POST(request: Request) {
   try {
     await ensureDatabaseSchema();
 
-    const body = await request.json();
-    const { email, password } = body;
+    const { email, password } = await request.json();
 
     if (!email || !password) {
-      return NextResponse.json({ error: 'Faltan credenciales' }, { status: 400 });
+      return NextResponse.json({ error: 'Email y contraseña son requeridos' }, { status: 400 });
     }
 
-    normalizedEmail = String(email).trim().toLowerCase();
+    normalizedEmail = String(email).toLowerCase().trim();
     rawPassword = String(password);
 
-    // Try finding user by exact email first, or case-insensitive fallback
-    let user = await prisma.user.findUnique({
-      where: { email: normalizedEmail },
-      include: { addresses: true },
-    });
-
-    if (!user && normalizedEmail !== String(email).trim()) {
-      user = await prisma.user.findUnique({
-        where: { email: String(email).trim() },
-        include: { addresses: true },
+    let user: any = null;
+    try {
+      user = await prisma.user.findFirst({
+        where: {
+          email: {
+            equals: normalizedEmail,
+          },
+        },
+        include: {
+          addresses: true,
+        },
       });
+    } catch (dbError: any) {
+      console.error(`[LOGIN DB ERROR] ${dbError.message}`);
     }
 
-    // Master Admin Credential Check (creates/ensures real DB record so orders & foreign keys always work)
-    if (
-      (normalizedEmail === 'admin@supplymax.app' || normalizedEmail === 'admin@supplymax.com') &&
-      rawPassword === 'admin123'
-    ) {
-      if (!user) {
+    // Fallback: if DB lookup failed or user not found, check hardcoded admin and ensure DB record
+    if (!user) {
+      if (
+        normalizedEmail === ADMIN_FALLBACK.email &&
+        (rawPassword === ADMIN_FALLBACK.password || rawPassword === 'admin123')
+      ) {
         try {
-          const hashedPassword = await bcrypt.hash('admin123', 10);
           user = await prisma.user.create({
             data: {
-              name: 'Administrador Principal',
-              email: normalizedEmail,
-              password: hashedPassword,
+              name: ADMIN_FALLBACK.name,
+              email: ADMIN_FALLBACK.email,
+              password: ADMIN_FALLBACK.password,
               role_id: 'Admin',
-              level: 'Oro',
-              sub_level: 'Elite',
               status: 'Active',
-              tokens: 0,
             },
             include: { addresses: true },
           });
+          const { password: _, ...adminWithoutPassword } = user;
+          return NextResponse.json(sanitizeJsonPayload(adminWithoutPassword));
         } catch {
-          return NextResponse.json(sanitizeJsonPayload(ADMIN_FALLBACK));
+          const { password: _, ...adminWithoutPassword } = ADMIN_FALLBACK;
+          return NextResponse.json(sanitizeJsonPayload(adminWithoutPassword));
         }
-      } else {
-        const { password: _, ...adminWithoutPassword } = user;
-        return NextResponse.json(sanitizeJsonPayload(adminWithoutPassword));
       }
-    }
 
-    if (!user) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
-    const isPasswordValid = await bcrypt.compare(rawPassword, user.password);
+    const isAdminMaster =
+      normalizedEmail === ADMIN_FALLBACK.email &&
+      (rawPassword === ADMIN_FALLBACK.password || rawPassword === 'admin123');
 
-    if (!isPasswordValid) {
+    if (user.password !== rawPassword && !isAdminMaster) {
       return NextResponse.json({ error: 'Contraseña incorrecta' }, { status: 401 });
     }
 
     const { password: _, ...userWithoutPassword } = user;
     return NextResponse.json(sanitizeJsonPayload(userWithoutPassword));
-  } catch (error) {
+  } catch (error: any) {
     console.error('[LOGIN ERROR]:', error);
-    // Guarantee admin access even if database has connection/migration issues
     if (
-      (normalizedEmail === 'admin@supplymax.app' || normalizedEmail === 'admin@supplymax.com') &&
-      rawPassword === 'admin123'
+      normalizedEmail === ADMIN_FALLBACK.email &&
+      (rawPassword === ADMIN_FALLBACK.password || rawPassword === 'admin123')
     ) {
-      return NextResponse.json(sanitizeJsonPayload(ADMIN_FALLBACK));
+      const { password: _, ...adminWithoutPassword } = ADMIN_FALLBACK;
+      return NextResponse.json(sanitizeJsonPayload(adminWithoutPassword));
     }
-    return NextResponse.json({ error: 'Error en el servidor al iniciar sesión' }, { status: 500 });
+    return NextResponse.json(
+      { error: `Error en el servidor: ${error.message || 'Error desconocido'}` },
+      { status: 500 }
+    );
   }
 }

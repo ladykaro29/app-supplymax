@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
 import { ensureDatabaseSchema, sanitizeJsonPayload } from '@/lib/dbInit';
 
 export async function POST(request: Request) {
@@ -11,7 +10,7 @@ export async function POST(request: Request) {
     const { name, email, password, role_id, phone, idNumber, newsletter } = body;
 
     if (!name || !email || !password) {
-      return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
+      return NextResponse.json({ error: 'Todos los campos son obligatorios' }, { status: 400 });
     }
 
     const normalizedEmail = String(email).trim().toLowerCase();
@@ -21,10 +20,8 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
-      return NextResponse.json({ error: 'El correo electrónico ya está registrado' }, { status: 400 });
+      return NextResponse.json({ error: 'El email ya está registrado' }, { status: 400 });
     }
-
-    const hashedPassword = await bcrypt.hash(String(password), 10);
 
     let user: any;
     try {
@@ -32,11 +29,11 @@ export async function POST(request: Request) {
         data: {
           name: String(name).trim(),
           email: normalizedEmail,
-          password: hashedPassword,
-          role_id: role_id || 'User',
+          password: String(password),
           phone: phone ? String(phone).trim() : null,
           idNumber: idNumber ? String(idNumber).trim() : null,
-          newsletter: newsletter !== undefined ? Boolean(newsletter) : true,
+          newsletter: typeof newsletter === 'boolean' ? newsletter : true,
+          role_id: role_id || 'User',
           status: role_id === 'Coach' || role_id === 'Influencer' ? 'Pending' : 'Active',
         },
       });
@@ -46,7 +43,7 @@ export async function POST(request: Request) {
         data: {
           name: String(name).trim(),
           email: normalizedEmail,
-          password: hashedPassword,
+          password: String(password),
           role_id: role_id || 'User',
           status: role_id === 'Coach' || role_id === 'Influencer' ? 'Pending' : 'Active',
         },
@@ -56,9 +53,9 @@ export async function POST(request: Request) {
     const { password: _, ...userWithoutPassword } = user;
     return NextResponse.json(sanitizeJsonPayload(userWithoutPassword));
   } catch (error: any) {
-    console.error('[REGISTER ERROR]:', error);
+    console.error('Registration error:', error);
     return NextResponse.json(
-      { error: error?.message || 'Error al registrar usuario' },
+      { error: error?.message || 'Error en el servidor al registrar' },
       { status: 500 }
     );
   }
